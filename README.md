@@ -24,6 +24,6 @@ Scorecard is a web application that allows Decadevs extracts the weekly performa
 The Decadev logs  into the application and views the weekly performance result for that week while also has the option to compare the recent performance records against past performance records. The Decadev can also take the skill test to get evaluation on their skill level .
  
 ## Product Scope
-Extract Decadev record from performance tReview process
-A change in how decadevs take their growth process 
-A change in how progress is tracked
+- Extract Decadev record from performance Review process
+- A change in how decadevs take their growth process 
+- A change in how progress is tracked
