@@ -52,29 +52,31 @@ const passwordHandler = async (password: string) => {
 };
 
 const superAdminValidator = () => {
-    return Joi.object({
-        firstname: Joi.string().required(),
-        lastname: Joi.string().required(),
-        email: Joi.string().email().required(),
-        stack: Joi.string().required(),
-        squad: Joi.string().required(),
-        password: Joi.string().required(),
-        phone: Joi.string().required(),
-        confirmPassword: Joi.string().required()
-    })
-}
-
+  return Joi.object({
+    firstname: Joi.string().required(),
+    lastname: Joi.string().required(),
+    email: Joi.string().email().required(),
+    stack: Joi.string().required(),
+    squad: Joi.string().required(),
+    password: Joi.string().required(),
+    phone: Joi.string().required(),
+    confirmPassword: Joi.string().required(),
+  });
+};
 
 function passwordChange() {
-    return Joi.object({
-        newPassword: Joi.string().required(),
-        confirmPassword: Joi.string().required(),
-    });
+  return Joi.object({
+    newPassword: Joi.string().required(),
+    confirmPassword: Joi.string().required(),
+  });
 }
 
-
-
-module.exports = { superAdminValidator, userLogin, passwordHandler, generateToken, passwordChange, generateToken,
-  userRegistration,
+module.exports = {
+  superAdminValidator,
+  userLogin,
+  passwordHandler,
+  generateToken,
+  passwordChange,
   userUpdate,
-  userStatus }
+  userStatus,
+};

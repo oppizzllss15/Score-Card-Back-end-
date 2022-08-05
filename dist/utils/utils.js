@@ -54,7 +54,7 @@ const superAdminValidator = () => {
         squad: Joi.string().required(),
         password: Joi.string().required(),
         phone: Joi.string().required(),
-        confirmPassword: Joi.string().required()
+        confirmPassword: Joi.string().required(),
     });
 };
 function passwordChange() {
@@ -63,7 +63,12 @@ function passwordChange() {
         confirmPassword: Joi.string().required(),
     });
 }
-module.exports = { superAdminValidator, userLogin, passwordHandler, generateToken, passwordChange, generateToken,
-    userRegistration,
+module.exports = {
+    superAdminValidator,
+    userLogin,
+    passwordHandler,
+    generateToken,
+    passwordChange,
     userUpdate,
-    userStatus };
+    userStatus,
+};
