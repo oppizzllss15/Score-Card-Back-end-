@@ -5,6 +5,55 @@ const { generateToken, userRegistration, userUpdate, userLogin, userStatus, pass
 const asyncHandler = require("express-async-handler");
 const bcrypt = require("bcryptjs");
 const User = require("../models/user.model");
+const userProfile = asyncHandler(async (req, res) => {
+    const id = req.cookies.Id;
+    if (!id) {
+        res.status(400);
+        throw new Error("Provide user id");
+    }
+    const findUser = await User.findById(id);
+    if (findUser) {
+        res.status(201).json({
+            firstname: findUser.firstname,
+            lastname: findUser.lastname,
+            email: findUser.email,
+            phone: findUser.phone,
+            stack: findUser.stack,
+            squad: findUser.squad,
+        });
+    }
+    else {
+        res.status(404).json({ message: "User not found" });
+    }
+});
+const changeUserPhoneNumber = asyncHandler(async (req, res) => {
+    const id = req.cookies.Id;
+    if (!id) {
+        res.status(400);
+        throw new Error("Provide user id");
+    }
+    if (!req.body.phone) {
+        res.status(400);
+        throw new Error("Provide user new phone number");
+    }
+    const findUser = await User.findById(id);
+    if (findUser) {
+        await User.updateOne({ _id: id }, { phone: req.body.phone });
+        const changedNo = await User.findById(id);
+        console.log(changedNo);
+        res.status(201).json({
+            firstname: findUser.firstname,
+            lastname: findUser.lastname,
+            email: findUser.email,
+            phone: changedNo.phone,
+            stack: findUser.stack,
+            squad: findUser.squad,
+        });
+    }
+    else {
+        res.status(404).json({ message: "User not found" });
+    }
+});
 const registerUser = asyncHandler(async (req, res) => {
     const { firstname, lastname, email, password, confirmPassword, phone, squad, stack, } = req.body;
     await userRegistration().validateAsync({
@@ -56,7 +105,10 @@ const loginUser = asyncHandler(async (req, res) => {
         }
         if (await bcrypt.compare(password, user[0].password)) {
             const token = generateToken(user[0]._id);
-            res.status(201).json({ token, usser: user[0] });
+            res.cookie("Token", token);
+            res.cookie("Name", user[0].firstname);
+            res.cookie("Id", user[0]._id);
+            res.status(201).json({ token, user: user[0] });
         }
         else {
             res.status(404).json({ message: "Invalid password" });
@@ -104,12 +156,16 @@ const updateUser = asyncHandler(async (req, res) => {
 const deactivateUser = asyncHandler(async (req, res) => {
     await userStatus().validateAsync({
         email: req.body.email,
-        status: req.body.status
+        status: req.body.status,
     });
     const { email, status } = req.body;
     const findUser = await User.find({ email: email.toLowerCase() });
     if (findUser.length > 0) {
-        const deactivateUserAccount = await User.updateOne({ email: email.toLowerCase() }, { status: status.toLowerCase() === "active" ? status.toLowerCase() : "deactivated" });
+        const deactivateUserAccount = await User.updateOne({ email: email.toLowerCase() }, {
+            status: status.toLowerCase() === "active"
+                ? status.toLowerCase()
+                : "deactivated",
+        });
         res
             .status(201)
             .json({ message: "Updated successfully", deactivateUserAccount });
@@ -127,7 +183,9 @@ const deleteUser = asyncHandler(async (req, res) => {
     const findUser = await User.findById(id);
     if (findUser) {
         await findUser.remove();
-        res.status(201).json({ message: `${findUser.email} with id ${id} has been removed` });
+        res
+            .status(201)
+            .json({ message: `${findUser.email} with id ${id} has been removed` });
     }
     else {
         res.status(404).json({ message: "User not found" });
@@ -139,4 +197,6 @@ module.exports = {
     updateUser,
     deactivateUser,
     deleteUser,
+    userProfile,
+    changeUserPhoneNumber
 };

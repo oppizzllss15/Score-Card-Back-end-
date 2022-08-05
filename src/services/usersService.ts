@@ -1,5 +1,16 @@
 const nodemailer = require("nodemailer");
-import { HttpError } from "http-errors";
+
+const transporter = nodemailer.createTransport({
+  service: "gmail",
+  auth: {
+    type: "OAuth2",
+    user: process.env.EMAIL_USERNAME,
+    pass: process.env.PASSWORD,
+    clientId: process.env.CLIENT_ID,
+    clientSecret: process.env.CLIENT_SECRET,
+    refreshToken: process.env.REFRESH_TOKEN,
+  },
+});
 
 const mailMessage = (mail: string, firstname: string, password: string) => {
   return {
@@ -10,23 +21,19 @@ const mailMessage = (mail: string, firstname: string, password: string) => {
   };
 };
 
-const transporter = nodemailer.createTransport({
-  host: "smtp.mailtrap.io",
-  port: 2525,
-  auth: {
-    user: process.env.USER_NAME,
-    pass: process.env.USER_SECRET,
-  },
-});
-
-const messageTransporter = async (mail: string, firstname: string, password: string) => {
-  await transporter.sendMail(mailMessage(mail, firstname, password), function (err: HttpError, info: object) {
-    if (err) {
-      console.log(err.message);
-    } else {
+const messageTransporter = async (
+  mail: string,
+  firstname: string,
+  password: string
+) => {
+  transporter.sendMail(
+    mailMessage(mail, firstname, password),
+    function (error: string, info: string) {
+      if (error) throw Error(error);
+      console.log("Email Sent Successfully");
       console.log(info);
     }
-  });
+  );
 };
 
 module.exports = { messageTransporter };

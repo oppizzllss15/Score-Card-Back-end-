@@ -12,6 +12,58 @@ const bcrypt = require("bcryptjs");
 const User = require("../models/user.model");
 import { Request, Response } from "express";
 
+const userProfile = asyncHandler(async (req: Request, res: Response) => {
+  const id = req.cookies.Id;
+  if (!id) {
+    res.status(400);
+    throw new Error("Provide user id");
+  }
+
+  const findUser = await User.findById(id);
+  if (findUser) {
+    res.status(201).json({
+      firstname: findUser.firstname,
+      lastname: findUser.lastname,
+      email: findUser.email,
+      phone: findUser.phone,
+      stack: findUser.stack,
+      squad: findUser.squad,
+    });
+  } else {
+    res.status(404).json({ message: "User not found" });
+  }
+});
+
+const changeUserPhoneNumber = asyncHandler(async (req: Request, res: Response) => {
+  const id = req.cookies.Id;
+  if (!id) {
+    res.status(400);
+    throw new Error("Provide user id");
+  }
+
+  if (!req.body.phone) {
+    res.status(400);
+    throw new Error("Provide user new phone number");
+  }
+
+  const findUser = await User.findById(id);
+  if (findUser) {
+    await User.updateOne({ _id: id }, { phone: req.body.phone });
+    const changedNo = await User.findById(id);
+    console.log(changedNo);
+    res.status(201).json({
+      firstname: findUser.firstname,
+      lastname: findUser.lastname,
+      email: findUser.email,
+      phone: changedNo.phone,
+      stack: findUser.stack,
+      squad: findUser.squad,
+    });
+  } else {
+    res.status(404).json({ message: "User not found" });
+  }
+});
+
 const registerUser = asyncHandler(async (req: Request, res: Response) => {
   const {
     firstname,
@@ -81,7 +133,11 @@ const loginUser = asyncHandler(async (req: Request, res: Response) => {
 
     if (await bcrypt.compare(password, user[0].password)) {
       const token = generateToken(user[0]._id);
-      res.status(201).json({ token, usser: user[0] });
+      res.cookie("Token", token);
+      res.cookie("Name", user[0].firstname);
+      res.cookie("Id", user[0]._id);
+
+      res.status(201).json({ token, user: user[0] });
     } else {
       res.status(404).json({ message: "Invalid password" });
       return;
@@ -132,15 +188,20 @@ const updateUser = asyncHandler(async (req: Request, res: Response) => {
 const deactivateUser = asyncHandler(async (req: Request, res: Response) => {
   await userStatus().validateAsync({
     email: req.body.email,
-    status: req.body.status
-  })
+    status: req.body.status,
+  });
   const { email, status } = req.body;
 
   const findUser = await User.find({ email: email.toLowerCase() });
   if (findUser.length > 0) {
     const deactivateUserAccount = await User.updateOne(
       { email: email.toLowerCase() },
-      { status: status.toLowerCase() === "active" ? status.toLowerCase() : "deactivated"},
+      {
+        status:
+          status.toLowerCase() === "active"
+            ? status.toLowerCase()
+            : "deactivated",
+      }
     );
 
     res
@@ -152,7 +213,7 @@ const deactivateUser = asyncHandler(async (req: Request, res: Response) => {
 });
 
 const deleteUser = asyncHandler(async (req: Request, res: Response) => {
-    const id = req.params.id;
+  const id = req.params.id;
   if (!id) {
     res.status(400);
     throw new Error("Provide user email address");
@@ -162,7 +223,9 @@ const deleteUser = asyncHandler(async (req: Request, res: Response) => {
   if (findUser) {
     await findUser.remove();
 
-    res.status(201).json({ message: `${findUser.email} with id ${id} has been removed`});
+    res
+      .status(201)
+      .json({ message: `${findUser.email} with id ${id} has been removed` });
   } else {
     res.status(404).json({ message: "User not found" });
   }
@@ -174,4 +237,6 @@ module.exports = {
   updateUser,
   deactivateUser,
   deleteUser,
+  userProfile,
+  changeUserPhoneNumber
 };
