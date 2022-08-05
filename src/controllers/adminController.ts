@@ -2,8 +2,7 @@ import { Request, Response } from "express";
 import Joi, { ValidationResult } from "joi";
 import bcrypt from "bcrypt";
 import { IAdmin } from "../typings";
-import { isPropertyInDatabase, addAdmin, editAdmin, editAdminStatus, removeAdmin } from "../services/adminService";
-import { Admin } from "../models";
+import { isPropertyInDatabase, addAdmin, editAdmin, editAdminStatus, removeAdmin,  getAdminById } from "../services/adminService";
 require('dotenv').config();
 const uuidv1 = require('uuid');
 
@@ -19,6 +18,14 @@ const adminRegistrationSchema = Joi.object({
 });
 
 // console.log(dpass("une"))
+export async function getAdmin(req: Request, res: Response) {
+  try{
+    const admim = await getAdminById(req.params.adminId)
+    if(admim) return res.status(200).send({data: admim, message: "Admin data got successfully"})
+
+    return res.status(400).send({error: true, message: "no admin found"})
+  }catch(err){res.status(400).send("error getting admin")}
+}
 
 export async function createAdmin(req: Request, res: Response) {
   const validation: ValidationResult = adminRegistrationSchema.validate(
@@ -59,7 +66,7 @@ export async function updateAdmin(req: Request, res: Response) {
 
   const adminId = req.params.adminId || req.body.adminId;
   const result = await editAdmin(adminId, req.body);
-    console.log(JSON.stringify(req.body)+  "the body")
+
   if (!result) {
     return res.status(400).send({ message: "unable to register" });
   }

@@ -14,10 +14,20 @@ export async function addAdmin(admin: IAdmin) {
 export async function editAdmin(adminid: string, admin: IAdmin) {
   try {
     const newAdmin = await Admin.findByIdAndUpdate(adminid, {
-        $set: {
-            ...admin
-        }
+      $set: {
+        ...admin,
+      },
     });
+    return newAdmin ? newAdmin : null;
+  } catch (err) {
+    handleError(err);
+  }
+}
+
+//get admin
+export async function getAdminById(adminid: string) {
+  try {
+    const newAdmin = await Admin.findById(adminid);
     return newAdmin ? newAdmin : null;
   } catch (err) {
     handleError(err);

@@ -3,7 +3,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.deactivateAdmin = exports.activateAdmin = exports.deleteAdmin = exports.updateAdmin = exports.createAdmin = void 0;
+exports.deactivateAdmin = exports.activateAdmin = exports.deleteAdmin = exports.updateAdmin = exports.createAdmin = exports.getAdmin = void 0;
 const joi_1 = __importDefault(require("joi"));
 const bcrypt_1 = __importDefault(require("bcrypt"));
 const adminService_1 = require("../services/adminService");
@@ -19,6 +19,18 @@ const adminRegistrationSchema = joi_1.default.object({
     role: joi_1.default.string(),
 });
 // console.log(dpass("une"))
+async function getAdmin(req, res) {
+    try {
+        const admim = await (0, adminService_1.getAdminById)(req.params.adminId);
+        if (admim)
+            return res.status(200).send({ data: admim, message: "Admin data got successfully" });
+        return res.status(400).send({ error: true, message: "no admin found" });
+    }
+    catch (err) {
+        res.status(400).send("error getting admin");
+    }
+}
+exports.getAdmin = getAdmin;
 async function createAdmin(req, res) {
     const validation = adminRegistrationSchema.validate(req.body);
     if (validation.error)
@@ -46,7 +58,6 @@ async function updateAdmin(req, res) {
         return res.status(400).send({ message: "Registration Detail: " + validation.error.message, });
     const adminId = req.params.adminId || req.body.adminId;
     const result = await (0, adminService_1.editAdmin)(adminId, req.body);
-    console.log(JSON.stringify(req.body) + "the body");
     if (!result) {
         return res.status(400).send({ message: "unable to register" });
     }

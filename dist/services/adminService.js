@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.isPropertyInDatabase = exports.removeAdmin = exports.editAdminStatus = exports.editAdmin = exports.addAdmin = void 0;
+exports.isPropertyInDatabase = exports.removeAdmin = exports.editAdminStatus = exports.getAdminById = exports.editAdmin = exports.addAdmin = void 0;
 const models_1 = require("../models");
 //create admin
 async function addAdmin(admin) {
@@ -18,8 +18,8 @@ async function editAdmin(adminid, admin) {
     try {
         const newAdmin = await models_1.Admin.findByIdAndUpdate(adminid, {
             $set: {
-                ...admin
-            }
+                ...admin,
+            },
         });
         return newAdmin ? newAdmin : null;
     }
@@ -28,6 +28,17 @@ async function editAdmin(adminid, admin) {
     }
 }
 exports.editAdmin = editAdmin;
+//get admin
+async function getAdminById(adminid) {
+    try {
+        const newAdmin = await models_1.Admin.findById(adminid);
+        return newAdmin ? newAdmin : null;
+    }
+    catch (err) {
+        handleError(err);
+    }
+}
+exports.getAdminById = getAdminById;
 //edit admin activate or deactivated
 async function editAdminStatus(adminid, status) {
     try {
