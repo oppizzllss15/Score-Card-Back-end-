@@ -1,9 +1,17 @@
-const express = require('express');
+const express = require("express");
 const router = express.Router();
-import { Request, Response } from 'express';
+const {
+  registerUser,
+  loginUser,
+  updateUser,
+  deactivateUser,
+  deleteUser,
+} = require("../controllers/users.controller");
 
-router.get('/', (req: Request, res: Response) => {
-  res.json({message: "Welcome!"});
-});
+router.post("/create", registerUser);
+router.post("/login", loginUser);
+router.post("/update/:id", updateUser);
+router.post("/delete/:id", deleteUser);
+router.post("/deactivate", deactivateUser);
 
 module.exports = router;
