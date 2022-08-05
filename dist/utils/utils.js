@@ -45,11 +45,25 @@ const passwordHandler = async (password) => {
     const hashedPassword = await bcrypt.hash(password, salt);
     return hashedPassword;
 };
-module.exports = {
-    generateToken,
-    userRegistration,
-    userLogin,
-    passwordHandler,
-    userUpdate,
-    userStatus
+const superAdminValidator = () => {
+    return Joi.object({
+        firstname: Joi.string().required(),
+        lastname: Joi.string().required(),
+        email: Joi.string().email().required(),
+        stack: Joi.string().required(),
+        squad: Joi.string().required(),
+        password: Joi.string().required(),
+        phone: Joi.string().required(),
+        confirmPassword: Joi.string().required()
+    });
 };
+function passwordChange() {
+    return Joi.object({
+        newPassword: Joi.string().required(),
+        confirmPassword: Joi.string().required(),
+    });
+}
+module.exports = { superAdminValidator, userLogin, passwordHandler, generateToken, passwordChange, generateToken,
+    userRegistration,
+    userUpdate,
+    userStatus };
