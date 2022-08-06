@@ -2,6 +2,7 @@ let app;
 const request = require('supertest');
 const { connectDB, disconnectDB} = require('../../app/dbsetup')
 
+
 let adminId = "";
 describe("should create an admin",  () => {
     beforeAll( async () => { await connectDB(); app = require('../appp' ); })
@@ -57,7 +58,4 @@ describe("should create an admin",  () => {
         adminId = JSON.parse(res.text).data._id;
         //console.log(adminId + " admin id")
     });
-
-
-    
 })
