@@ -10,7 +10,21 @@ const {
 const asyncHandler = require("express-async-handler");
 const bcrypt = require("bcryptjs");
 const User = require("../models/user.model");
-import { Request, Response } from "express";
+import { Request, Response, NextFunction } from "express";
+
+const userProfileImage = asyncHandler(
+  async (req: Request, res: Response, next: NextFunction) => {
+    if (req.file === undefined) return res.send("you must select a file.");
+    const id = req.cookies.Id;
+    await User.updateOne(
+      { _id: id },
+      { profile_img: req.file?.path, cloudinary_id: req.file?.filename }
+    );
+    const findUser = await User.findById(id);
+
+    res.status(201).json({ message: "Uploaded file successfully", findUser });
+  }
+);
 
 const userProfile = asyncHandler(async (req: Request, res: Response) => {
   const id = req.cookies.Id;
@@ -34,35 +48,37 @@ const userProfile = asyncHandler(async (req: Request, res: Response) => {
   }
 });
 
-const changeUserPhoneNumber = asyncHandler(async (req: Request, res: Response) => {
-  const id = req.cookies.Id;
-  if (!id) {
-    res.status(400);
-    throw new Error("Provide user id");
-  }
+const changeUserPhoneNumber = asyncHandler(
+  async (req: Request, res: Response) => {
+    const id = req.cookies.Id;
+    if (!id) {
+      res.status(400);
+      throw new Error("Provide user id");
+    }
 
-  if (!req.body.phone) {
-    res.status(400);
-    throw new Error("Provide user new phone number");
-  }
+    if (!req.body.phone) {
+      res.status(400);
+      throw new Error("Provide user new phone number");
+    }
 
-  const findUser = await User.findById(id);
-  if (findUser) {
-    await User.updateOne({ _id: id }, { phone: req.body.phone });
-    const changedNo = await User.findById(id);
-    console.log(changedNo);
-    res.status(201).json({
-      firstname: findUser.firstname,
-      lastname: findUser.lastname,
-      email: findUser.email,
-      phone: changedNo.phone,
-      stack: findUser.stack,
-      squad: findUser.squad,
-    });
-  } else {
-    res.status(404).json({ message: "User not found" });
+    const findUser = await User.findById(id);
+    if (findUser) {
+      await User.updateOne({ _id: id }, { phone: req.body.phone });
+      const changedNo = await User.findById(id);
+
+      res.status(201).json({
+        firstname: findUser.firstname,
+        lastname: findUser.lastname,
+        email: findUser.email,
+        phone: changedNo.phone,
+        stack: findUser.stack,
+        squad: findUser.squad,
+      });
+    } else {
+      res.status(404).json({ message: "User not found" });
+    }
   }
-});
+);
 
 const registerUser = asyncHandler(async (req: Request, res: Response) => {
   const {
@@ -110,8 +126,7 @@ const registerUser = asyncHandler(async (req: Request, res: Response) => {
 
   if (user) {
     await messageTransporter(email, firstname, password);
-    const token = generateToken(user._id);
-    res.status(201).json({ token, user });
+    res.status(201).json({ user });
   }
 });
 
@@ -238,5 +253,6 @@ module.exports = {
   deactivateUser,
   deleteUser,
   userProfile,
-  changeUserPhoneNumber
+  changeUserPhoneNumber,
+  userProfileImage,
 };

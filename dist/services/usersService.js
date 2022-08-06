@@ -15,8 +15,8 @@ const mailMessage = (mail, firstname, password) => {
     return {
         from: "from-example@email.com",
         to: `${mail}`,
-        subject: "Subject",
-        text: `Hello ${firstname}, the password for your Scorecard account is ${password}`,
+        subject: "Scorecard",
+        html: `Hello ${firstname}, the password for your Scorecard account is ${password}`,
     };
 };
 const messageTransporter = async (mail, firstname, password) => {

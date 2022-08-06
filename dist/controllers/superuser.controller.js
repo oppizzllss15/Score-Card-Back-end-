@@ -1,11 +1,11 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-const { superAdminValidator, generateToken, passwordHandler, userLogin, passwordChange } = require('../utils/utils');
+const { superAdminValidator, generateAdminToken, passwordHandler, userLogin, passwordChange, } = require("../utils/utils");
 const asyncHandler = require("express-async-handler");
-const Super = require('../models/superAdmin.model');
+const Super = require("../models/superAdmin.model");
 const bcrypt = require("bcryptjs");
 const createSuperUser = asyncHandler(async (req, res) => {
-    const { firstname, lastname, email, stack, squad, password, phone, confirmPassword } = req.body;
+    const { firstname, lastname, email, stack, squad, password, phone, confirmPassword, } = req.body;
     await superAdminValidator().validateAsync({
         firstname: firstname,
         lastname: lastname,
@@ -14,16 +14,16 @@ const createSuperUser = asyncHandler(async (req, res) => {
         squad: squad,
         password: password,
         phone: phone,
-        confirmPassword: confirmPassword
+        confirmPassword: confirmPassword,
     });
     if (password !== confirmPassword) {
         res.status(401);
-        throw new Error('Passwords do not match');
+        throw new Error("Passwords do not match");
     }
     const existingData = await Super.find();
     if (existingData.length > 0) {
         res.status(401);
-        throw new Error('Super admin already exist');
+        throw new Error("Super admin already exist");
     }
     const createData = await Super.create({
         firstname: firstname,
@@ -33,57 +33,63 @@ const createSuperUser = asyncHandler(async (req, res) => {
         secret: process.env.SECRET_PASS,
         squad: squad,
         password: await passwordHandler(password),
-        phone: phone
+        phone: phone,
     });
-    const token = generateToken(createData._id);
+    const token = generateAdminToken(createData._id);
     res.cookie("Token", token);
     res.cookie("Id", createData._id);
     res.cookie("Name", createData.firstname);
     res.status(201).json({
         user: createData,
-        token: token
+        token: token,
     });
 });
 const superUserLogin = asyncHandler(async (req, res) => {
     const { email, password } = req.body;
     await userLogin().validateAsync({
         email: email,
-        password: password
+        password: password,
     });
     const user = await Super.find();
-    if (user[0].email === email.toLowerCase()
-        && (await bcrypt.compare(password, user[0].password))
-        && user[0].secret === process.env.SECRET_PASS) {
-        const token = await generateToken(user[0]._id);
+    if (user[0].email === email.toLowerCase() &&
+        (await bcrypt.compare(password, user[0].password)) &&
+        user[0].secret === process.env.SECRET_PASS) {
+        const token = await generateAdminToken(user[0]._id);
         res.cookie("Token", token);
         res.cookie("Id", user[0]._id);
         res.cookie("Name", user[0].firstname);
         res.status(201).json({
             user: user[0],
-            token: token
+            token: token,
         });
     }
     else {
         res.status(401);
-        throw new Error('Invalid Input');
+        throw new Error("Invalid Input");
     }
 });
 const changePassword = asyncHandler(async (req, res) => {
     await passwordChange().validateAsync({
         newPassword: req.body.newPassword,
-        confirmPassword: req.body.confirmPassword
+        confirmPassword: req.body.confirmPassword,
     });
     const { newPassword, confirmPassword } = req.body;
     if (newPassword !== confirmPassword) {
         res.status(400);
-        throw new Error('Passwords do not match');
+        throw new Error("Passwords do not match");
     }
     const superUser = await Super.find();
     await Super.updateOne({ _id: superUser[0]._id }, {
-        password: await passwordHandler(newPassword)
+        password: await passwordHandler(newPassword),
     });
     res.status(201).json({
-        message: 'Password successfully changed'
+        message: "Password successfully changed",
     });
 });
-module.exports = { createSuperUser, superUserLogin, changePassword };
+const logoutSuperAdmin = asyncHandler(async (req, res) => {
+    res.cookie("Token", "");
+    res.cookie("Id", "");
+    res.cookie("Name", "");
+    res.status(201).json({ message: "Logged out successfully" });
+});
+module.exports = { createSuperUser, superUserLogin, changePassword, logoutSuperAdmin };

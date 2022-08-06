@@ -1,22 +1,19 @@
 var express = require("express");
 var router = express.Router();
-const { protect} = require("../middlewares/authenticate")
+const { protect } = require("../middlewares/authenticate")
 const {
-  registerUser,
   loginUser,
-  updateUser,
-  deactivateUser,
-  deleteUser,
   userProfile,
-  changeUserPhoneNumber
+  changeUserPhoneNumber,
+  userProfileImage
 } = require("../controllers/users.controller");
+const {storage} = require("../services/uploads")
+import multer from "multer";
+const uploads = multer({storage})
 
-router.post("/create", registerUser);
-router.post("/login", loginUser);
-router.post("/update/:id", updateUser);
-router.post("/delete/:id", deleteUser);
-router.post("/deactivate", deactivateUser);
 router.get("/profile", protect, userProfile);
+router.post("/login", loginUser);
+router.post("/upload", protect, uploads.single("file"), userProfileImage);
 router.post("/change/phone", protect, changeUserPhoneNumber);
 
 module.exports = router;

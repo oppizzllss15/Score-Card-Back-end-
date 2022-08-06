@@ -5,6 +5,15 @@ const { generateToken, userRegistration, userUpdate, userLogin, userStatus, pass
 const asyncHandler = require("express-async-handler");
 const bcrypt = require("bcryptjs");
 const User = require("../models/user.model");
+const userProfileImage = asyncHandler(async (req, res, next) => {
+    var _a, _b;
+    if (req.file === undefined)
+        return res.send("you must select a file.");
+    const id = req.cookies.Id;
+    await User.updateOne({ _id: id }, { profile_img: (_a = req.file) === null || _a === void 0 ? void 0 : _a.path, cloudinary_id: (_b = req.file) === null || _b === void 0 ? void 0 : _b.filename });
+    const findUser = await User.findById(id);
+    res.status(201).json({ message: "Uploaded file successfully", findUser });
+});
 const userProfile = asyncHandler(async (req, res) => {
     const id = req.cookies.Id;
     if (!id) {
@@ -40,7 +49,6 @@ const changeUserPhoneNumber = asyncHandler(async (req, res) => {
     if (findUser) {
         await User.updateOne({ _id: id }, { phone: req.body.phone });
         const changedNo = await User.findById(id);
-        console.log(changedNo);
         res.status(201).json({
             firstname: findUser.firstname,
             lastname: findUser.lastname,
@@ -86,8 +94,7 @@ const registerUser = asyncHandler(async (req, res) => {
     });
     if (user) {
         await messageTransporter(email, firstname, password);
-        const token = generateToken(user._id);
-        res.status(201).json({ token, user });
+        res.status(201).json({ user });
     }
 });
 const loginUser = asyncHandler(async (req, res) => {
@@ -198,5 +205,6 @@ module.exports = {
     deactivateUser,
     deleteUser,
     userProfile,
-    changeUserPhoneNumber
+    changeUserPhoneNumber,
+    userProfileImage,
 };

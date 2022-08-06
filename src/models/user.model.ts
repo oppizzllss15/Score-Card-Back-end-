@@ -9,7 +9,7 @@ const userData = UserDb.Schema({
   profile_img: String,
   cloudinary_id: String,
   stack: String,
-  squad: String,
+  squad: Number,
   grades: [
     {
       week: Number,

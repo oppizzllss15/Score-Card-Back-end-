@@ -16,8 +16,8 @@ const mailMessage = (mail: string, firstname: string, password: string) => {
   return {
     from: "from-example@email.com",
     to: `${mail}`,
-    subject: "Subject",
-    text: `Hello ${firstname}, the password for your Scorecard account is ${password}`,
+    subject: "Scorecard",
+    html: `Hello ${firstname}, the password for your Scorecard account is ${password}`,
   };
 };
 

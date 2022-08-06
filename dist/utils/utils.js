@@ -7,6 +7,11 @@ const generateToken = (id) => {
         expiresIn: "3d",
     });
 };
+const generateAdminToken = (id) => {
+    return jwt.sign({ id }, process.env.SECRET_PASS, {
+        expiresIn: "3d",
+    });
+};
 function userRegistration() {
     return Joi.object({
         firstname: Joi.string().required(),
@@ -15,17 +20,17 @@ function userRegistration() {
         password: Joi.string().min(8).required(),
         confirmPassword: Joi.string().min(8).required(),
         phone: Joi.string().required(),
-        squad: Joi.string().required(),
+        squad: Joi.number().required(),
         stack: Joi.string().required(),
     });
 }
 function userUpdate() {
     return Joi.object({
-        firstname: Joi.string().required(),
-        lastname: Joi.string().required(),
-        phone: Joi.string().required(),
-        squad: Joi.string().required(),
-        stack: Joi.string().required(),
+        firstname: Joi.string(),
+        lastname: Joi.string(),
+        phone: Joi.string(),
+        squad: Joi.number(),
+        stack: Joi.string(),
     });
 }
 function userLogin() {
@@ -66,8 +71,10 @@ function passwordChange() {
 module.exports = {
     superAdminValidator,
     userLogin,
+    userRegistration,
     passwordHandler,
     generateToken,
+    generateAdminToken,
     passwordChange,
     userUpdate,
     userStatus,
