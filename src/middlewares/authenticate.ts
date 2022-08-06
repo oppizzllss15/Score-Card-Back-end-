@@ -41,11 +41,12 @@ const protect = asyncHandler(async (req: Request, res: Response, next: NextFunct
 
 const superAdminProtect = asyncHandler(async (req: Request, res: Response, next: NextFunction) => {
     let token = req.cookies.Token
+    console.log(token)
 
     if (token) {
         try {
-            if (process.env.JWT_SECRET) {
-                await jwt.verify(token, process.env.JWT_SECRET);
+            if (process.env.SECRET_PASS) {
+                await jwt.verify(token, process.env.SECRET_PASS);
                 const user = await AdminModel.find()
                 if (user[0].secret === process.env.SECRET_PASS) {
                     next();
@@ -62,7 +63,7 @@ const superAdminProtect = asyncHandler(async (req: Request, res: Response, next:
         try {
             token = req.headers.authorization.split(' ')[1]
 
-            await jwt.verify(token, process.env.JWT_SECRET)
+            await jwt.verify(token, process.env.SECRET_PASS)
             const user = await AdminModel.find()
             if (user[0].secret === process.env.SECRET_PASS) {
                 next();
@@ -74,8 +75,8 @@ const superAdminProtect = asyncHandler(async (req: Request, res: Response, next:
     }
 
     if (!token) {
-        res.status(401)
-        throw new Error('Not authorized, no token')
+      res.status(401);
+      throw new Error("Provide token for authentication");
     }
 })
 

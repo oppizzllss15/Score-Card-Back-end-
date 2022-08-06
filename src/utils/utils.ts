@@ -8,6 +8,12 @@ const generateToken = (id: string) => {
   });
 };
 
+const generateAdminToken = (id: string) => {
+  return jwt.sign({ id }, process.env.SECRET_PASS, {
+    expiresIn: "3d",
+  });
+};
+
 function userRegistration() {
   return Joi.object({
     firstname: Joi.string().required(),
@@ -16,18 +22,18 @@ function userRegistration() {
     password: Joi.string().min(8).required(),
     confirmPassword: Joi.string().min(8).required(),
     phone: Joi.string().required(),
-    squad: Joi.string().required(),
+    squad: Joi.number().required(),
     stack: Joi.string().required(),
   });
 }
 
 function userUpdate() {
   return Joi.object({
-    firstname: Joi.string().required(),
-    lastname: Joi.string().required(),
-    phone: Joi.string().required(),
-    squad: Joi.string().required(),
-    stack: Joi.string().required(),
+    firstname: Joi.string(),
+    lastname: Joi.string(),
+    phone: Joi.string(),
+    squad: Joi.number(),
+    stack: Joi.string(),
   });
 }
 
@@ -52,29 +58,33 @@ const passwordHandler = async (password: string) => {
 };
 
 const superAdminValidator = () => {
-    return Joi.object({
-        firstname: Joi.string().required(),
-        lastname: Joi.string().required(),
-        email: Joi.string().email().required(),
-        stack: Joi.string().required(),
-        squad: Joi.string().required(),
-        password: Joi.string().required(),
-        phone: Joi.string().required(),
-        confirmPassword: Joi.string().required()
-    })
-}
-
+  return Joi.object({
+    firstname: Joi.string().required(),
+    lastname: Joi.string().required(),
+    email: Joi.string().email().required(),
+    stack: Joi.string().required(),
+    squad: Joi.string().required(),
+    password: Joi.string().required(),
+    phone: Joi.string().required(),
+    confirmPassword: Joi.string().required(),
+  });
+};
 
 function passwordChange() {
-    return Joi.object({
-        newPassword: Joi.string().required(),
-        confirmPassword: Joi.string().required(),
-    });
+  return Joi.object({
+    newPassword: Joi.string().required(),
+    confirmPassword: Joi.string().required(),
+  });
 }
 
-
-
-module.exports = { superAdminValidator, userLogin, passwordHandler, generateToken, passwordChange, generateToken,
+module.exports = {
+  superAdminValidator,
+  userLogin,
   userRegistration,
+  passwordHandler,
+  generateToken,
+  generateAdminToken,
+  passwordChange,
   userUpdate,
-  userStatus }
+  userStatus,
+};

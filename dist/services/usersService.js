@@ -1,30 +1,30 @@
 "use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
 const nodemailer = require("nodemailer");
+const transporter = nodemailer.createTransport({
+    service: "gmail",
+    auth: {
+        type: "OAuth2",
+        user: process.env.EMAIL_USERNAME,
+        pass: process.env.PASSWORD,
+        clientId: process.env.CLIENT_ID,
+        clientSecret: process.env.CLIENT_SECRET,
+        refreshToken: process.env.REFRESH_TOKEN,
+    },
+});
 const mailMessage = (mail, firstname, password) => {
     return {
         from: "from-example@email.com",
         to: `${mail}`,
-        subject: "Subject",
-        text: `Hello ${firstname}, the password for your Scorecard account is ${password}`,
+        subject: "Scorecard",
+        html: `Hello ${firstname}, the password for your Scorecard account is ${password}`,
     };
 };
-const transporter = nodemailer.createTransport({
-    host: "smtp.mailtrap.io",
-    port: 2525,
-    auth: {
-        user: process.env.USER_NAME,
-        pass: process.env.USER_SECRET,
-    },
-});
 const messageTransporter = async (mail, firstname, password) => {
-    await transporter.sendMail(mailMessage(mail, firstname, password), function (err, info) {
-        if (err) {
-            console.log(err.message);
-        }
-        else {
-            console.log(info);
-        }
+    transporter.sendMail(mailMessage(mail, firstname, password), function (error, info) {
+        if (error)
+            throw Error(error);
+        console.log("Email Sent Successfully");
+        console.log(info);
     });
 };
 module.exports = { messageTransporter };

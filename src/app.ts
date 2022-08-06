@@ -6,7 +6,6 @@ require('dotenv').config();
 import { Request, Response, NextFunction} from 'express';
 const { connectDB } = require('./database/db');
 connectDB();
-const { errorHandler } = require("./middlewares/errorHandler")
 
 const usersRouter = require('./routes/users');
 const superAdminRouter = require('./routes/superAdmin.route');
