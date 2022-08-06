@@ -15,7 +15,7 @@ router.get('/superuser/logout', logoutSuperAdmin);
 router.post('/change/password', superAdminProtect, changePassword);
 router.post("/user/create", superAdminProtect, registerUser);
 router.post("/user/update/:id", superAdminProtect, updateUser);
-router.post("/user/delete/:id", superAdminProtect, deleteUser);
+router.get("/user/delete/:id", superAdminProtect, deleteUser);
 router.post("/user/deactivate", superAdminProtect, deactivateUser);
 
 module.exports = router;
