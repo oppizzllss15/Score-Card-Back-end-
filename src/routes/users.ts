@@ -3,6 +3,7 @@ var router = express.Router();
 const { protect } = require("../middlewares/authenticate")
 const {
   loginUser,
+  logoutUser,
   userProfile,
   changeUserPhoneNumber,
   userProfileImage
@@ -13,6 +14,7 @@ const uploads = multer({storage})
 
 router.get("/profile", protect, userProfile);
 router.post("/login", loginUser);
+router.get('/logout', logoutUser);
 router.post("/upload", protect, uploads.single("file"), userProfileImage);
 router.post("/change/phone", protect, changeUserPhoneNumber);
 

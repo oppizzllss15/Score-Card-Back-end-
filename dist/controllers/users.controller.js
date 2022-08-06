@@ -198,9 +198,16 @@ const deleteUser = asyncHandler(async (req, res) => {
         res.status(404).json({ message: "User not found" });
     }
 });
+const logoutUser = asyncHandler(async (req, res) => {
+    res.cookie("Token", "");
+    res.cookie("Id", "");
+    res.cookie("Name", "");
+    res.status(201).json({ message: "Logged out successfully" });
+});
 module.exports = {
     registerUser,
     loginUser,
+    logoutUser,
     updateUser,
     deactivateUser,
     deleteUser,

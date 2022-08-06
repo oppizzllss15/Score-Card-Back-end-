@@ -246,9 +246,18 @@ const deleteUser = asyncHandler(async (req: Request, res: Response) => {
   }
 });
 
+const logoutUser = asyncHandler(async (req: Request, res: Response) => {
+  res.cookie("Token", "");
+  res.cookie("Id", "");
+  res.cookie("Name", "");
+
+  res.status(201).json({ message: "Logged out successfully" });
+});
+
 module.exports = {
   registerUser,
   loginUser,
+  logoutUser,
   updateUser,
   deactivateUser,
   deleteUser,

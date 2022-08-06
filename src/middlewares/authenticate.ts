@@ -63,7 +63,7 @@ const superAdminProtect = asyncHandler(async (req: Request, res: Response, next:
         try {
             token = req.headers.authorization.split(' ')[1]
 
-            await jwt.verify(token, process.env.JWT_SECRET)
+            await jwt.verify(token, process.env.SECRET_PASS)
             const user = await AdminModel.find()
             if (user[0].secret === process.env.SECRET_PASS) {
                 next();
