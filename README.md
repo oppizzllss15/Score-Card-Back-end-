@@ -16,8 +16,8 @@ Imagine a process where no one has to take and share screenshots every week to t
 Not only is this less stressful, it is a more effective way for decadevs to also monitor and track their performance..
 
 ## Users
-Decadevs 
-Admin
+- Decadevs 
+- Admin
 
 ## Product Description
 Scorecard is a web application that allows Decadevs extracts the weekly performance records of a decadev from the performance tracker and stores this record for future reference purposes. It also allows the Decadevs to take skill based tests in order to get a skill proficiency evaluation.
