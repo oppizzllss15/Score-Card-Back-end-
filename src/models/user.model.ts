@@ -1,3 +1,5 @@
+import { Double } from "mongodb";
+
 const UserDb = require("mongoose");
 
 const userData = UserDb.Schema({

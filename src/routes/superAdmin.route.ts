@@ -5,7 +5,9 @@ const {
     registerUser,
     updateUser,
     deactivateUser,
-    deleteUser
+  deleteUser,
+  calScore,
+    getScores
   } = require("../controllers/users.controller");
 const { superAdminProtect } = require('../middlewares/authenticate')
 
@@ -17,5 +19,7 @@ router.post("/user/create", superAdminProtect, registerUser);
 router.post("/user/update/:id", superAdminProtect, updateUser);
 router.post("/user/delete/:id", superAdminProtect, deleteUser);
 router.post("/user/deactivate", superAdminProtect, deactivateUser);
+router.post("/user/calculate/score/:id", superAdminProtect, calScore);
+router.get("/user/getscores/:id", superAdminProtect, getScores);  
 
 module.exports = router;
