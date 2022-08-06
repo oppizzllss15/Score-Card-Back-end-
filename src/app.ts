@@ -7,7 +7,7 @@ import { Request, Response, NextFunction} from 'express';
 const { connectDB } = require('./database/db');
 connectDB();
 
-const usersRouter = require('./routes/users');
+const usersRouter = require('./routes/users.route');
 const superAdminRouter = require('./routes/superAdmin.route');
 
 const app = express();
