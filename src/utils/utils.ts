@@ -77,6 +77,16 @@ function passwordChange() {
   });
 }
 
+function score() {
+  return Joi.object({
+     week: Joi.number().required(),
+     agile: Joi.number().max(100).min(0).required(),
+     weekly_task: Joi.number().max(100).min(0).required(),
+     assessment: Joi.number().max(100).min(0).required(),
+     algorithm: Joi.number().max(100).min(0).required(),
+  });
+}
+
 module.exports = {
   superAdminValidator,
   userLogin,
@@ -87,4 +97,5 @@ module.exports = {
   passwordChange,
   userUpdate,
   userStatus,
+  score,
 };

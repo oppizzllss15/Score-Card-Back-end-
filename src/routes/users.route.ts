@@ -6,7 +6,8 @@ const {
   logoutUser,
   userProfile,
   changeUserPhoneNumber,
-  userProfileImage
+  userProfileImage,
+  getScores
 } = require("../controllers/users.controller");
 const {storage} = require("../services/uploads")
 import multer from "multer";
@@ -17,5 +18,6 @@ router.post("/login", loginUser);
 router.get('/logout', logoutUser);
 router.post("/upload", protect, uploads.single("file"), userProfileImage);
 router.post("/change/phone", protect, changeUserPhoneNumber);
+router.get("/getscores/:id",protect, getScores);
 
 module.exports = router;
