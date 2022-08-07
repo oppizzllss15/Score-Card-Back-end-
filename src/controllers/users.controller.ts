@@ -11,6 +11,7 @@ const {
 const asyncHandler = require("express-async-handler");
 const bcrypt = require("bcryptjs");
 const User = require("../models/user.model");
+const randomPass = require("pino-password")
 import { Request, Response, NextFunction } from "express";
 
 const userProfileImage = asyncHandler(
@@ -86,9 +87,6 @@ const registerUser = asyncHandler(async (req: Request, res: Response) => {
     firstname,
     lastname,
     email,
-    password,
-    confirmPassword,
-    phone,
     squad,
     stack,
   } = req.body;
@@ -96,17 +94,13 @@ const registerUser = asyncHandler(async (req: Request, res: Response) => {
     firstname: firstname,
     lastname: lastname,
     email: email,
-    password: password,
-    confirmPassword: confirmPassword,
-    phone: phone,
     squad: squad,
     stack: stack,
   });
 
-  if (password !== confirmPassword) {
-    res.status(400);
-    throw new Error("Passwords do not match");
-  }
+  const pass = new randomPass()
+  const password = pass.generatePassword(firstname)
+  console.log(password)
 
   const userExists = await User.find({ email: email.toLowerCase() });
 
@@ -120,7 +114,6 @@ const registerUser = asyncHandler(async (req: Request, res: Response) => {
     lastname,
     email: email.toLowerCase(),
     password: await passwordHandler(password),
-    phone,
     squad,
     stack,
   });

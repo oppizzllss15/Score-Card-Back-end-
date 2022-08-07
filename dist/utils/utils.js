@@ -17,9 +17,6 @@ const userRegistration = () => {
         firstname: Joi.string().required(),
         lastname: Joi.string().required(),
         email: Joi.string().email().required(),
-        password: Joi.string().min(8).required(),
-        confirmPassword: Joi.string().min(8).required(),
-        phone: Joi.string().required(),
         squad: Joi.number().required(),
         stack: Joi.string().required(),
     });
