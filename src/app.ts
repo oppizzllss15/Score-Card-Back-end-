@@ -8,7 +8,7 @@ const { connectDB } = require('./database/db');
 connectDB();
 
 const usersRouter = require('./routes/users.route');
-const superAdminRouter = require('./routes/superAdmin.route');
+const superAdminRouter = require('./routes/superadmin.route');
 
 const app = express();
 

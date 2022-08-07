@@ -5,6 +5,7 @@ const { generateToken, userRegistration, userUpdate, userLogin, userStatus, pass
 const asyncHandler = require("express-async-handler");
 const bcrypt = require("bcryptjs");
 const User = require("../models/user.model");
+const randomPass = require("pino-password");
 const userProfileImage = asyncHandler(async (req, res, next) => {
     var _a, _b;
     if (req.file === undefined)
@@ -63,21 +64,17 @@ const changeUserPhoneNumber = asyncHandler(async (req, res) => {
     }
 });
 const registerUser = asyncHandler(async (req, res) => {
-    const { firstname, lastname, email, password, confirmPassword, phone, squad, stack, } = req.body;
+    const { firstname, lastname, email, squad, stack, } = req.body;
     await userRegistration().validateAsync({
         firstname: firstname,
         lastname: lastname,
         email: email,
-        password: password,
-        confirmPassword: confirmPassword,
-        phone: phone,
         squad: squad,
         stack: stack,
     });
-    if (password !== confirmPassword) {
-        res.status(400);
-        throw new Error("Passwords do not match");
-    }
+    const pass = new randomPass();
+    const password = pass.generatePassword(firstname);
+    console.log(password);
     const userExists = await User.find({ email: email.toLowerCase() });
     if (userExists.length > 0) {
         res.status(400);
@@ -88,7 +85,6 @@ const registerUser = asyncHandler(async (req, res) => {
         lastname,
         email: email.toLowerCase(),
         password: await passwordHandler(password),
-        phone,
         squad,
         stack,
     });
