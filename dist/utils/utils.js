@@ -8,6 +8,11 @@ const generateToken = (id) => {
     });
 };
 const generateAdminToken = (id) => {
+    return jwt.sign({ id }, process.env.ADMIN_PASS, {
+        expiresIn: "3d",
+    });
+};
+const generateSuperAdminToken = (id) => {
     return jwt.sign({ id }, process.env.SECRET_PASS, {
         expiresIn: "3d",
     });
@@ -74,6 +79,14 @@ const score = () => {
         algorithm: Joi.number().max(100).min(0).required(),
     });
 };
+const adminRegistrationSchema = Joi.object({
+    firstname: Joi.string().min(3).required(),
+    lastname: Joi.string().min(3).required(),
+    email: Joi.string().email().required(),
+    stack: Joi.string().required(),
+    squad: Joi.string().required(),
+    role: Joi.string(),
+});
 module.exports = {
     superAdminValidator,
     userLogin,
@@ -81,8 +94,10 @@ module.exports = {
     passwordHandler,
     generateToken,
     generateAdminToken,
+    generateSuperAdminToken,
     passwordChange,
     userUpdate,
     userStatus,
     score,
+    adminRegistrationSchema
 };

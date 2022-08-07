@@ -1,4 +1,6 @@
 NODE_ENV = environment
 JWT_SECRET = aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+ADMIN_PASS = shhaglkjnvmlzhglshvvshgsbh
+
 PORT = 5000
 MONGO_URI = mongodb+srv://usernam:password@bankcluster.akkbjv8.mongodb.net/<Project>?retryWrites=true&w=majority

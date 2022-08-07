@@ -8,7 +8,7 @@ const adminSchema = new Schema(
       unique: true,
     },
     password: String,
-    profilepicture: String,
+    profile_img: String,
     stack: {
       type: Schema.Types.ObjectId,
       ref: "stack",

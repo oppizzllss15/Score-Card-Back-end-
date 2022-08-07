@@ -1,6 +1,16 @@
 var express = require("express");
 var router = express.Router();
 const {
+  activateAdmin,
+  createAdmin,
+  setdminActivationStatus,
+  deleteAdmin,
+  getAdmin,
+  updateAdmin,
+  loginAdmin
+} = require("../controllers/adminController");
+
+const {
   createSuperUser,
   superUserLogin,
   changePassword,
@@ -15,7 +25,7 @@ const {
   calScore,
   getScores,
 } = require("../controllers/users.controller");
-const { superAdminProtect } = require("../middlewares/authenticate");
+const { superAdminProtect, adminProtect } = require("../middlewares/authenticate");
 const {storage} = require("../services/uploads")
 import multer from "multer";
 const uploads = multer({storage})
@@ -32,5 +42,13 @@ router.get("/user/delete/:id", superAdminProtect, deleteUser);
 router.post("/user/deactivate", superAdminProtect, deactivateUser);
 router.post("/user/calculate/score/:id", superAdminProtect, calScore);
 router.get("/user/getscores/:id", superAdminProtect, getScores);
+
+//functons on admin
+router.post("/admin/login", loginAdmin);
+router.get("/admin/:adminId", superAdminProtect,  getAdmin);
+router.post("/admin/create", superAdminProtect,  createAdmin);
+router.put("/admin/update/:adminId", adminProtect,  updateAdmin);
+router.delete("/admin/delete/:adminId", superAdminProtect, deleteAdmin);
+router.put("/admin/deactivate/:adminId/:action", superAdminProtect, setdminActivationStatus );
 
 module.exports = router;

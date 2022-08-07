@@ -1,6 +1,6 @@
 const {
   superAdminValidator,
-  generateAdminToken,
+  generateSuperAdminToken,
   passwordHandler,
   userLogin,
   passwordChange,
@@ -54,7 +54,7 @@ const createSuperUser = asyncHandler(async (req: Request, res: Response) => {
     phone: phone,
   });
 
-  const token = generateAdminToken(createData._id);
+  const token = generateSuperAdminToken(createData._id);
   res.cookie("Token", token);
   res.cookie("Id", createData._id);
   res.cookie("Name", createData.firstname);
@@ -79,7 +79,7 @@ const superUserLogin = asyncHandler(async (req: Request, res: Response) => {
     (await bcrypt.compare(password, user[0].password)) &&
     user[0].secret === process.env.SECRET_PASS
   ) {
-    const token = await generateAdminToken(user[0]._id);
+    const token = await generateSuperAdminToken(user[0]._id);
 
     res.cookie("Token", token);
     res.cookie("Id", user[0]._id);
@@ -94,6 +94,7 @@ const superUserLogin = asyncHandler(async (req: Request, res: Response) => {
     throw new Error("Invalid Input");
   }
 });
+
 
 const changePassword = asyncHandler(async (req: Request, res: Response) => {
   await passwordChange().validateAsync({
@@ -120,6 +121,7 @@ const changePassword = asyncHandler(async (req: Request, res: Response) => {
   });
 });
 
+
 const superUserProfileImage = asyncHandler(
   async (req: Request, res: Response, next: NextFunction) => {
     if (req.file === undefined) return res.send("you must select a file.");
@@ -143,6 +145,11 @@ const logoutSuperAdmin = asyncHandler(async (req: Request, res: Response) => {
 
   res.status(201).json({ message: "Logged out successfully" });
 });
+
+
+
+//ADMIN FUNCTIONS
+
 
 module.exports = {
   createSuperUser,

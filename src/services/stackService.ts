@@ -1,4 +1,4 @@
-import {Stack} from '../models/index'
+import {Stack} from '../models/admin.model'
 import { IStack } from '../typings'
 export async function createStack(stack: IStack){
     try{
