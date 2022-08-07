@@ -14,7 +14,7 @@ const generateAdminToken = (id: string) => {
   });
 };
 
-function userRegistration() {
+const userRegistration = () => {
   return Joi.object({
     firstname: Joi.string().required(),
     lastname: Joi.string().required(),
@@ -27,7 +27,7 @@ function userRegistration() {
   });
 }
 
-function userUpdate() {
+const userUpdate = () => {
   return Joi.object({
     firstname: Joi.string(),
     lastname: Joi.string(),
@@ -37,14 +37,14 @@ function userUpdate() {
   });
 }
 
-function userLogin() {
+const userLogin = () => {
   return Joi.object({
     email: Joi.string().required(),
     password: Joi.string().required(),
   });
 }
 
-function userStatus() {
+const userStatus = () => {
   return Joi.object({
     email: Joi.string().required(),
     status: Joi.string().required(),
@@ -70,14 +70,14 @@ const superAdminValidator = () => {
   });
 };
 
-function passwordChange() {
+const passwordChange = () => {
   return Joi.object({
     newPassword: Joi.string().required(),
     confirmPassword: Joi.string().required(),
   });
 }
 
-function score() {
+const score = () => {
   return Joi.object({
      week: Joi.number().required(),
      agile: Joi.number().max(100).min(0).required(),
