@@ -36,7 +36,6 @@ const protect = asyncHandler(async (req, res, next) => {
 });
 const superAdminProtect = asyncHandler(async (req, res, next) => {
     let token = req.cookies.Token;
-    console.log(token);
     if (token) {
         try {
             if (process.env.SECRET_PASS) {
