@@ -41,7 +41,6 @@ const protect = asyncHandler(async (req: Request, res: Response, next: NextFunct
 
 const superAdminProtect = asyncHandler(async (req: Request, res: Response, next: NextFunction) => {
     let token = req.cookies.Token
-    console.log(token)
 
     if (token) {
         try {

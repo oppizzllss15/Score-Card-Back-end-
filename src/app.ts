@@ -12,6 +12,7 @@ const adminRouter = require("./routes/admin");
 const stackRouter = require("./routes/stack");
 const superAdminRouter = require('./routes/superAdmin.route');
 
+
 const app = express();
 
 app.use(logger('dev'));
@@ -22,7 +23,7 @@ app.use(cookieParser());
 app.use('/users', usersRouter);
 app.use("/admin", adminRouter);
 app.use("/stack", stackRouter);
-app.use('/admin', superAdminRouter);
+app.use('/superadmin', superAdminRouter);
 app.use(errorHandler)
 
 app.use((req: Request, res: Response, next: NextFunction) => {

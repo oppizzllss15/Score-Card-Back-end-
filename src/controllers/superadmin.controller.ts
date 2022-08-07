@@ -6,7 +6,7 @@ const {
   passwordChange,
 } = require("../utils/utils");
 const asyncHandler = require("express-async-handler");
-import { Request, Response } from "express";
+import { Request, Response, NextFunction } from "express";
 const Super = require("../models/superAdmin.model");
 const bcrypt = require("bcryptjs");
 
@@ -120,6 +120,22 @@ const changePassword = asyncHandler(async (req: Request, res: Response) => {
   });
 });
 
+const superUserProfileImage = asyncHandler(
+  async (req: Request, res: Response, next: NextFunction) => {
+    if (req.file === undefined) return res.send("you must select a file.");
+    const id = req.cookies.Id;
+    await Super.updateOne(
+      { _id: id },
+      { profile_img: req.file?.path, cloudinary_id: req.file?.filename }
+    );
+    const findSuper = await Super.find();
+
+    res
+      .status(201)
+      .json({ message: "Uploaded file successfully", user: findSuper[0] });
+  }
+);
+
 const logoutSuperAdmin = asyncHandler(async (req: Request, res: Response) => {
   res.cookie("Token", "");
   res.cookie("Id", "");
@@ -128,4 +144,10 @@ const logoutSuperAdmin = asyncHandler(async (req: Request, res: Response) => {
   res.status(201).json({ message: "Logged out successfully" });
 });
 
-module.exports = { createSuperUser, superUserLogin, changePassword, logoutSuperAdmin };
+module.exports = {
+  createSuperUser,
+  superUserLogin,
+  changePassword,
+  superUserProfileImage,
+  logoutSuperAdmin,
+};
