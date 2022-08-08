@@ -26,6 +26,28 @@ const stacksShield = asyncHandler(
   }
 );
 
+const stacksShield2 = asyncHandler(
+  async (req: Request, res: Response, next: NextFunction) => {
+    const userID = req.cookies.uID;
+    const superUser = await SuperUser.findOne({ _id: userID });
+    const admin = await Admin.findOne({ _id: userID });
+    if (admin) next();
+    else if (superUser) {
+      res.status(200).json({
+        status: "Success",
+        message: `Hi SuperAdmin, please view all stacks`
+      })
+    }
+    else {
+      res.status(403).json({
+        status: "Failed",
+        message: "Access Denied.",
+      });
+      return;
+    }
+  }
+);
+
 const viewAllStacks = asyncHandler(async (req: Request, res: Response) => {
   const allStacks = await Stacks.find({}, { _id: 0, __v: 0 });
 
@@ -36,6 +58,19 @@ const viewAllStacks = asyncHandler(async (req: Request, res: Response) => {
     },
   });
   return;
+});
+
+const viewStack = asyncHandler(async (req: Request, res: Response) => {
+  const userID = req.cookies.uID;
+  const admin = await Admin.findOne({ _id: userID });
+  const stack = admin.stack.type;
+  const adminStack = await Stacks.findOne({ name: stack });
+
+  res.status(200).json({
+    status: "Success",
+    message: adminStack,
+  });
+  return
 });
 
 const createStack = asyncHandler(async (req: Request, res: Response) => {
@@ -91,4 +126,6 @@ module.exports = {
   editStack,
   deleteStack,
   viewAllStacks,
+  viewStack,
+  stacksShield,
 };

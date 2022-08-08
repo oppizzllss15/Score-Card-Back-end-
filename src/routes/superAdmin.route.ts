@@ -4,6 +4,7 @@ const {
   createSuperUser,
   superUserLogin,
   changePassword,
+  
 } = require("../controllers/superuser.controller");
 const { superAdminProtect } = require("../middlewares/authenticate");
 const {
@@ -11,12 +12,16 @@ const {
   editStack,
   deleteStack,
   viewAllStacks,
+  viewStack,
+  stacksShield,
+  stacksShield2,
 } = require("../controllers/stackController");
 
-router.get("/Stacks", viewAllStacks);
-router.post("/createStack", createStack);
-router.post("/editStack/:id", editStack);
-router.post("/deleteStack/:id", deleteStack);
+router.get("/Stacks", stacksShield, viewAllStacks);
+router.get("/Stack", stacksShield2, viewStack);
+router.post("/createStack", superAdminProtect, createStack);
+router.post("/editStack/:id", superAdminProtect, editStack);
+router.post("/deleteStack/:id", superAdminProtect, deleteStack);
 
 router.post("/superuser/create", createSuperUser);
 router.post("/superuser/login", superUserLogin);

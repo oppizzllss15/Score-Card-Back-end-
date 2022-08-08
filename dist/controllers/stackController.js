@@ -25,6 +25,26 @@ const stacksShield = asyncHandler(async (req, res, next) => {
         return;
     }
 });
+const stacksShield2 = asyncHandler(async (req, res, next) => {
+    const userID = req.cookies.uID;
+    const superUser = await SuperUser.findOne({ _id: userID });
+    const admin = await Admin.findOne({ _id: userID });
+    if (admin)
+        next();
+    else if (superUser) {
+        res.status(200).json({
+            status: "Success",
+            message: `Hi SuperAdmin, please view all stacks`
+        });
+    }
+    else {
+        res.status(403).json({
+            status: "Failed",
+            message: "Access Denied.",
+        });
+        return;
+    }
+});
 const viewAllStacks = asyncHandler(async (req, res) => {
     const allStacks = await Stacks.find({}, { _id: 0, __v: 0 });
     res.status(200).json({
@@ -32,6 +52,17 @@ const viewAllStacks = asyncHandler(async (req, res) => {
         message: {
             allStacks,
         },
+    });
+    return;
+});
+const viewStack = asyncHandler(async (req, res) => {
+    const userID = req.cookies.uID;
+    const admin = await Admin.findOne({ _id: userID });
+    const stack = admin.stack.type;
+    const adminStack = await Stacks.findOne({ name: stack });
+    res.status(200).json({
+        status: "Success",
+        message: adminStack,
     });
     return;
 });
@@ -77,4 +108,6 @@ module.exports = {
     editStack,
     deleteStack,
     viewAllStacks,
+    viewStack,
+    stacksShield,
 };
