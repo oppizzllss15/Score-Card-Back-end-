@@ -16,13 +16,11 @@ const {
 } = require("../controllers/stackController");
 
 const {
-  activateAdmin,
   createAdmin,
   setdminActivationStatus,
   deleteAdmin,
   getAdmin,
-  updateAdmin,
-  loginAdmin
+  updateAdmin
 } = require("../controllers/adminController");
 
 const {
@@ -40,8 +38,6 @@ const {
   calScore,
   getScores,
 } = require("../controllers/users.controller");
-
-
 
 router.post("/superuser/create", createSuperUser);
 router.post("/superuser/login", superUserLogin);
@@ -64,6 +60,7 @@ router.post("/deleteStack/:id", superAdminProtect, deleteStack);
 
 //functons on admin
 router.post("/admin/login", loginAdmin);
+//functions on admin
 router.get("/admin/:adminId", superAdminProtect,  getAdmin);
 router.post("/admin/create", superAdminProtect,  createAdmin);
 router.put("/admin/update/:adminId", adminProtect,  updateAdmin);

@@ -8,6 +8,7 @@ const { connectDB } = require('./database/db');
 connectDB();
 
 const usersRouter = require('./routes/users');
+const adminRouter = require('./routes/admin.route');
 const superAdminRouter = require('./routes/superAdmin.route');
 
 
@@ -19,6 +20,7 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 
 app.use('/users', usersRouter);
+app.use('/admin', adminRouter);
 app.use('/superadmin', superAdminRouter);
 app.use(errorHandler)
 

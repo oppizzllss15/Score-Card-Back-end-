@@ -10,7 +10,7 @@ const { storage } = require("../services/uploads");
 const multer_1 = __importDefault(require("multer"));
 const uploads = (0, multer_1.default)({ storage });
 const { createStack, editStack, deleteStack, viewAllStacks, viewStack, stacksShield, stacksShield2, } = require("../controllers/stackController");
-const { activateAdmin, createAdmin, setdminActivationStatus, deleteAdmin, getAdmin, updateAdmin, loginAdmin } = require("../controllers/adminController");
+const { createAdmin, setdminActivationStatus, deleteAdmin, getAdmin, updateAdmin } = require("../controllers/adminController");
 const { createSuperUser, superUserLogin, changePassword, superUserProfileImage, logoutSuperAdmin, } = require("../controllers/superuser.controller");
 const { registerUser, updateUser, deactivateUser, deleteUser, calScore, getScores, } = require("../controllers/users.controller");
 router.post("/superuser/create", createSuperUser);
@@ -31,6 +31,7 @@ router.post("/editStack/:id", superAdminProtect, editStack);
 router.post("/deleteStack/:id", superAdminProtect, deleteStack);
 //functons on admin
 router.post("/admin/login", loginAdmin);
+//functions on admin
 router.get("/admin/:adminId", superAdminProtect, getAdmin);
 router.post("/admin/create", superAdminProtect, createAdmin);
 router.put("/admin/update/:adminId", adminProtect, updateAdmin);

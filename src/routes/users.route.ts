@@ -9,7 +9,7 @@ const {
   userProfileImage,
   getScores
 } = require("../controllers/users.controller");
-const {storage} = require("../services/uploads")
+const {storage} = require("../utils/upload")
 import multer from "multer";
 const uploads = multer({storage})
 

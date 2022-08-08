@@ -1,0 +1,1 @@
+const Super = require("../models/superAdmin.model");

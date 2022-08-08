@@ -6,7 +6,7 @@ import express, { Request, Response, NextFunction } from "express";
 
 const stacksShield = asyncHandler(
   async (req: Request, res: Response, next: NextFunction) => {
-    const userID = req.cookies.uID;
+    const userID = req.cookies.Id;
     const superUser = await SuperUser.findOne({ _id: userID });
     const admin = await Admin.findOne({ _id: userID });
     if (superUser) next();
@@ -28,7 +28,7 @@ const stacksShield = asyncHandler(
 
 const stacksShield2 = asyncHandler(
   async (req: Request, res: Response, next: NextFunction) => {
-    const userID = req.cookies.uID;
+    const userID = req.cookies.Id;
     const superUser = await SuperUser.findOne({ _id: userID });
     const admin = await Admin.findOne({ _id: userID });
     if (admin) next();
@@ -61,10 +61,10 @@ const viewAllStacks = asyncHandler(async (req: Request, res: Response) => {
 });
 
 const viewStack = asyncHandler(async (req: Request, res: Response) => {
-  const userID = req.cookies.uID;
+  const userID = req.cookies.Id;
   const admin = await Admin.findOne({ _id: userID });
   const stack = admin.stack.type;
-  const adminStack = await Stacks.findOne({ name: stack });
+  const adminStack = await Stacks.find({ _id: stack });
 
   res.status(200).json({
     status: "Success",

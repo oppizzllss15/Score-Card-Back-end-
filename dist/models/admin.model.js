@@ -23,7 +23,7 @@ var __importStar = (this && this.__importStar) || function (mod) {
     return result;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.Admin = exports.Stack = void 0;
+exports.Admin = void 0;
 const mongoose_1 = __importStar(require("mongoose"));
 const adminSchema = new mongoose_1.Schema({
     firstname: String,
@@ -34,16 +34,15 @@ const adminSchema = new mongoose_1.Schema({
     },
     password: String,
     profile_img: String,
-    stack: {
-        type: mongoose_1.Schema.Types.ObjectId,
-        ref: "stack",
-    },
+    cloudinary_id: String,
+    stack: [
+        {
+            type: mongoose_1.Schema.Types.ObjectId,
+            ref: "stack",
+        },
+    ],
     squad: Number,
     role: String,
-    activationStatus: { type: Boolean, default: false }
+    activationStatus: { type: Boolean, default: false },
 }, { timestamps: true });
-const stackSchema = new mongoose_1.Schema({
-    name: String,
-}, { timestamps: true });
-exports.Stack = mongoose_1.default.model("stack", stackSchema);
 exports.Admin = mongoose_1.default.model("admin", adminSchema);
