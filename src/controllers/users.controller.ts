@@ -119,7 +119,7 @@ const registerUser = asyncHandler(async (req: Request, res: Response) => {
   });
 
   if (user) {
-    await messageTransporter(email, firstname, password);
+    await messageTransporter(email, firstname, password, squad);
     res.status(201).json({ user });
   }
 });
