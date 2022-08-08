@@ -4,9 +4,9 @@ import { IAdmin } from "../typings";
 const { adminRegistrationSchema }  = require( "../utils/utils");
 const asyncHandler = require("express-async-handler");
 import {Admin} from '../models/admin.model'
-//import { adminRegistrationSchema } from "../utils/utils";
+
 const { passwordHandler, generateAdminToken } = require("../utils/utils");
-const { messageTransporter } = require("../services/email.service");
+const { messageTransporter } = require("../utils/email");
 require('dotenv').config();
 const uuidv1 = require('uuid');
 

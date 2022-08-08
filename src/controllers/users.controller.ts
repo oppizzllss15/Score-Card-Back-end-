@@ -1,4 +1,4 @@
-const { messageTransporter } = require("../services/email.service");
+const { messageTransporter } = require("../utils/email");
 const {
   generateToken,
   userRegistration,
