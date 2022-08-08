@@ -7,9 +7,9 @@ import { Request, Response, NextFunction} from 'express';
 const { connectDB } = require('./database/db');
 connectDB();
 
-const indexRouter = require('./routes/index');
 const usersRouter = require('./routes/users');
 const superAdminRouter = require('./routes/superAdmin.route');
+
 
 const app = express();
 
@@ -18,11 +18,9 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 
-app.use('/', indexRouter);
 app.use('/users', usersRouter);
-app.use('/admin', superAdminRouter);
+app.use('/superadmin', superAdminRouter);
 app.use(errorHandler)
-
 
 app.use((req: Request, res: Response, next: NextFunction) => {
   res.status(404).json({message: "page not found"})

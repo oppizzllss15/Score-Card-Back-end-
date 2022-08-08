@@ -33,7 +33,7 @@ const adminSchema = new mongoose_1.Schema({
         unique: true,
     },
     password: String,
-    profilepicture: String,
+    profile_img: String,
     stack: {
         type: mongoose_1.Schema.Types.ObjectId,
         ref: "stack",
