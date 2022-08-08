@@ -6,6 +6,7 @@ const {
   changePassword,
   superUserProfileImage,
   logoutSuperAdmin,
+  viewAdmins
 } = require("../controllers/superuser.controller");
 const {
   registerUser,
@@ -25,6 +26,7 @@ router.post("/superuser/login", superUserLogin);
 router.get("/superuser/logout", logoutSuperAdmin);
 router.post("/change/password", superAdminProtect, changePassword);
 router.post("/upload", superAdminProtect, uploads.single("file"), superUserProfileImage);
+router.get("/superuser/viewAdmins",viewAdmins);
 
 router.post("/user/create", superAdminProtect, registerUser);
 router.post("/user/update/:id", superAdminProtect, updateUser);

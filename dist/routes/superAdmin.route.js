@@ -5,7 +5,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 var express = require("express");
 var router = express.Router();
-const { createSuperUser, superUserLogin, changePassword, superUserProfileImage, logoutSuperAdmin, } = require("../controllers/superuser.controller");
+const { createSuperUser, superUserLogin, changePassword, superUserProfileImage, logoutSuperAdmin, viewAdmins } = require("../controllers/superuser.controller");
 const { registerUser, updateUser, deactivateUser, deleteUser, calScore, getScores, } = require("../controllers/users.controller");
 const { superAdminProtect } = require("../middlewares/authenticate");
 const { storage } = require("../services/uploads");
@@ -16,6 +16,7 @@ router.post("/superuser/login", superUserLogin);
 router.get("/superuser/logout", logoutSuperAdmin);
 router.post("/change/password", superAdminProtect, changePassword);
 router.post("/upload", superAdminProtect, uploads.single("file"), superUserProfileImage);
+router.get("/superuser/viewAdmins", viewAdmins);
 router.post("/user/create", superAdminProtect, registerUser);
 router.post("/user/update/:id", superAdminProtect, updateUser);
 router.get("/user/delete/:id", superAdminProtect, deleteUser);

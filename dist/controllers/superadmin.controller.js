@@ -103,10 +103,18 @@ const logoutSuperAdmin = asyncHandler(async (req, res) => {
     res.cookie("Name", "");
     res.status(201).json({ message: "Logged out successfully" });
 });
+// logic to enable superAdmin view all registered admins
+const viewAdmins = asyncHandler(async (req, res) => {
+    const admins = await Super.find();
+    if (!admins)
+        throw new Error;
+    res.status(200).json(admins);
+});
 module.exports = {
     createSuperUser,
     superUserLogin,
     changePassword,
     superUserProfileImage,
     logoutSuperAdmin,
+    viewAdmins
 };
