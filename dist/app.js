@@ -15,7 +15,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use('/users', usersRouter);
-app.use('/superadmin', superAdminRouter);
+app.use('/admin', superAdminRouter);
 app.use(errorHandler);
 app.use((req, res, next) => {
     res.status(404).json({ message: "page not found" });

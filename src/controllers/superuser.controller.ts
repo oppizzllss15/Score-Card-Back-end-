@@ -1,12 +1,12 @@
 const {
   superAdminValidator,
-  generateSuperAdminToken,
+  generateAdminToken,
   passwordHandler,
   userLogin,
   passwordChange,
 } = require("../utils/utils");
 const asyncHandler = require("express-async-handler");
-import { Request, Response, NextFunction } from "express";
+import { Request, Response } from "express";
 const Super = require("../models/superAdmin.model");
 const bcrypt = require("bcryptjs");
 
@@ -54,7 +54,7 @@ const createSuperUser = asyncHandler(async (req: Request, res: Response) => {
     phone: phone,
   });
 
-  const token = generateSuperAdminToken(createData._id);
+  const token = generateAdminToken(createData._id);
   res.cookie("Token", token);
   res.cookie("Id", createData._id);
   res.cookie("Name", createData.firstname);
@@ -79,7 +79,7 @@ const superUserLogin = asyncHandler(async (req: Request, res: Response) => {
     (await bcrypt.compare(password, user[0].password)) &&
     user[0].secret === process.env.SECRET_PASS
   ) {
-    const token = await generateSuperAdminToken(user[0]._id);
+    const token = await generateAdminToken(user[0]._id);
 
     res.cookie("Token", token);
     res.cookie("Id", user[0]._id);
@@ -94,7 +94,6 @@ const superUserLogin = asyncHandler(async (req: Request, res: Response) => {
     throw new Error("Invalid Input");
   }
 });
-
 
 const changePassword = asyncHandler(async (req: Request, res: Response) => {
   await passwordChange().validateAsync({
@@ -121,23 +120,6 @@ const changePassword = asyncHandler(async (req: Request, res: Response) => {
   });
 });
 
-
-const superUserProfileImage = asyncHandler(
-  async (req: Request, res: Response, next: NextFunction) => {
-    if (req.file === undefined) return res.send("you must select a file.");
-    const id = req.cookies.Id;
-    await Super.updateOne(
-      { _id: id },
-      { profile_img: req.file?.path, cloudinary_id: req.file?.filename }
-    );
-    const findSuper = await Super.find();
-
-    res
-      .status(201)
-      .json({ message: "Uploaded file successfully", user: findSuper[0] });
-  }
-);
-
 const logoutSuperAdmin = asyncHandler(async (req: Request, res: Response) => {
   res.cookie("Token", "");
   res.cookie("Id", "");
@@ -146,15 +128,4 @@ const logoutSuperAdmin = asyncHandler(async (req: Request, res: Response) => {
   res.status(201).json({ message: "Logged out successfully" });
 });
 
-
-
-//ADMIN FUNCTIONS
-
-
-module.exports = {
-  createSuperUser,
-  superUserLogin,
-  changePassword,
-  superUserProfileImage,
-  logoutSuperAdmin,
-};
+module.exports = { createSuperUser, superUserLogin, changePassword, logoutSuperAdmin };
