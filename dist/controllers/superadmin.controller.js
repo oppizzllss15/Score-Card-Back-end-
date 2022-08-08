@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-const { superAdminValidator, generateAdminToken, passwordHandler, userLogin, passwordChange, } = require("../utils/utils");
+const { superAdminValidator, generateSuperAdminToken, passwordHandler, userLogin, passwordChange, } = require("../utils/utils");
 const asyncHandler = require("express-async-handler");
 const Super = require("../models/superAdmin.model");
 const bcrypt = require("bcryptjs");
@@ -35,7 +35,7 @@ const createSuperUser = asyncHandler(async (req, res) => {
         password: await passwordHandler(password),
         phone: phone,
     });
-    const token = generateAdminToken(createData._id);
+    const token = generateSuperAdminToken(createData._id);
     res.cookie("Token", token);
     res.cookie("Id", createData._id);
     res.cookie("Name", createData.firstname);
@@ -54,7 +54,7 @@ const superUserLogin = asyncHandler(async (req, res) => {
     if (user[0].email === email.toLowerCase() &&
         (await bcrypt.compare(password, user[0].password)) &&
         user[0].secret === process.env.SECRET_PASS) {
-        const token = await generateAdminToken(user[0]._id);
+        const token = await generateSuperAdminToken(user[0]._id);
         res.cookie("Token", token);
         res.cookie("Id", user[0]._id);
         res.cookie("Name", user[0].firstname);
@@ -103,6 +103,7 @@ const logoutSuperAdmin = asyncHandler(async (req, res) => {
     res.cookie("Name", "");
     res.status(201).json({ message: "Logged out successfully" });
 });
+<<<<<<< HEAD
 // logic to enable superAdmin view all registered admins
 const viewAdmins = asyncHandler(async (req, res) => {
     const admins = await Super.find();
@@ -110,6 +111,9 @@ const viewAdmins = asyncHandler(async (req, res) => {
         throw new Error;
     res.status(200).json(admins);
 });
+=======
+//ADMIN FUNCTIONS
+>>>>>>> create-admin
 module.exports = {
     createSuperUser,
     superUserLogin,

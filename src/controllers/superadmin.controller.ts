@@ -1,6 +1,6 @@
 const {
   superAdminValidator,
-  generateAdminToken,
+  generateSuperAdminToken,
   passwordHandler,
   userLogin,
   passwordChange,
@@ -55,7 +55,7 @@ const createSuperUser = asyncHandler(async (req: Request, res: Response) => {
     phone: phone,
   });
 
-  const token = generateAdminToken(createData._id);
+  const token = generateSuperAdminToken(createData._id);
   res.cookie("Token", token);
   res.cookie("Id", createData._id);
   res.cookie("Name", createData.firstname);
@@ -80,7 +80,7 @@ const superUserLogin = asyncHandler(async (req: Request, res: Response) => {
     (await bcrypt.compare(password, user[0].password)) &&
     user[0].secret === process.env.SECRET_PASS
   ) {
-    const token = await generateAdminToken(user[0]._id);
+    const token = await generateSuperAdminToken(user[0]._id);
 
     res.cookie("Token", token);
     res.cookie("Id", user[0]._id);
@@ -95,6 +95,7 @@ const superUserLogin = asyncHandler(async (req: Request, res: Response) => {
     throw new Error("Invalid Input");
   }
 });
+
 
 const changePassword = asyncHandler(async (req: Request, res: Response) => {
   await passwordChange().validateAsync({
@@ -120,6 +121,7 @@ const changePassword = asyncHandler(async (req: Request, res: Response) => {
     message: "Password successfully changed",
   });
 });
+
 
 const superUserProfileImage = asyncHandler(
   async (req: Request, res: Response, next: NextFunction) => {
@@ -150,6 +152,11 @@ const viewAdmins = asyncHandler(async( req: Request, res: Response ) => {
   if( !admins ) throw new Error
   res.status(200).json( admins )
 })
+
+
+
+//ADMIN FUNCTIONS
+
 
 module.exports = {
   createSuperUser,
