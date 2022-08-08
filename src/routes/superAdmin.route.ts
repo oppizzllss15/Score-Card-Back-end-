@@ -5,8 +5,7 @@ const {
   setdminActivationStatus,
   deleteAdmin,
   getAdmin,
-  updateAdmin,
-  loginAdmin
+  updateAdmin
 } = require("../controllers/adminController");
 
 const {
@@ -25,7 +24,7 @@ const {
   getScores,
 } = require("../controllers/users.controller");
 const { superAdminProtect, adminProtect } = require("../middlewares/authenticate");
-const {storage} = require("../services/uploads")
+const {storage} = require("../services/upload.service")
 import multer from "multer";
 const uploads = multer({storage})
 
@@ -42,8 +41,7 @@ router.post("/user/deactivate", superAdminProtect, deactivateUser);
 router.post("/user/calculate/score/:id", superAdminProtect, calScore);
 router.get("/user/getscores/:id", superAdminProtect, getScores);
 
-//functons on admin
-router.post("/admin/login", loginAdmin);
+//functions on admin
 router.get("/admin/:adminId", superAdminProtect,  getAdmin);
 router.post("/admin/create", superAdminProtect,  createAdmin);
 router.put("/admin/update/:adminId", adminProtect,  updateAdmin);

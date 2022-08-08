@@ -182,6 +182,32 @@ const adminProfile = asyncHandler(async (req: Request, res: Response) => {
   }
 });
 
+const changeAdminPhoneNumber = asyncHandler(
+  async (req: Request, res: Response) => {
+    const id = req.cookies.Id;
+    if (!id) {
+      res.status(400);
+      throw new Error("Provide user id");
+    }
+
+    if (!req.body.phone) {
+      res.status(400);
+      throw new Error("Provide user new phone number");
+    }
+
+    const findAdmin = await Admin.findById(id);
+    if (findAdmin) {
+      await Admin.updateOne({ _id: id }, { phone: req.body.phone });
+
+      res.status(201).json({
+        message: "Phone number updated successfully"
+      });
+    } else {
+      res.status(404).json({ message: "Admin accountnot found" });
+    }
+  }
+);
+
 module.exports = {
   getAdmin,
   createAdmin,
@@ -190,5 +216,6 @@ module.exports = {
   setdminActivationStatus,
   loginAdmin,
   adminProfileImage,
-  adminProfile
+  adminProfile,
+  changeAdminPhoneNumber
 }
