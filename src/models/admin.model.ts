@@ -1,4 +1,4 @@
-import mongoose ,{ Mongoose, Schema, Model } from "mongoose";
+import mongoose, { Mongoose, Schema, Model } from "mongoose";
 const adminSchema = new Schema(
   {
     firstname: String,
@@ -9,23 +9,18 @@ const adminSchema = new Schema(
     },
     password: String,
     profile_img: String,
-    stack: {
-      type: Schema.Types.ObjectId,
-      ref: "stack",
-    },
+    cloudinary_id: String,
+    stack: [
+      {
+        type: Schema.Types.ObjectId,
+        ref: "stack",
+      },
+    ],
     squad: Number,
     role: String,
-    activationStatus: {type: Boolean, default: false}
+    activationStatus: { type: Boolean, default: false },
   },
   { timestamps: true }
 );
 
-const stackSchema = new Schema(
-  {
-    name: String,
-  },
-  { timestamps: true }
-);
-
-export const Stack = mongoose.model("stack", stackSchema);
 export const Admin = mongoose.model("admin", adminSchema);
