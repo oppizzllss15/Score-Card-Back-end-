@@ -33,7 +33,7 @@ const createAdmin = asyncHandler(async (req, res) => {
     //sendEmailToAdmin(admin.email, admin.password)
     //const registeredAdmin = await addAdmin(admin);
     const registeredAdmin = await admin_model_1.Admin.create({ ...admin });
-    //await messageTransporter(admin.email, admin.firstname, password)
+    await messageTransporter(admin.email, admin.firstname, password);
     if (!registeredAdmin)
         return res.status(400).send({ message: "Ussername already in use, try another" });
     return res.status(201).send({ data: registeredAdmin, message: "Successfully created admin, password has been sent to " + admin.email });
@@ -41,7 +41,7 @@ const createAdmin = asyncHandler(async (req, res) => {
 const updateAdmin = asyncHandler(async (req, res) => {
     const validation = adminRegistrationSchema.validate(req.body);
     if (validation.error)
-        return res.status(400).send({ message: "Registration Detail: " + validation.error.message, });
+        return res.status(400).send({ message: "Admin Detail: " + validation.error.message, });
     const adminId = req.params.adminId || req.body.adminId;
     const result = await admin_model_1.Admin.updateOne({ _id: adminId }, { ...req.body });
     if (!result)
