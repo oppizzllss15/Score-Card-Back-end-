@@ -1,6 +1,6 @@
 "use strict";
 const stack = require('mongoose');
-const stackSchema = new stack.Schema({
+const stackSchema = stack.Schema({
     image: {
         type: String,
         required: true,

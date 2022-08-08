@@ -1,18 +1,19 @@
-
-export type IAdmin = {
-  _id?: string,
-  firstname?: string,
-  lastname?: string,
-  email: string,
-  password?: string,
-  profilepicture?: string,
-  stack?: string,
-  phone?: string,
-  role?: string,
-  squad?: number,
-  activationStatus?: boolean
+interface IAdmin {
+  _id?: string;
+  firstname?: string;
+  lastname?: string;
+  email: string;
+  password?: string;
+  phonenumber: string;
+  profile_img?: string;
+  stack?: string;
+  phone?: string;
+  role?: string;
+  squad?: number;
+  activationStatus?: boolean;
 }
-export type IStack = {
-  _id?: string,
-  name: string
+interface IUser {
+  _id: string;
+  image: string;
+  stack: string;
 }

@@ -3,24 +3,26 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const asyncHandler = require("express-async-handler");
 const Stacks = require("../models/stack");
 const SuperUser = require("../models/superAdmin.model");
-const Admin = require("../models/admin.model");
+const admin_model_1 = require("../models/admin.model");
 const stacksShield = asyncHandler(async (req, res, next) => {
     const userID = req.cookies.Id;
+    console.log(userID);
+    const adminUser = await admin_model_1.Admin.find({ _id: userID });
+    console.log(adminUser);
     const superUser = await SuperUser.findOne({ _id: userID });
-    const admin = await Admin.findOne({ _id: userID });
     if (superUser)
         next();
-    else if (admin) {
-        res.status(403).json({
-            status: "Failed",
-            message: `Hi ${admin.firstname}, you can only access the stack you have been assigned to`,
-        });
-        return;
-    }
+    // else if (adminUser) {
+    //   res.status(403).json({
+    //     status: "Failed",
+    //     message: `Hi ${adminUser.firstname}, you can only access the stack you have been assigned to`,
+    //   });
+    //   return;
+    // } 
     else {
         res.status(403).json({
             status: "Failed",
-            message: "Access Denied.",
+            message: "You currently have no permission to view this page.",
         });
         return;
     }
@@ -28,13 +30,13 @@ const stacksShield = asyncHandler(async (req, res, next) => {
 const stacksShield2 = asyncHandler(async (req, res, next) => {
     const userID = req.cookies.Id;
     const superUser = await SuperUser.findOne({ _id: userID });
-    const admin = await Admin.findOne({ _id: userID });
+    const admin = await admin_model_1.Admin.findOne({ _id: userID });
     if (admin)
         next();
     else if (superUser) {
         res.status(200).json({
             status: "Success",
-            message: `Hi SuperAdmin, please view all stacks`
+            message: `Hi SuperAdmin, please view all stacks`,
         });
     }
     else {
@@ -57,9 +59,14 @@ const viewAllStacks = asyncHandler(async (req, res) => {
 });
 const viewStack = asyncHandler(async (req, res) => {
     const userID = req.cookies.Id;
-    const admin = await Admin.findOne({ _id: userID });
-    const stack = admin.stack.type;
-    const adminStack = await Stacks.find({ _id: stack });
+    const admin = await admin_model_1.Admin.findOne({ _id: userID });
+    console.log(admin);
+    const stack = admin.stack;
+    const adminStack = [];
+    for (let el in stack) {
+        const user = await Stacks.find({ _id: el });
+        adminStack.push(user);
+    }
     res.status(200).json({
         status: "Success",
         message: adminStack,
@@ -110,4 +117,5 @@ module.exports = {
     viewAllStacks,
     viewStack,
     stacksShield,
+    stacksShield2,
 };

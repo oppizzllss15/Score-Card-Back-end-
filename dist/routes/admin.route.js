@@ -6,7 +6,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 var express = require("express");
 var router = express.Router();
 const { adminProtect } = require("../middlewares/authenticate");
-const { loginAdmin, adminProfileImage, adminProfile } = require("../controllers/adminController");
+const { loginAdmin, adminProfileImage, adminProfile } = require("../controllers/admin.controller");
 const { storage } = require("../utils/upload");
 const multer_1 = __importDefault(require("multer"));
 const uploads = (0, multer_1.default)({ storage });

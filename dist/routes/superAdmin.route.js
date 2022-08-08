@@ -5,13 +5,13 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const express = require("express");
 const router = express.Router();
-const { superAdminProtect } = require("../middlewares/authenticate");
-const { storage } = require("../services/uploads");
+const { superAdminProtect, adminProtect } = require("../middlewares/authenticate");
+const { storage } = require("../utils/upload");
 const multer_1 = __importDefault(require("multer"));
 const uploads = (0, multer_1.default)({ storage });
-const { createStack, editStack, deleteStack, viewAllStacks, viewStack, stacksShield, stacksShield2, } = require("../controllers/stackController");
-const { createAdmin, setdminActivationStatus, deleteAdmin, getAdmin, updateAdmin } = require("../controllers/adminController");
-const { createSuperUser, superUserLogin, changePassword, superUserProfileImage, logoutSuperAdmin, } = require("../controllers/superuser.controller");
+const { createStack, editStack, deleteStack, viewAllStacks, viewStack, stacksShield, stacksShield2, } = require("../controllers/stack.controller");
+const { createAdmin, setdminActivationStatus, deleteAdmin, getAdmin, updateAdmin } = require("../controllers/admin.controller");
+const { createSuperUser, superUserLogin, changePassword, superUserProfileImage, logoutSuperAdmin, } = require("../controllers/superadmin.controller");
 const { registerUser, updateUser, deactivateUser, deleteUser, calScore, getScores, } = require("../controllers/users.controller");
 router.post("/superuser/create", createSuperUser);
 router.post("/superuser/login", superUserLogin);
@@ -24,13 +24,11 @@ router.get("/user/delete/:id", superAdminProtect, deleteUser);
 router.post("/user/deactivate", superAdminProtect, deactivateUser);
 router.post("/user/calculate/score/:id", superAdminProtect, calScore);
 router.get("/user/getscores/:id", superAdminProtect, getScores);
-router.get("/Stacks", stacksShield, viewAllStacks);
-router.get("/Stack", stacksShield2, viewStack);
-router.post("/createStack", superAdminProtect, createStack);
-router.post("/editStack/:id", superAdminProtect, editStack);
-router.post("/deleteStack/:id", superAdminProtect, deleteStack);
-//functons on admin
-router.post("/admin/login", loginAdmin);
+router.get("/stacks", stacksShield, viewAllStacks);
+router.get("/stack", stacksShield2, viewStack);
+router.post("/createstack", superAdminProtect, createStack);
+router.post("/editstack/:id", superAdminProtect, editStack);
+router.post("/deletestack/:id", superAdminProtect, deleteStack);
 //functions on admin
 router.get("/admin/:adminId", superAdminProtect, getAdmin);
 router.post("/admin/create", superAdminProtect, createAdmin);

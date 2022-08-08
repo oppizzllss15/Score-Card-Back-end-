@@ -1,25 +1,29 @@
 const asyncHandler = require("express-async-handler");
 const Stacks = require("../models/stack");
 const SuperUser = require("../models/superAdmin.model");
-const Admin = require("../models/admin.model");
+import {Admin} from "../models/admin.model";
 import express, { Request, Response, NextFunction } from "express";
 
 const stacksShield = asyncHandler(
   async (req: Request, res: Response, next: NextFunction) => {
     const userID = req.cookies.Id;
+    console.log(userID);
+    const adminUser = await Admin.find({ _id: userID });
+    console.log(adminUser);
     const superUser = await SuperUser.findOne({ _id: userID });
-    const admin = await Admin.findOne({ _id: userID });
+
     if (superUser) next();
-    else if (admin) {
+    // else if (adminUser) {
+    //   res.status(403).json({
+    //     status: "Failed",
+    //     message: `Hi ${adminUser.firstname}, you can only access the stack you have been assigned to`,
+    //   });
+    //   return;
+    // } 
+    else {
       res.status(403).json({
         status: "Failed",
-        message: `Hi ${admin.firstname}, you can only access the stack you have been assigned to`,
-      });
-      return;
-    } else {
-      res.status(403).json({
-        status: "Failed",
-        message: "Access Denied.",
+        message: "You currently have no permission to view this page.",
       });
       return;
     }
@@ -35,10 +39,9 @@ const stacksShield2 = asyncHandler(
     else if (superUser) {
       res.status(200).json({
         status: "Success",
-        message: `Hi SuperAdmin, please view all stacks`
-      })
-    }
-    else {
+        message: `Hi SuperAdmin, please view all stacks`,
+      });
+    } else {
       res.status(403).json({
         status: "Failed",
         message: "Access Denied.",
@@ -63,14 +66,20 @@ const viewAllStacks = asyncHandler(async (req: Request, res: Response) => {
 const viewStack = asyncHandler(async (req: Request, res: Response) => {
   const userID = req.cookies.Id;
   const admin = await Admin.findOne({ _id: userID });
-  const stack = admin.stack.type;
-  const adminStack = await Stacks.find({ _id: stack });
+  console.log(admin);
+  const stack = admin.stack;
+  const adminStack: IUser[] = [];
+
+  for (let el in stack) {
+    const user: IUser = await Stacks.find({ _id: el });
+    adminStack.push(user);
+  }
 
   res.status(200).json({
     status: "Success",
     message: adminStack,
   });
-  return
+  return;
 });
 
 const createStack = asyncHandler(async (req: Request, res: Response) => {
@@ -128,4 +137,5 @@ module.exports = {
   viewAllStacks,
   viewStack,
   stacksShield,
+  stacksShield2,
 };
