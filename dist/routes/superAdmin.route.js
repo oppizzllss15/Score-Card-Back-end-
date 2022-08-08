@@ -5,7 +5,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 var express = require("express");
 var router = express.Router();
-const { createAdmin, setdminActivationStatus, deleteAdmin, getAdmin, updateAdmin } = require("../controllers/adminController");
+const { createAdmin, setdminActivationStatus, deleteAdmin, getAdmin, updateAdmin } = require("../controllers/admin.controller");
 const { createSuperUser, superUserLogin, changePassword, superUserProfileImage, logoutSuperAdmin, } = require("../controllers/superuser.controller");
 const { registerUser, updateUser, deactivateUser, deleteUser, calScore, getScores, } = require("../controllers/users.controller");
 const { superAdminProtect, adminProtect } = require("../middlewares/authenticate");

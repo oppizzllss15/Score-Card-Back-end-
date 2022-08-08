@@ -33,6 +33,7 @@ const adminSchema = new mongoose_1.Schema({
         unique: true,
     },
     password: String,
+    phonenumber: String,
     profile_img: String,
     cloudinary_id: String,
     stack: [
