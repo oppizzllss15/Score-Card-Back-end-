@@ -6,7 +6,7 @@ const {
   deleteAdmin,
   getAdmin,
   updateAdmin
-} = require("../controllers/adminController");
+} = require("../controllers/admin.controller");
 
 const {
   createSuperUser,
