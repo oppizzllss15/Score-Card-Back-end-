@@ -8,6 +8,7 @@ const adminSchema = new Schema(
       unique: true,
     },
     password: String,
+    phonenumber: String,
     profile_img: String,
     cloudinary_id: String,
     stack: [
