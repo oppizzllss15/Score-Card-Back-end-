@@ -3,13 +3,11 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const { adminRegistrationSchema } = require("../utils/utils");
 const asyncHandler = require("express-async-handler");
 const admin_model_1 = require("../models/admin.model");
-//import { adminRegistrationSchema } from "../utils/utils";
 const { passwordHandler, generateAdminToken } = require("../utils/utils");
-const { messageTransporter } = require("../services/usersService");
+const { messageTransporter } = require("../utils/email");
 require('dotenv').config();
 const uuidv1 = require('uuid');
 const ADMIN_EMAIL_DOMAIN = "decagon.dev";
-// console.log(dpass("une"))
 const getAdmin = asyncHandler(async (req, res) => {
     const admim = await admin_model_1.Admin.findById(req.params.adminId);
     if (admim)
@@ -17,13 +15,13 @@ const getAdmin = asyncHandler(async (req, res) => {
     return res.status(400).send({ error: true, message: "no admin found" });
 });
 const createAdmin = asyncHandler(async (req, res) => {
-    const validation = adminRegistrationSchema.validate(req.body);
+    const validation = adminRegistrationSchema.validateAsync(req.body);
     if (validation.error)
         return res.status(400).send({ message: "Registration Detail: " + validation.error.message });
     if (req.body.email.search(ADMIN_EMAIL_DOMAIN) === -1) {
         return res.status(400).send({ "error": true, message: "Please use an official email" });
     }
-    const isUserInRegistered = await admin_model_1.Admin.find({ email: req.body.email });
+    const isUserInRegistered = await admin_model_1.Admin.find({ email: req.body.email.toLowerCase() });
     if (isUserInRegistered.length > 0)
         return res.status(400).send({ message: "Email already in use, try another" });
     let admin = req.body;
@@ -32,7 +30,15 @@ const createAdmin = asyncHandler(async (req, res) => {
     admin.password = await passwordHandler(password);
     //sendEmailToAdmin(admin.email, admin.password)
     //const registeredAdmin = await addAdmin(admin);
-    const registeredAdmin = await admin_model_1.Admin.create({ ...admin });
+    const registeredAdmin = await admin_model_1.Admin.create({
+        firstname: admin.firstname,
+        lastname: admin.lastname,
+        email: admin.email.toLowerCase(),
+        password: admin.password,
+        stack: [admin.stack],
+        squad: admin.squad,
+        role: admin.role,
+    });
     await messageTransporter(admin.email, admin.firstname, password);
     if (!registeredAdmin)
         return res.status(400).send({ message: "Ussername already in use, try another" });
@@ -84,7 +90,7 @@ const loginAdmin = asyncHandler(async (req, res) => {
             return;
         }
         if (await bcrypt.compare(password, admim[0].password)) {
-            const token = generateToken((admim[0]._id).toString());
+            const token = generateAdminToken((admim[0]._id).toString());
             res.cookie("Token", token);
             res.cookie("Name", admim[0].firstname);
             res.cookie("Id", admim[0]._id);
@@ -99,11 +105,64 @@ const loginAdmin = asyncHandler(async (req, res) => {
         res.status(404).json({ error: true, message: "User not found" });
     }
 });
+const adminProfileImage = asyncHandler(async (req, res) => {
+    var _a, _b;
+    if (req.file === undefined)
+        return res.send("You must select a file.");
+    const id = req.cookies.Id;
+    await admin_model_1.Admin.updateOne({ _id: id }, { profile_img: (_a = req.file) === null || _a === void 0 ? void 0 : _a.path, cloudinary_id: (_b = req.file) === null || _b === void 0 ? void 0 : _b.filename });
+    const findAdmin = await admin_model_1.Admin.findById(id);
+    res.status(201).json({ message: "Uploaded file successfully", findAdmin });
+});
+const adminProfile = asyncHandler(async (req, res) => {
+    const id = req.cookies.Id;
+    if (!id) {
+        res.status(400);
+        throw new Error("Provide Admin id");
+    }
+    const findAdmin = await admin_model_1.Admin.findById(id);
+    if (findAdmin) {
+        res.status(201).json({
+            firstname: findAdmin.firstname,
+            lastname: findAdmin.lastname,
+            email: findAdmin.email,
+            stack: findAdmin.stack,
+            squad: findAdmin.squad,
+        });
+    }
+    else {
+        res.status(404).json({ message: "Admin not found" });
+    }
+});
+const changeAdminPhoneNumber = asyncHandler(async (req, res) => {
+    const id = req.cookies.Id;
+    if (!id) {
+        res.status(400);
+        throw new Error("Provide user id");
+    }
+    if (!req.body.phone) {
+        res.status(400);
+        throw new Error("Provide user new phone number");
+    }
+    const findAdmin = await admin_model_1.Admin.findById(id);
+    if (findAdmin) {
+        await admin_model_1.Admin.updateOne({ _id: id }, { phone: req.body.phone });
+        res.status(201).json({
+            message: "Phone number updated successfully"
+        });
+    }
+    else {
+        res.status(404).json({ message: "Admin accountnot found" });
+    }
+});
 module.exports = {
     getAdmin,
     createAdmin,
     updateAdmin,
     deleteAdmin,
     setdminActivationStatus,
-    loginAdmin
+    loginAdmin,
+    adminProfileImage,
+    adminProfile,
+    changeAdminPhoneNumber
 };
