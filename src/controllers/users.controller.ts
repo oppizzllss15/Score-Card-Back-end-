@@ -1,4 +1,4 @@
-const { messageTransporter } = require("../services/usersService");
+const { messageTransporter } = require("../utils/email");
 const {
   generateToken,
   userRegistration,
@@ -6,10 +6,12 @@ const {
   userLogin,
   userStatus,
   passwordHandler,
+  score,
 } = require("../utils/utils");
 const asyncHandler = require("express-async-handler");
 const bcrypt = require("bcryptjs");
 const User = require("../models/user.model");
+const randomPass = require("pino-password")
 import { Request, Response, NextFunction } from "express";
 
 const userProfileImage = asyncHandler(
@@ -85,9 +87,6 @@ const registerUser = asyncHandler(async (req: Request, res: Response) => {
     firstname,
     lastname,
     email,
-    password,
-    confirmPassword,
-    phone,
     squad,
     stack,
   } = req.body;
@@ -95,17 +94,13 @@ const registerUser = asyncHandler(async (req: Request, res: Response) => {
     firstname: firstname,
     lastname: lastname,
     email: email,
-    password: password,
-    confirmPassword: confirmPassword,
-    phone: phone,
     squad: squad,
     stack: stack,
   });
 
-  if (password !== confirmPassword) {
-    res.status(400);
-    throw new Error("Passwords do not match");
-  }
+  const pass = new randomPass()
+  const password = pass.generatePassword(firstname)
+  console.log(password)
 
   const userExists = await User.find({ email: email.toLowerCase() });
 
@@ -119,7 +114,6 @@ const registerUser = asyncHandler(async (req: Request, res: Response) => {
     lastname,
     email: email.toLowerCase(),
     password: await passwordHandler(password),
-    phone,
     squad,
     stack,
   });
@@ -219,9 +213,10 @@ const deactivateUser = asyncHandler(async (req: Request, res: Response) => {
       }
     );
 
-    res
-      .status(201)
-      .json({ message: "Updated successfully", deactivateUserAccount });
+    res.status(201).json({
+      message: "Updated successfully",
+      deactivateUserAccount,
+    });
   } else {
     res.status(404).json({ message: "User not found" });
   }
@@ -238,9 +233,9 @@ const deleteUser = asyncHandler(async (req: Request, res: Response) => {
   if (findUser) {
     await findUser.remove();
 
-    res
-      .status(201)
-      .json({ message: `${findUser.email} with id ${id} has been removed` });
+    res.status(201).json({
+      message: `${findUser.email} with id ${id} has been removed`,
+    });
   } else {
     res.status(404).json({ message: "User not found" });
   }
@@ -254,6 +249,48 @@ const logoutUser = asyncHandler(async (req: Request, res: Response) => {
   res.status(201).json({ message: "Logged out successfully" });
 });
 
+const calScore = asyncHandler(async (req: Request, res: Response) => {
+  await score().validateAsync({
+    week: req.body.week,
+    agile: req.body.agile,
+    weekly_task: req.body.weekly_task,
+    assessment: req.body.assessment,
+    algorithm: req.body.algorithm,
+  });
+  const id = req.params.id;
+  const { week, agile, weekly_task, assessment, algorithm } = req.body;
+
+  const calCum =
+    weekly_task * 0.4 + agile * 0.2 + assessment * 0.2 + algorithm * 0.2;
+  const data = {
+    week: week,
+    agile: agile,
+    weekly_task: weekly_task,
+    assessment: assessment,
+    algorithm: algorithm,
+    cummulative: calCum,
+  };
+
+  const userData = await User.updateOne(
+    { _id: id },
+    { $push: { grades: data } }
+  );
+
+  const getScores = await User.findById(id);
+
+  res
+    .status(201)
+    .json({ message: "Updated successfully", scores: getScores.grades });
+});
+
+const getScores = asyncHandler(async (req: Request, res: Response) => {
+  const id = req.params.id;
+  const getScores = await User.findById(id);
+  res
+    .status(201)
+    .json({ message: "Grade successfully", scores: getScores.grades });
+});
+
 module.exports = {
   registerUser,
   loginUser,
@@ -264,4 +301,6 @@ module.exports = {
   userProfile,
   changeUserPhoneNumber,
   userProfileImage,
+  calScore,
+  getScores,
 };
