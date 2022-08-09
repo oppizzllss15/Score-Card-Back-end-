@@ -51,12 +51,19 @@ async function isPropertyInDatabase<T>(property: string, value: T) {
     return admin.length > 0 ? admin : false;
 
 }
+//view admins
+async function getAdmins() {
+  const Admins = await Admin.find();
+  return Admins
+
+}
 module.exports = {
   addAdmin,
   editAdmin,
   getAdminById,
   removeAdmin,
   editAdminStatus,
-  isPropertyInDatabase
+  isPropertyInDatabase,
+  getAdmins
 }
 

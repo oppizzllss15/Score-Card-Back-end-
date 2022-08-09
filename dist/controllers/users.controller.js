@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-const { messageTransporter } = require("../services/usersService");
+const { messageTransporter } = require("../utils/email");
 const { generateToken, userRegistration, userUpdate, userLogin, userStatus, passwordHandler, score, } = require("../utils/utils");
 const asyncHandler = require("express-async-handler");
 const bcrypt = require("bcryptjs");

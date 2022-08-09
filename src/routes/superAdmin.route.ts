@@ -24,6 +24,7 @@ const {
   calScore,
   getScores,
 } = require("../controllers/users.controller");
+
 const { superAdminProtect, adminProtect } = require("../middlewares/authenticate");
 const {storage} = require("../utils/upload")
 import multer from "multer";
