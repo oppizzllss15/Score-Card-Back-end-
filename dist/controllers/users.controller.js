@@ -233,7 +233,7 @@ const calScore = asyncHandler(async (req, res) => {
 const getScores = asyncHandler(async (req, res) => {
     const id = req.params.id;
     const getScores = await User.findById(id);
-    res.status(201).json({ message: "Grade successfully", scores: getScores.grades });
+    res.status(201).json({ message: "User grades", scores: getScores.grades });
 });
 module.exports = {
     registerUser,

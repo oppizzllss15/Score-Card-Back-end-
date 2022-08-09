@@ -256,23 +256,29 @@ const logoutUser = asyncHandler(async (req: Request, res: Response) => {
    res.status(201).json({ message: "Logged out successfully" });
 });
 
+//adding score
 const calScore = asyncHandler(async (req: Request, res: Response) => {
   await score().validateAsync({
-     week: req.body.week,
      agile: req.body.agile,
      weekly_task: req.body.weekly_task,
      assessment: req.body.assessment,
      algorithm: req.body.algorithm,
   });
   const id = req.params.id;
-   const { week, agile, weekly_task, assessment, algorithm } =
+   const {agile, weekly_task, assessment, algorithm } =
       req.body;
 
   const calCum =  ((weekly_task * 0.4) + (agile * 0.2) + (assessment * 0.2) + (algorithm * 0.2) );
   ;
 
+//get the length of the grades array
+  const getLength = async () => { 
+    const user = await User.findById(id);
+    return user.grades.length + 1;
+  }
+
    const data = {
-      week: week,
+      week: await getLength(),
       agile: agile,
       weekly_task: weekly_task,
       assessment: assessment,
@@ -297,7 +303,7 @@ const calScore = asyncHandler(async (req: Request, res: Response) => {
 const getScores = asyncHandler(async (req: Request, res: Response) => { 
   const id = req.params.id;
   const getScores = await User.findById(id);
-  res.status(201).json({ message: "Grade successfully", scores: getScores.grades });
+  res.status(201).json({ message: "User grades", scores: getScores.grades });
 })
 
 
