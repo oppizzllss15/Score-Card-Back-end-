@@ -11,6 +11,7 @@ const { storage } = require("../utils/upload");
 const multer_1 = __importDefault(require("multer"));
 const uploads = (0, multer_1.default)({ storage });
 router.get("/profile", adminProtect, adminProfile);
-router.post("/login", adminProtect, loginAdmin);
+router.post("/login", loginAdmin);
 router.post("/upload", adminProtect, uploads.single("file"), adminProfileImage);
 module.exports = router;
+//  adminProtect,

@@ -15,12 +15,12 @@ const adminSchema = new mongoose.Schema(
     stack: [
       {
         type: Schema.Types.ObjectId,
-        ref: "stack",
+        ref: "Stacks",
       },
     ],
     squad: Number,
     role: String,
-    activationStatus: { type: Boolean, default: false },
+    activationStatus: { type: Boolean, default: true },
   },
   { timestamps: true }
 );

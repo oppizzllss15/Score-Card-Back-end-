@@ -39,11 +39,11 @@ async function removeAdmin(adminid: string) {
 }
 
 //delete admin
-async function isPropertyInDatabase<T>(property: string, value: T) {
+async function isPropertyInDatabase<T>(property: string, value: T): Promise<any> {
   let propertyObject: any;
   propertyObject[property] = value;
   const admin = await Admin.find({ propertyObject });
-  return admin.length > 0 ? admin : false;
+  return admin.length > 0 ? admin[0] : false;
 }
 module.exports = {
   addAdmin,

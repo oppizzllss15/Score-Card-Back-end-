@@ -84,7 +84,7 @@ const adminRegistrationSchema = Joi.object({
     lastname: Joi.string().min(3).required(),
     email: Joi.string().email().required(),
     stack: Joi.string().required(),
-    squad: Joi.string().required(),
+    squad: Joi.number().required(),
     role: Joi.string(),
 });
 module.exports = {
@@ -99,5 +99,5 @@ module.exports = {
     userUpdate,
     userStatus,
     score,
-    adminRegistrationSchema
+    adminRegistrationSchema,
 };
