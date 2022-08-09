@@ -39,11 +39,11 @@ const adminSchema = new mongoose_1.default.Schema({
     stack: [
         {
             type: mongoose_1.Schema.Types.ObjectId,
-            ref: "stack",
+            ref: "Stacks",
         },
     ],
     squad: Number,
     role: String,
-    activationStatus: { type: Boolean, default: false },
+    activationStatus: { type: Boolean, default: true },
 }, { timestamps: true });
 exports.Admin = mongoose_1.default.model("Admin", adminSchema);

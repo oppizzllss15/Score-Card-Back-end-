@@ -39,7 +39,7 @@ async function isPropertyInDatabase(property, value) {
     let propertyObject;
     propertyObject[property] = value;
     const admin = await admin_model_1.Admin.find({ propertyObject });
-    return admin.length > 0 ? admin : false;
+    return admin.length > 0 ? admin[0] : false;
 }
 module.exports = {
     addAdmin,
