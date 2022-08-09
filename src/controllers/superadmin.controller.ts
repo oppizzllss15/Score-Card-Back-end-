@@ -5,6 +5,7 @@ const {
   userLogin,
   passwordChange,
 } = require("../utils/utils");
+const {getAdmins} = require('../services/admin.service')
 
 const asyncHandler = require("express-async-handler");
 import { Request, Response, NextFunction } from "express";
@@ -146,11 +147,11 @@ const logoutSuperAdmin = asyncHandler(async (req: Request, res: Response) => {
 
   res.status(201).json({ message: "Logged out successfully" });
 });
-// logic to enable superAdmin view all registered admins
+// logic that enable superAdmin view all registered admins
 const viewAdmins = asyncHandler(async( req: Request, res: Response ) => {
-   const admins = await viewAdmins.find()
-  if( !admins ) throw new Error
-  res.status(200).json( admins )
+   const admins = await getAdmins()
+  if( admins.length == 0 ) res.status( 404 ).send( 'No admins')
+  res.status( 200 ).json( admins )
 })
 
 

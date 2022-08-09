@@ -1,6 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const { superAdminValidator, generateSuperAdminToken, passwordHandler, userLogin, passwordChange, } = require("../utils/utils");
+const { getAdmins } = require('../services/admin.service');
 const asyncHandler = require("express-async-handler");
 const Super = require("../models/superAdmin.model");
 const bcrypt = require("bcryptjs");
@@ -103,11 +104,11 @@ const logoutSuperAdmin = asyncHandler(async (req, res) => {
     res.cookie("Name", "");
     res.status(201).json({ message: "Logged out successfully" });
 });
-// logic to enable superAdmin view all registered admins
+// logic that enable superAdmin view all registered admins
 const viewAdmins = asyncHandler(async (req, res) => {
-    const admins = await viewAdmins.find();
-    if (!admins)
-        throw new Error;
+    const admins = await getAdmins();
+    if (admins.length == 0)
+        res.status(404).send('No admins');
     res.status(200).json(admins);
 });
 //ADMIN FUNCTIONS
