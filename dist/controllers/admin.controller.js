@@ -1,4 +1,5 @@
 "use strict";
+<<<<<<< HEAD
 Object.defineProperty(exports, "__esModule", { value: true });
 const { adminRegistrationSchema } = require("../utils/utils");
 const asyncHandler = require("express-async-handler");
@@ -7,11 +8,26 @@ const { passwordHandler, generateAdminToken } = require("../utils/utils");
 const { messageTransporter } = require("../utils/email");
 require('dotenv').config();
 const uuidv1 = require('uuid');
+=======
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+const { adminRegistrationSchema, userLogin } = require("../utils/utils");
+const asyncHandler = require("express-async-handler");
+const bcrypt_1 = __importDefault(require("bcrypt"));
+const admin_model_1 = require("../models/admin.model");
+const { passwordHandler, generateAdminToken } = require("../utils/utils");
+const { messageTransporter } = require("../utils/email");
+require("dotenv").config();
+const uuidv1 = require("uuid");
+>>>>>>> opeyemi
 const { isPropertyInDatabase, addAdmin, editAdmin, editAdminStatus, removeAdmin, getAdminById, } = require("../services/admin.service");
 const ADMIN_EMAIL_DOMAIN = "decagon.dev";
 const getAdmin = asyncHandler(async (req, res) => {
     const admim = await getAdminById(req.params.adminId);
     if (admim)
+<<<<<<< HEAD
         return res.status(200).send({ data: admim, message: "Admin data got successfully" });
     return res.status(400).send({ error: true, message: "no admin found" });
 });
@@ -28,6 +44,35 @@ const createAdmin = asyncHandler(async (req, res) => {
     let admin = req.body;
     admin.activationStatus = false;
     const password = uuidv1.v1().substr(0, 8).padStart("0", 8);
+=======
+        return res
+            .status(200)
+            .send({ data: admim, message: "Admin data got successfully" });
+    return res.status(400).send({ error: true, message: "no admin found" });
+});
+const createAdmin = asyncHandler(async (req, res) => {
+    const validation = await adminRegistrationSchema.validateAsync(req.body);
+    if (validation.error)
+        return res
+            .status(400)
+            .send({ message: "Registration Detail: " + validation.error.message });
+    if (req.body.email.search(ADMIN_EMAIL_DOMAIN) === -1) {
+        return res
+            .status(400)
+            .send({ error: true, message: "Please use an official email" });
+    }
+    const isUserInRegistered = await admin_model_1.Admin.find({
+        email: req.body.email.toLowerCase(),
+    });
+    if (isUserInRegistered.length > 0)
+        return res
+            .status(400)
+            .send({ message: "Email already in use, try another" });
+    let admin = req.body;
+    admin.activationStatus = true;
+    const password = uuidv1.v1().substr(0, 8).padStart("0", 8);
+    console.log(password);
+>>>>>>> opeyemi
     admin.password = await passwordHandler(password);
     //sendEmailToAdmin(admin.email, admin.password)
     //const registeredAdmin = await addAdmin(admin);
@@ -42,13 +87,31 @@ const createAdmin = asyncHandler(async (req, res) => {
     });
     await messageTransporter(admin.email, admin.firstname, password);
     if (!registeredAdmin)
+<<<<<<< HEAD
         return res.status(400).send({ message: "Ussername already in use, try another" });
     return res.status(201).send({ data: registeredAdmin, message: "Successfully created admin, password has been sent to " + admin.email });
+=======
+        return res
+            .status(400)
+            .send({ message: "Ussername already in use, try another" });
+    return res
+        .status(201)
+        .send({
+        data: registeredAdmin,
+        message: "Successfully created admin, password has been sent to " + admin.email,
+    });
+>>>>>>> opeyemi
 });
 const updateAdmin = asyncHandler(async (req, res) => {
     const validation = adminRegistrationSchema.validate(req.body);
     if (validation.error)
+<<<<<<< HEAD
         return res.status(400).send({ message: "Admin Detail: " + validation.error.message, });
+=======
+        return res
+            .status(400)
+            .send({ message: "Admin Detail: " + validation.error.message });
+>>>>>>> opeyemi
     const adminId = req.params.adminId || req.body.adminId;
     const result = await editAdmin({ _id: adminId }, { ...req.body });
     if (!result)
@@ -73,7 +136,15 @@ const setdminActivationStatus = asyncHandler(async (req, res) => {
     const activationStatus = /activate/i.test(action) ? true : false;
     const result = await editAdminStatus(adminId, { activationStatus });
     if (!result)
+<<<<<<< HEAD
         return res.status(400).send({ message: "unable to process action; Maybe no such admin was found" });
+=======
+        return res
+            .status(400)
+            .send({
+            message: "unable to process action; Maybe no such admin was found",
+        });
+>>>>>>> opeyemi
     const newAdmin = await admin_model_1.Admin.findById(adminId);
     const message = "successfully deleted admin";
     return res.status(200).send({ data: newAdmin, message: message });
@@ -84,6 +155,7 @@ const loginAdmin = asyncHandler(async (req, res) => {
         password: req.body.password,
     });
     const { email, password } = req.body;
+<<<<<<< HEAD
     const admim = await isPropertyInDatabase("email", email);
     if (admim.length > 0) {
         if (admim[0].activationStatus) {
@@ -92,6 +164,18 @@ const loginAdmin = asyncHandler(async (req, res) => {
         const passwordMatch = await bcrypt.compare(password, admim[0].password);
         if (passwordMatch) {
             const token = generateAdminToken((admim[0]._id).toString());
+=======
+    console.log(email);
+    const admim = await admin_model_1.Admin.find({ email });
+    console.log(admim);
+    if (admim.length > 0) {
+        if (!admim[0].activationStatus) {
+            return res.status(404).json({ message: "Account deactivated" });
+        }
+        const passwordMatch = await bcrypt_1.default.compare(password, admim[0].password);
+        if (passwordMatch) {
+            const token = generateAdminToken(admim[0]._id.toString());
+>>>>>>> opeyemi
             res.cookie("Token", token);
             res.cookie("Name", admim[0].firstname);
             res.cookie("Id", admim[0]._id);
@@ -149,7 +233,11 @@ const changeAdminPhoneNumber = asyncHandler(async (req, res) => {
     if (findAdmin) {
         await admin_model_1.Admin.updateOne({ _id: id }, { phone: req.body.phone });
         res.status(201).json({
+<<<<<<< HEAD
             message: "Phone number updated successfully"
+=======
+            message: "Phone number updated successfully",
+>>>>>>> opeyemi
         });
     }
     else {
@@ -165,5 +253,9 @@ module.exports = {
     loginAdmin,
     adminProfileImage,
     adminProfile,
+<<<<<<< HEAD
     changeAdminPhoneNumber
+=======
+    changeAdminPhoneNumber,
+>>>>>>> opeyemi
 };

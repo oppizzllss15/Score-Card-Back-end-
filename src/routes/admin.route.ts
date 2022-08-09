@@ -11,7 +11,8 @@ import multer from "multer";
 const uploads = multer({storage})
 
 router.get("/profile", adminProtect, adminProfile);
-router.post("/login", adminProtect, loginAdmin);
+router.post("/login" ,loginAdmin);
 router.post("/upload", adminProtect, uploads.single("file"), adminProfileImage);
 
 module.exports = router;
+//  adminProtect,

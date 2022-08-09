@@ -35,17 +35,30 @@ async function removeAdmin(adminid) {
     return deletedAdmin ? deletedAdmin : false;
 }
 //delete admin
+<<<<<<< HEAD
 const isPropertyInDatabase = async (property, value) => {
     let propertyObject = {};
     propertyObject[property] = value;
     const admin = await admin_model_1.Admin.find(propertyObject);
     return admin.length > 0 ? admin : false;
 };
+=======
+async function isPropertyInDatabase(property, value) {
+    let propertyObject;
+    propertyObject[property] = value;
+    const admin = await admin_model_1.Admin.find({ propertyObject });
+    return admin.length > 0 ? admin[0] : false;
+}
+>>>>>>> opeyemi
 module.exports = {
     addAdmin,
     editAdmin,
     getAdminById,
     removeAdmin,
     editAdminStatus,
+<<<<<<< HEAD
     isPropertyInDatabase
+=======
+    isPropertyInDatabase,
+>>>>>>> opeyemi
 };
