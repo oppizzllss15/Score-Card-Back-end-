@@ -28,7 +28,7 @@ const userRegistration = () => {
     squad: Joi.number().required(),
     stack: Joi.string().required(),
   });
-}
+};
 
 const userUpdate = () => {
   return Joi.object({
@@ -38,21 +38,21 @@ const userUpdate = () => {
     squad: Joi.number(),
     stack: Joi.string(),
   });
-}
+};
 
 const userLogin = () => {
   return Joi.object({
     email: Joi.string().required(),
     password: Joi.string().required(),
   });
-}
+};
 
 const userStatus = () => {
   return Joi.object({
     email: Joi.string().required(),
     status: Joi.string().required(),
   });
-}
+};
 
 const passwordHandler = async (password: string) => {
   const salt = await bcrypt.genSalt(10);
@@ -78,25 +78,24 @@ const passwordChange = () => {
     newPassword: Joi.string().required(),
     confirmPassword: Joi.string().required(),
   });
-}
+};
 
 const score = () => {
   return Joi.object({
-     week: Joi.number().required(),
-     agile: Joi.number().max(100).min(0).required(),
-     weekly_task: Joi.number().max(100).min(0).required(),
-     assessment: Joi.number().max(100).min(0).required(),
-     algorithm: Joi.number().max(100).min(0).required(),
+    week: Joi.number().required(),
+    agile: Joi.number().max(100).min(0).required(),
+    weekly_task: Joi.number().max(100).min(0).required(),
+    assessment: Joi.number().max(100).min(0).required(),
+    algorithm: Joi.number().max(100).min(0).required(),
   });
-}
-
+};
 
 const adminRegistrationSchema = Joi.object({
   firstname: Joi.string().min(3).required(),
   lastname: Joi.string().min(3).required(),
   email: Joi.string().email().required(),
   stack: Joi.string().required(),
-  squad: Joi.string().required(),
+  squad: Joi.number().required(),
   role: Joi.string(),
 });
 
@@ -112,5 +111,5 @@ module.exports = {
   userUpdate,
   userStatus,
   score,
-  adminRegistrationSchema
+  adminRegistrationSchema,
 };
