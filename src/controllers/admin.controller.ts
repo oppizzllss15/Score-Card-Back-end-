@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import Joi, { ValidationResult } from "joi";
+import Joi, { any, ValidationResult } from "joi";
 import { IAdmin } from "../typings";
 const { adminRegistrationSchema }  = require( "../utils/utils");
 const asyncHandler = require("express-async-handler");
@@ -83,7 +83,7 @@ const updateAdmin = asyncHandler( async (req: Request, res: Response) => {
   if (validation.error) return res.status(400).send({message: "Admin Detail: " + validation.error.message,});
 
   const adminId = req.params.adminId || req.body.adminId;
-  const result = await editAdmin({_id: adminId}, {...req.body})
+  const result = await editAdmin({_id: adminId}, req.body)
 
   if (!result) return res.status(400).send({ message: "unable to register" });
   

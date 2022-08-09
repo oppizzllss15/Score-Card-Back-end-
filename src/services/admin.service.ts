@@ -11,9 +11,7 @@ async function addAdmin(admin: IAdmin) {
 //edit admin
 async function editAdmin(adminid: string, admin: IAdmin) {
   const newAdmin = await Admin.findByIdAndUpdate(adminid, {
-      $set: {
-        ...admin,
-      },
+      $set: admin
     });
     return newAdmin ? newAdmin : null;
   
@@ -44,13 +42,14 @@ async function removeAdmin(adminid: string) {
 }
 
 //delete admin
-async function isPropertyInDatabase<T>(property: string, value: T) {
-    let propertyObject: any;
+const isPropertyInDatabase = async <T>(property: string, value: T) => {
+    let propertyObject: any = {};
     propertyObject[property] = value;
-    const admin = await Admin.find({ propertyObject });
+    const admin = await Admin.find(propertyObject);
     return admin.length > 0 ? admin : false;
 
 }
+
 module.exports = {
   addAdmin,
   editAdmin,
