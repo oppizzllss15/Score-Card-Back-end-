@@ -2,7 +2,8 @@ const asyncHandler = require("express-async-handler");
 const Stacks = require("../models/stack");
 const SuperUser = require("../models/superAdmin.model");
 const mongoose = require("mongoose");
-import { Admin } from "../models/admin.model";
+// import { Admin } from "../models/admin.model";
+const Admin = require("../models/admin.model")
 import express, { Request, Response, NextFunction } from "express";
 
 // const toId = mongoose.Schema.types.ObjectId
