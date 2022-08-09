@@ -1,5 +1,6 @@
 import mongoose, { Mongoose, Schema, Model } from "mongoose";
-const adminSchema = new Schema(
+
+const adminSchema = new mongoose.Schema(
   {
     firstname: String,
     lastname: String,
@@ -24,4 +25,4 @@ const adminSchema = new Schema(
   { timestamps: true }
 );
 
-export const Admin = mongoose.model("admin", adminSchema);
+export const Admin = mongoose.model("Admin", adminSchema);

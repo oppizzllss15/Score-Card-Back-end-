@@ -1,6 +1,5 @@
 import { Request, Response } from "express";
 import Joi, { ValidationResult } from "joi";
-import { IAdmin } from "../typings";
 const { adminRegistrationSchema }  = require( "../utils/utils");
 const asyncHandler = require("express-async-handler");
 import {Admin} from '../models/admin.model'

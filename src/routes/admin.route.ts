@@ -5,7 +5,7 @@ const {
     loginAdmin,
     adminProfileImage,
     adminProfile
-  } = require("../controllers/adminController");
+  } = require("../controllers/admin.controller");
 const {storage} = require("../utils/upload")
 import multer from "multer";
 const uploads = multer({storage})
