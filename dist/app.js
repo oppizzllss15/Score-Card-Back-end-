@@ -7,7 +7,7 @@ const logger = require('morgan');
 require('dotenv').config();
 const { connectDB } = require('./database/db');
 connectDB();
-const usersRouter = require('./routes/users');
+const usersRouter = require('./routes/users.route');
 const adminRouter = require('./routes/admin.route');
 const superAdminRouter = require('./routes/superAdmin.route');
 const app = express();

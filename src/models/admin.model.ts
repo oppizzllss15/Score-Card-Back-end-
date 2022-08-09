@@ -1,5 +1,6 @@
 import mongoose, { Mongoose, Schema, Model } from "mongoose";
-const adminSchema = new Schema(
+
+const adminSchema = new mongoose.Schema(
   {
     firstname: String,
     lastname: String,
@@ -14,14 +15,14 @@ const adminSchema = new Schema(
     stack: [
       {
         type: Schema.Types.ObjectId,
-        ref: "stack",
+        ref: "Stacks",
       },
     ],
     squad: Number,
     role: String,
-    activationStatus: { type: Boolean, default: false },
+    activationStatus: { type: Boolean, default: true },
   },
   { timestamps: true }
 );
 
-export const Admin = mongoose.model("admin", adminSchema);
+export const Admin = mongoose.model("Admin", adminSchema);
