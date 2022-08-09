@@ -233,6 +233,28 @@ const getScores = asyncHandler(async (req, res) => {
         .status(201)
         .json({ message: "Grade successfully", scores: getScores.grades });
 });
+const filterScores = asyncHandler(async (req, res) => {
+    const week = Number(req.params.weekId);
+    const getAllScores = await User.find();
+    const buffer = [];
+    getAllScores.forEach((doc) => buffer.push({ firstname: doc.firstname,
+        lastname: doc.lastname,
+        week: doc.grades.filter((grd) => grd["week"] === week) }));
+    res.status(201)
+        .json({ message: "Grade by week", week: buffer });
+});
+const getScoresByName = asyncHandler(async (req, res) => {
+    const { firstname, lastname } = req.body;
+    const getStudentScores = await User.find({ firstname, lastname });
+    if (getStudentScores.length === 0) {
+        res.status(400);
+        throw new Error("Student does not exist");
+    }
+    console.log(getStudentScores[0].grades);
+    res
+        .status(201)
+        .json({ message: "Student grades", scores: getStudentScores[0].grades });
+});
 module.exports = {
     registerUser,
     loginUser,
@@ -245,4 +267,6 @@ module.exports = {
     userProfileImage,
     calScore,
     getScores,
+    filterScores,
+    getScoresByName
 };
