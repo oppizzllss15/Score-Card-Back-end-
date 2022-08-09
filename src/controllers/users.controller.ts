@@ -8,21 +8,31 @@ const {
   passwordHandler,
   score,
 } = require("../utils/utils");
+const {
+  findUserByEmail,
+  createUser,
+  findUserById,
+  updateUserById,
+  updateUserStatus,
+  updateUserScore,
+  getAllUsers,
+  getUserScoreByName,
+  updateUserPhoneNo,
+  updateUserProfileImg,
+} = require("../services/user.service");
+
+const { getUserStack } = require("../services/stack.service");
 const asyncHandler = require("express-async-handler");
 const bcrypt = require("bcryptjs");
-const User = require("../models/user.model");
-const randomPass = require("pino-password")
+const randomPass = require("pino-password");
 import { Request, Response, NextFunction } from "express";
 
 const userProfileImage = asyncHandler(
   async (req: Request, res: Response, next: NextFunction) => {
-    if (req.file === undefined) return res.send("you must select a file.");
+    if (req.file === undefined) return res.send("You must select a file.");
     const id = req.cookies.Id;
-    await User.updateOne(
-      { _id: id },
-      { profile_img: req.file?.path, cloudinary_id: req.file?.filename }
-    );
-    const findUser = await User.findById(id);
+    await updateUserProfileImg(id, req.file?.path, req.file?.filename);
+    const findUser = await findUserById(id);
 
     res.status(201).json({ message: "Uploaded file successfully", findUser });
   }
@@ -35,14 +45,15 @@ const userProfile = asyncHandler(async (req: Request, res: Response) => {
     throw new Error("Provide user id");
   }
 
-  const findUser = await User.findById(id);
+  const findUser = await findUserById(id);
+  const userStack = await getUserStack(findUser.stack);
   if (findUser) {
     res.status(201).json({
       firstname: findUser.firstname,
       lastname: findUser.lastname,
       email: findUser.email,
       phone: findUser.phone,
-      stack: findUser.stack,
+      stack: userStack,
       squad: findUser.squad,
     });
   } else {
@@ -63,17 +74,18 @@ const changeUserPhoneNumber = asyncHandler(
       throw new Error("Provide user new phone number");
     }
 
-    const findUser = await User.findById(id);
+    const findUser = await findUserById(id);
     if (findUser) {
-      await User.updateOne({ _id: id }, { phone: req.body.phone });
-      const changedNo = await User.findById(id);
+      await updateUserPhoneNo(id, req.body.phone);
+      const changedNo = await findUserById(id);
+      const userStack = await getUserStack(findUser.stack);
 
       res.status(201).json({
         firstname: findUser.firstname,
         lastname: findUser.lastname,
         email: findUser.email,
         phone: changedNo.phone,
-        stack: findUser.stack,
+        stack: userStack,
         squad: findUser.squad,
       });
     } else {
@@ -83,13 +95,7 @@ const changeUserPhoneNumber = asyncHandler(
 );
 
 const registerUser = asyncHandler(async (req: Request, res: Response) => {
-  const {
-    firstname,
-    lastname,
-    email,
-    squad,
-    stack,
-  } = req.body;
+  const { firstname, lastname, email, squad, stack } = req.body;
   await userRegistration().validateAsync({
     firstname: firstname,
     lastname: lastname,
@@ -98,29 +104,39 @@ const registerUser = asyncHandler(async (req: Request, res: Response) => {
     stack: stack,
   });
 
-  const pass = new randomPass()
-  const password = pass.generatePassword(firstname)
-  console.log(password)
+  const pass = new randomPass();
+  const password = pass.generatePassword(firstname);
 
-  const userExists = await User.find({ email: email.toLowerCase() });
+  const userExists = await findUserByEmail(email);
 
   if (userExists.length > 0) {
     res.status(400);
     throw new Error("User already exists");
   }
 
-  const user = await User.create({
+  const userStack = await getUserStack(stack);
+  const hashedPass = await passwordHandler(password);
+  const user = await createUser(
     firstname,
     lastname,
-    email: email.toLowerCase(),
-    password: await passwordHandler(password),
+    email,
+    hashedPass,
     squad,
-    stack,
-  });
+    stack
+  );
 
   if (user) {
     await messageTransporter(email, firstname, password, squad);
-    res.status(201).json({ user });
+    res.status(201).json({
+      userId: user._id,
+      firstname: user.firstname,
+      lastname: user.lastname,
+      email: user.email,
+      stack: userStack,
+      squad: user.squad,
+      status: user.status,
+      grades: user.grades,
+    });
   }
 });
 
@@ -132,7 +148,7 @@ const loginUser = asyncHandler(async (req: Request, res: Response) => {
   });
 
   const { email, password } = req.body;
-  const user = await User.find({ email: email.toLowerCase() });
+  const user = await findUserByEmail(email);
 
   if (user.length > 0) {
     if (user[0].status !== "active") {
@@ -168,7 +184,7 @@ const updateUser = asyncHandler(async (req: Request, res: Response) => {
   });
 
   const { firstname, lastname, phone, squad, stack } = req.body;
-  const user = await User.findById(id);
+  const user = await findUserById(id);
 
   if (user) {
     const newData = {
@@ -184,11 +200,20 @@ const updateUser = asyncHandler(async (req: Request, res: Response) => {
       cloudinary_id: user.cloudinary_id,
     };
 
-    const updatedUser = await User.findByIdAndUpdate(user._id, newData, {
-      new: true,
-    });
+    const updatedUser = await updateUserById(user._id, newData);
+    const userStack = await getUserStack(updatedUser.stack);
 
-    res.status(201).json({ message: "Updated successfully", updatedUser });
+    res.status(201).json({
+      message: "Updated successfully",
+      userId: updatedUser._id,
+      firstname: updatedUser.firstname,
+      lastname: updatedUser.lastname,
+      email: updatedUser.email,
+      stack: userStack,
+      squad: updatedUser.squad,
+      status: updatedUser.status,
+      grades: updatedUser.grades,
+    });
   } else {
     res.status(404).json({ message: "User not Found" });
   }
@@ -201,18 +226,9 @@ const deactivateUser = asyncHandler(async (req: Request, res: Response) => {
   });
   const { email, status } = req.body;
 
-  const findUser = await User.find({ email: email.toLowerCase() });
+  const findUser = await findUserByEmail(email);
   if (findUser.length > 0) {
-    const deactivateUserAccount = await User.updateOne(
-      { email: email.toLowerCase() },
-      {
-        status:
-          status.toLowerCase() === "active"
-            ? status.toLowerCase()
-            : "deactivated",
-      }
-    );
-
+    const deactivateUserAccount = await updateUserStatus(email, status);
     res.status(201).json({
       message: "Updated successfully",
       deactivateUserAccount,
@@ -229,7 +245,7 @@ const deleteUser = asyncHandler(async (req: Request, res: Response) => {
     throw new Error("Provide user email address");
   }
 
-  const findUser = await User.findById(id);
+  const findUser = await findUserById(id);
   if (findUser) {
     await findUser.remove();
 
@@ -268,15 +284,12 @@ const calScore = asyncHandler(async (req: Request, res: Response) => {
     weekly_task: weekly_task,
     assessment: assessment,
     algorithm: algorithm,
-    cummulative: calCum,
+    cummulative: calCum.toFixed(1),
   };
 
-  const userData = await User.updateOne(
-    { _id: id },
-    { $push: { grades: data } }
-  );
+  const userData = await updateUserScore(id, data);
 
-  const getScores = await User.findById(id);
+  const getScores = await findUserById(id);
 
   res
     .status(201)
@@ -285,44 +298,50 @@ const calScore = asyncHandler(async (req: Request, res: Response) => {
 
 const getScores = asyncHandler(async (req: Request, res: Response) => {
   const id = req.params.id;
-  const getScores = await User.findById(id);
-  res
-    .status(201)
-    .json({ message: "Grade successfully", scores: getScores.grades });
+  const getScores = await findUserById(id);
+  console.log(id);
+  if (getScores) {
+    res
+      .status(201)
+      .json({ message: "Grade successfully", scores: getScores.grades });
+  } else {
+    res.status(404);
+    throw new Error("User not found");
+  }
 });
 
 const filterScores = asyncHandler(async (req: Request, res: Response) => {
   const week = Number(req.params.weekId);
-  const getAllScores = await User.find()
-  const buffer: any[] = []
+  const getAllScores = await getAllUsers();
+  const buffer: any[] = [];
 
-  getAllScores.forEach((doc: {
-    lastname: string;
-    firstname: string; 
-    grades: any 
-}) => buffer.push({firstname: doc.firstname, 
-  lastname: doc.lastname, 
-  week: doc.grades.filter((grd: { week: number; }) => grd["week"] === week)}))
+  getAllScores.forEach(
+    (doc: { lastname: string; firstname: string; grades: any }) =>
+      buffer.push({
+        firstname: doc.firstname,
+        lastname: doc.lastname,
+        week: doc.grades.filter(
+          (grd: { week: number }) => grd["week"] === week
+        ),
+      })
+  );
 
-  res.status(201)
-    .json({ message: "Grade by week", week: buffer });
+  res.status(201).json({ message: "Grade by week", week: buffer });
 });
 
-
 const getScoresByName = asyncHandler(async (req: Request, res: Response) => {
-  const { firstname, lastname } = req.body
-  const getStudentScores = await User.find({firstname, lastname});
+  const { firstname, lastname } = req.body;
+  const getStudentScores = await getUserScoreByName(firstname, lastname);
 
   if (getStudentScores.length === 0) {
-    res.status(400)
-    throw new Error("Student does not exist")
+    res.status(400);
+    throw new Error("Student does not exist");
   }
-  console.log(getStudentScores[0].grades)
+  console.log(getStudentScores[0].grades);
   res
     .status(201)
     .json({ message: "Student grades", scores: getStudentScores[0].grades });
 });
-
 
 module.exports = {
   registerUser,
@@ -337,5 +356,5 @@ module.exports = {
   calScore,
   getScores,
   filterScores,
-  getScoresByName
+  getScoresByName,
 };
