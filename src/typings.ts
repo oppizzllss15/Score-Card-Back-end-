@@ -5,14 +5,11 @@ export type IAdmin = {
   lastname?: string,
   email: string,
   password?: string,
-  profilepicture?: string,
+  phonenumber: string,
+  profile_img?: string,
   stack?: string,
   phone?: string,
   role?: string,
   squad?: number,
   activationStatus?: boolean
-}
-export type IStack = {
-  _id?: string,
-  name: string
 }
