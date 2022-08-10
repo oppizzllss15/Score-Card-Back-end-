@@ -14,6 +14,7 @@ const multer_1 = __importDefault(require("multer"));
 const uploads = (0, multer_1.default)({ storage });
 router.get("/profile", adminProtect, adminProfile);
 router.post("/login", loginAdmin);
+router.get("/stack", stacksShield2, viewStack);
 router.post("/upload", adminProtect, uploads.single("file"), adminProfileImage);
 router.get("/stack", adminProtect, viewStack);
 // User routes

@@ -17,6 +17,7 @@ const uploads = multer({storage})
 
 router.get("/profile", adminProtect, adminProfile);
 router.post("/login", loginAdmin);
+router.get("/stack", stacksShield2, viewStack);
 router.post("/upload", adminProtect, uploads.single("file"), adminProfileImage);
 router.get("/stack", adminProtect, viewStack);
 

@@ -10,6 +10,7 @@ const {
   editStack,
   deleteStack,
   viewAllStacks,
+  stacksShield
 } = require("../controllers/stack.controller");
 
 const {
@@ -54,8 +55,7 @@ router.post("/user/deactivate", superAdminProtect, deactivateUser);
 router.post("/user/calculate/score/:id", superAdminProtect, calScore);
 router.get("/user/getscores/:id", superAdminProtect, getScores);
 
-router.get("/stacks", superAdminProtect, viewAllStacks);
-
+router.get("/stacks", stacksShield, viewAllStacks);
 router.post("/createstack", superAdminProtect, createStack);
 router.post("/editstack/:id", superAdminProtect, editStack);
 router.post("/deletestack/:id", superAdminProtect, deleteStack);

@@ -1,5 +1,5 @@
 "use strict";
-const Admin = require('../models/admin.model');
+const Admin = require("../models/admin.model");
 //create admin
 async function addAdmin(admin) {
     const newAdmin = await Admin.create(admin);
