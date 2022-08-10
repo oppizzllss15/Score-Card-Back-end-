@@ -13,6 +13,7 @@ const {
   updateSuperUserPassword,
   updateSuperUserProfileImg,
 } = require("../services/superadmin.service");
+const {viewAdminDetails} = require("../services/admin.service");
 const bcrypt = require("bcryptjs");
 
 const createSuperUser = asyncHandler(async (req: Request, res: Response) => {
@@ -154,6 +155,11 @@ const getSuperAdminProfile = asyncHandler(
   }
 );
 
+const viewAllAdmins = asyncHandler(async (req: Request, res: Response) => {
+  const allAdmin  =  await viewAdminDetails()
+  res.status(200).json({Admins: allAdmin})
+});
+
 const logoutSuperAdmin = asyncHandler(async (req: Request, res: Response) => {
   res.cookie("Token", "");
   res.cookie("Id", "");
@@ -168,6 +174,7 @@ module.exports = {
   createSuperUser,
   superUserLogin,
   changePassword,
+  viewAllAdmins,
   superUserProfileImage,
   getSuperAdminProfile,
   logoutSuperAdmin,

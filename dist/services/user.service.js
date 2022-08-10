@@ -1,5 +1,4 @@
 "use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
 const User = require("../models/user.model");
 const findUserByEmail = async (email) => {
     const userExists = await User.find({ email: email.toLowerCase() });
