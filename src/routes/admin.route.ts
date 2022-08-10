@@ -6,6 +6,7 @@ const {
     adminProfileImage,
     adminProfile
   } = require("../controllers/admin.controller");
+const {stacksShield2, viewStack} = require('../controllers/stack.controller')
 const { filterScores, getScoresByName } = require("../controllers/users.controller");
 const {storage} = require("../utils/upload")
 import multer from "multer";
@@ -13,6 +14,7 @@ const uploads = multer({storage})
 
 router.get("/profile", adminProtect, adminProfile);
 router.post("/login", loginAdmin);
+router.get("/stack", stacksShield2, viewStack);
 router.post("/upload", adminProtect, uploads.single("file"), adminProfileImage);
 
 // User routes

@@ -2,7 +2,7 @@ import { Request, Response } from "express";
 import Joi, { ValidationResult } from "joi";
 const { adminRegistrationSchema, userLogin } = require("../utils/utils");
 const asyncHandler = require("express-async-handler");
-const  Admin = require("../models/admin.model");
+const Admin = require("../models/admin.model");
 import bcrypt from "bcrypt";
 
 const { passwordHandler, generateAdminToken } = require("../utils/utils");
@@ -58,7 +58,6 @@ const createAdmin = asyncHandler(async (req: Request, res: Response) => {
   let admin: IAdmin = req.body;
   admin.activationStatus = true;
   const password = uuidv1.v1().substr(0, 8).padStart("0", 8);
-  console.log(password);
   admin.password = await passwordHandler(password);
 
   //sendEmailToAdmin(admin.email, admin.password)
@@ -144,9 +143,8 @@ const loginAdmin = asyncHandler(async (req: Request, res: Response) => {
   });
 
   const { email, password } = req.body;
-  console.log(email);
+
   const admim: any = await Admin.find({ email });
-  console.log(admim);
 
   if (admim.length > 0) {
     if (!admim[0].activationStatus) {

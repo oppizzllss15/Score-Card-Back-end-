@@ -58,7 +58,6 @@ router.post("/user/calculate/score/:id", superAdminProtect, calScore);
 router.get("/user/getscores/:id", superAdminProtect, getScores);
 
 router.get("/stacks", stacksShield, viewAllStacks);
-router.get("/stack", stacksShield2, viewStack);
 router.post("/createstack", superAdminProtect, createStack);
 router.post("/editstack/:id", superAdminProtect, editStack);
 router.post("/deletestack/:id", superAdminProtect, deleteStack);

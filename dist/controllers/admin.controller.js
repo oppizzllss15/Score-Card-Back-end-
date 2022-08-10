@@ -42,7 +42,6 @@ const createAdmin = asyncHandler(async (req, res) => {
     let admin = req.body;
     admin.activationStatus = true;
     const password = uuidv1.v1().substr(0, 8).padStart("0", 8);
-    console.log(password);
     admin.password = await passwordHandler(password);
     //sendEmailToAdmin(admin.email, admin.password)
     //const registeredAdmin = await addAdmin(admin);
@@ -108,9 +107,7 @@ const loginAdmin = asyncHandler(async (req, res) => {
         password: req.body.password,
     });
     const { email, password } = req.body;
-    console.log(email);
     const admim = await Admin.find({ email });
-    console.log(admim);
     if (admim.length > 0) {
         if (!admim[0].activationStatus) {
             return res.status(404).json({ message: "Account deactivated" });
