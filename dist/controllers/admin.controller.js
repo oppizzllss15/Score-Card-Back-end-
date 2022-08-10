@@ -6,7 +6,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const { adminRegistrationSchema, userLogin } = require("../utils/utils");
 const asyncHandler = require("express-async-handler");
 const bcrypt_1 = __importDefault(require("bcrypt"));
-const admin_model_1 = require("../models/admin.model");
+const Admin = require('../models/admin.model');
 const { passwordHandler, generateAdminToken } = require("../utils/utils");
 const { messageTransporter } = require("../utils/email");
 require("dotenv").config();
@@ -32,7 +32,7 @@ const createAdmin = asyncHandler(async (req, res) => {
             .status(400)
             .send({ error: true, message: "Please use an official email" });
     }
-    const isUserInRegistered = await admin_model_1.Admin.find({
+    const isUserInRegistered = await Admin.find({
         email: req.body.email.toLowerCase(),
     });
     if (isUserInRegistered.length > 0)
@@ -75,7 +75,7 @@ const updateAdmin = asyncHandler(async (req, res) => {
     const result = await editAdmin({ _id: adminId }, { ...req.body });
     if (!result)
         return res.status(400).send({ message: "unable to register" });
-    const newAdmin = await admin_model_1.Admin.findById(adminId);
+    const newAdmin = await Admin.findById(adminId);
     const message = "successfully updated admin";
     return res.status(200).send({ data: newAdmin, message: message });
 });
@@ -98,7 +98,7 @@ const setdminActivationStatus = asyncHandler(async (req, res) => {
         return res.status(400).send({
             message: "unable to process action; Maybe no such admin was found",
         });
-    const newAdmin = await admin_model_1.Admin.findById(adminId);
+    const newAdmin = await Admin.findById(adminId);
     const message = "successfully deleted admin";
     return res.status(200).send({ data: newAdmin, message: message });
 });
@@ -109,7 +109,7 @@ const loginAdmin = asyncHandler(async (req, res) => {
     });
     const { email, password } = req.body;
     console.log(email);
-    const admim = await admin_model_1.Admin.find({ email });
+    const admim = await Admin.find({ email });
     console.log(admim);
     if (admim.length > 0) {
         if (!admim[0].activationStatus) {
@@ -138,7 +138,7 @@ const adminProfileImage = asyncHandler(async (req, res) => {
         return res.send("You must select a file.");
     const id = req.cookies.Id;
     await updateAdminProfileImg(id, (_a = req.file) === null || _a === void 0 ? void 0 : _a.path, (_b = req.file) === null || _b === void 0 ? void 0 : _b.filename);
-    const findAdmin = await admin_model_1.Admin.findById(id);
+    const findAdmin = await Admin.findById(id);
     res.status(201).json({ message: "Uploaded file successfully", findAdmin });
 });
 const adminProfile = asyncHandler(async (req, res) => {
@@ -147,7 +147,7 @@ const adminProfile = asyncHandler(async (req, res) => {
         res.status(400);
         throw new Error("Provide Admin id");
     }
-    const findAdmin = await admin_model_1.Admin.findById(id);
+    const findAdmin = await Admin.findById(id);
     if (findAdmin) {
         res.status(201).json({
             firstname: findAdmin.firstname,
@@ -171,7 +171,7 @@ const changeAdminPhoneNumber = asyncHandler(async (req, res) => {
         res.status(400);
         throw new Error("Provide user new phone number");
     }
-    const findAdmin = await admin_model_1.Admin.findById(id);
+    const findAdmin = await Admin.findById(id);
     if (findAdmin) {
         await updateAdminPhoneNo(id, req.body.phone);
         res.status(201).json({
