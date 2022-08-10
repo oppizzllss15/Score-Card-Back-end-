@@ -11,12 +11,12 @@ require("dotenv").config();
 const uuidv1 = require("uuid");
 
 const {
-  isPropertyInDatabase,
   addAdmin,
   editAdmin,
   editAdminStatus,
-  removeAdmin,
+  updateAdminProfileImg,
   getAdminById,
+  updateAdminPhoneNo,
 } = require("../services/admin.service");
 
 const ADMIN_EMAIL_DOMAIN = "decagon.dev";
@@ -79,13 +79,11 @@ const createAdmin = asyncHandler(async (req: Request, res: Response) => {
       .status(400)
       .send({ message: "Ussername already in use, try another" });
 
-  return res
-    .status(201)
-    .send({
-      data: registeredAdmin,
-      message:
-        "Successfully created admin, password has been sent to " + admin.email,
-    });
+  return res.status(201).send({
+    data: registeredAdmin,
+    message:
+      "Successfully created admin, password has been sent to " + admin.email,
+  });
 });
 
 const updateAdmin = asyncHandler(async (req: Request, res: Response) => {
@@ -129,11 +127,9 @@ const setdminActivationStatus = asyncHandler(
     const result = await editAdminStatus(adminId, { activationStatus });
 
     if (!result)
-      return res
-        .status(400)
-        .send({
-          message: "unable to process action; Maybe no such admin was found",
-        });
+      return res.status(400).send({
+        message: "unable to process action; Maybe no such admin was found",
+      });
 
     const newAdmin = await Admin.findById(adminId);
     const message = "successfully deleted admin";
@@ -177,10 +173,7 @@ const loginAdmin = asyncHandler(async (req: Request, res: Response) => {
 const adminProfileImage = asyncHandler(async (req: Request, res: Response) => {
   if (req.file === undefined) return res.send("You must select a file.");
   const id = req.cookies.Id;
-  await Admin.updateOne(
-    { _id: id },
-    { profile_img: req.file?.path, cloudinary_id: req.file?.filename }
-  );
+  await updateAdminProfileImg(id, req.file?.path, req.file?.filename);
   const findAdmin = await Admin.findById(id);
 
   res.status(201).json({ message: "Uploaded file successfully", findAdmin });
@@ -222,13 +215,13 @@ const changeAdminPhoneNumber = asyncHandler(
 
     const findAdmin = await Admin.findById(id);
     if (findAdmin) {
-      await Admin.updateOne({ _id: id }, { phone: req.body.phone });
+      await updateAdminPhoneNo(id, req.body.phone);
 
       res.status(201).json({
         message: "Phone number updated successfully",
       });
     } else {
-      res.status(404).json({ message: "Admin accountnot found" });
+      res.status(404).json({ message: "Admin account not found" });
     }
   }
 );

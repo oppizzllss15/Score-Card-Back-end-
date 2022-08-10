@@ -52,7 +52,6 @@ const viewAllStacks = asyncHandler(async (req, res) => {
 const viewStack = asyncHandler(async (req, res) => {
     const userID = req.cookies.Id;
     const admin = await Admin.findOne({ _id: userID });
-    const stack = admin.stack[0];
     const adminStack = [];
     for (let i = 0; i < admin.stack.length; i++) {
         const user = await Stacks.find({ _id: admin.stack[i] });

@@ -6,7 +6,7 @@ interface IAdmin {
   password?: string;
   phonenumber: string;
   profile_img?: string;
-  stack?: string;
+  stack: string[];
   phone?: string;
   role?: string;
   squad?: number;
