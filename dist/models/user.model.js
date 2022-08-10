@@ -1,5 +1,4 @@
 "use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
 const UserDb = require("mongoose");
 const userData = UserDb.Schema({
     firstname: String,

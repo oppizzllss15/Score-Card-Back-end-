@@ -86,27 +86,10 @@ const changePassword = asyncHandler(async (req, res) => {
         message: "Password successfully changed",
     });
 });
-const superUserProfileImage = asyncHandler(async (req, res, next) => {
-    var _a, _b;
-    if (req.file === undefined)
-        return res.send("you must select a file.");
-    const id = req.cookies.Id;
-    await Super.updateOne({ _id: id }, { profile_img: (_a = req.file) === null || _a === void 0 ? void 0 : _a.path, cloudinary_id: (_b = req.file) === null || _b === void 0 ? void 0 : _b.filename });
-    const findSuper = await Super.find();
-    res
-        .status(201)
-        .json({ message: "Uploaded file successfully", user: findSuper[0] });
-});
 const logoutSuperAdmin = asyncHandler(async (req, res) => {
     res.cookie("Token", "");
     res.cookie("Id", "");
     res.cookie("Name", "");
     res.status(201).json({ message: "Logged out successfully" });
 });
-module.exports = {
-    createSuperUser,
-    superUserLogin,
-    changePassword,
-    superUserProfileImage,
-    logoutSuperAdmin,
-};
+module.exports = { createSuperUser, superUserLogin, changePassword, logoutSuperAdmin };

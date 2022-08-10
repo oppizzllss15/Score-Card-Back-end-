@@ -8,10 +8,7 @@ const userData = UserDb.Schema({
   phone: String,
   profile_img: String,
   cloudinary_id: String,
-  stack: {
-    type: UserDb.Schema.Types.ObjectId,
-    ref: "stack",
-  },
+  stack: String,
   squad: Number,
   grades: [
     {
@@ -21,7 +18,7 @@ const userData = UserDb.Schema({
       assessment: Number,
       algorithm: Number,
       cummulative: Number,
-    },
+    }
   ],
   status: {
     type: String,
