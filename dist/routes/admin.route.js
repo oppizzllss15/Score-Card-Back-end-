@@ -7,24 +7,16 @@ var express = require("express");
 var router = express.Router();
 const { adminProtect } = require("../middlewares/authenticate");
 const { loginAdmin, adminProfileImage, adminProfile } = require("../controllers/admin.controller");
+const { stacksShield2, viewStack } = require('../controllers/stack.controller');
+const { filterScores, getScoresByName } = require("../controllers/users.controller");
 const { storage } = require("../utils/upload");
 const multer_1 = __importDefault(require("multer"));
 const uploads = (0, multer_1.default)({ storage });
-<<<<<<< HEAD
-const { isPropertyInDatabase } = require("../services/admin.service");
-router.get("/", async (req, res) => {
-    const ad = await isPropertyInDatabase("email", "okageaugona@decagon.dev");
-    console.log("okay isproperty", JSON.stringify(ad));
-    return res.status(200).json({ message: JSON.stringify(ad) });
-});
-router.get("/profile", adminProtect, adminProfile);
-router.post("/login", adminProtect, loginAdmin);
-router.post("/upload", adminProtect, uploads.single("file"), adminProfileImage);
-module.exports = router;
-=======
 router.get("/profile", adminProtect, adminProfile);
 router.post("/login", loginAdmin);
+router.get("/stack", stacksShield2, viewStack);
 router.post("/upload", adminProtect, uploads.single("file"), adminProfileImage);
+// User routes
+router.get("/user/filterscores/:weekId", filterScores);
+router.post("/user/score/name", getScoresByName);
 module.exports = router;
-//  adminProtect,
->>>>>>> opeyemi

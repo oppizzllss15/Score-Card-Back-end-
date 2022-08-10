@@ -1,10 +1,33 @@
-import { Admin } from "../models/admin.model";
+const Admin = require("../models/admin.model");
 
 //create admin
 async function addAdmin(admin: IAdmin) {
   const newAdmin = await Admin.create(admin);
   return newAdmin ? newAdmin : null;
 }
+
+//view all admin
+async function viewAdminDetails() {
+  const allAdmins = await Admin.find();
+  return allAdmins
+}
+
+// update admin profile_img
+const updateAdminProfileImg = async (
+  id: string,
+  filePath: string,
+  filename: String
+) => {
+  await Admin.updateOne(
+    { _id: id },
+    { profile_img: filePath, cloudinary_id: filename }
+  );
+};
+
+// update admin phone number
+const updateAdminPhoneNo = async (id: string, data: string) => {
+  await Admin.updateOne({ _id: id }, { phone: data });
+};
 
 //edit admin
 async function editAdmin(adminid: string, admin: IAdmin) {
@@ -24,12 +47,12 @@ async function getAdminById(adminid: string) {
 
 //edit admin activate or deactivated
 async function editAdminStatus(adminid: string, status: boolean) {
-  const newAdmin = await Admin.findByIdAndUpdate(adminid, {
+  const newAdmin = await Admin.updateOne({_id: adminid}, {
     $set: {
-      activationStatus: status,
+        activationStatus: status,
     },
   });
-  return newAdmin ? newAdmin : null;
+  return newAdmin ? true : false;
 }
 
 //delete admin
@@ -39,11 +62,11 @@ async function removeAdmin(adminid: string) {
 }
 
 //delete admin
-async function isPropertyInDatabase<T>(property: string, value: T): Promise<IAdmin | boolean>{
+async function isPropertyInDatabase<T>(property: string, value: T): Promise<IAdmin>{
   let propertyObject: {[key: string]: T} = {}
   propertyObject[property] = value;
   const admin: IAdmin[] = await Admin.find(propertyObject);
-  return admin.length > 0 ? admin[0] : false;
+  return admin[0];
 }
 
 module.exports = {
@@ -51,6 +74,9 @@ module.exports = {
   editAdmin,
   getAdminById,
   removeAdmin,
+  viewAdminDetails,
   editAdminStatus,
   isPropertyInDatabase,
+  updateAdminProfileImg,
+  updateAdminPhoneNo,
 };

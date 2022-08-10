@@ -2,8 +2,8 @@ import { Request, Response } from "express";
 import Joi, { ValidationResult } from "joi";
 const { adminRegistrationSchema, userLogin } = require("../utils/utils");
 const asyncHandler = require("express-async-handler");
+const Admin = require("../models/admin.model");
 import bcrypt from "bcrypt";
-import { Admin } from "../models/admin.model";
 
 const { passwordHandler, generateAdminToken } = require("../utils/utils");
 const { messageTransporter } = require("../utils/email");
@@ -11,12 +11,13 @@ require("dotenv").config();
 const uuidv1 = require("uuid");
 
 const {
-  isPropertyInDatabase,
   addAdmin,
   editAdmin,
   editAdminStatus,
-  removeAdmin,
+  updateAdminProfileImg,
   getAdminById,
+  updateAdminPhoneNo,
+  isPropertyInDatabase
 } = require("../services/admin.service");
 
 const ADMIN_EMAIL_DOMAIN = "decagon.dev";
@@ -56,34 +57,24 @@ const createAdmin = asyncHandler(async (req: Request, res: Response) => {
   let admin: IAdmin = req.body;
   admin.activationStatus = true;
   const password = uuidv1.v1().substr(0, 8).padStart("0", 8);
-  console.log(password);
   admin.password = await passwordHandler(password);
 
   //sendEmailToAdmin(admin.email, admin.password)
 
   //const registeredAdmin = await addAdmin(admin);
-  const registeredAdmin = await addAdmin({
-    firstname: admin.firstname,
-    lastname: admin.lastname,
-    email: admin.email.toLowerCase(),
-    password: admin.password,
-    stack: [admin.stack],
-    squad: admin.squad,
-    role: admin.role,
-  });
+  const registeredAdmin = await addAdmin(admin);
+
   await messageTransporter(admin.email, admin.firstname, password);
   if (!registeredAdmin)
     return res
       .status(400)
       .send({ message: "Ussername already in use, try another" });
 
-  return res
-    .status(201)
-    .send({
-      data: registeredAdmin,
-      message:
-        "Successfully created admin, password has been sent to " + admin.email,
-    });
+  return res.status(201).send({
+    data: registeredAdmin,
+    message:
+      `Successfully created admin, password: (${password}) has been sent to ${admin.email}`
+  });
 });
 
 const updateAdmin = asyncHandler(async (req: Request, res: Response) => {
@@ -97,11 +88,11 @@ const updateAdmin = asyncHandler(async (req: Request, res: Response) => {
       .send({ message: "Admin Detail: " + validation.error.message });
 
   const adminId = req.params.adminId || req.body.adminId;
-  const result = await editAdmin({ _id: adminId }, { ...req.body });
+  const result = await editAdmin({ _id: adminId }, req.body);
 
   if (!result) return res.status(400).send({ message: "unable to register" });
 
-  const newAdmin = await Admin.findById(adminId);
+  const newAdmin = await getAdminById(adminId);
   const message = "successfully updated admin";
   return res.status(200).send({ data: newAdmin, message: message });
 });
@@ -123,17 +114,15 @@ const setdminActivationStatus = asyncHandler(
   async (req: Request, res: Response) => {
     const adminId = req.params.adminId || req.body.adminId;
     const action = req.params.action || req.body.action;
-    const activationStatus = /activate/i.test(action) ? true : false;
-    const result = await editAdminStatus(adminId, { activationStatus });
-
+    const activationStatus = /^activate$/i.test(action.trim()) ? true : false;
+    const result = await editAdminStatus(adminId,  activationStatus );
+    
     if (!result)
-      return res
-        .status(400)
-        .send({
-          message: "unable to process action; Maybe no such admin was found",
-        });
+      return res.status(400).send({
+        message: "unable to process action; Maybe no such admin was found",
+      });
 
-    const newAdmin = await Admin.findById(adminId);
+    const newAdmin = await getAdminById(adminId);
     const message = "successfully deleted admin";
     return res.status(200).send({ data: newAdmin, message: message });
   }
@@ -146,39 +135,29 @@ const loginAdmin = asyncHandler(async (req: Request, res: Response) => {
   });
 
   const { email, password } = req.body;
-  console.log(email);
-  const admim: IAdmin = await isPropertyInDatabase("email", email);
-  console.log(admim);
-
-  if (admim) {
-    if (!admim.activationStatus) {
-      return res.status(404).json({ message: "Account deactivated" });
-    }
-
-    const passwordMatch = await bcrypt.compare(password, <string>admim.password);
-    if (passwordMatch) {
-      const token = generateAdminToken(admim._id);
-      res.cookie("Token", token);
-      res.cookie("Name", admim.firstname);
-      res.cookie("Id", admim._id);
-
-      res.status(201).json({ token, data: admim });
-    } else {
-      res.status(400).json({ error: true, message: "Invalid password" });
-      return;
-    }
-  } else {
-    return res.status(404).json({ error: true, message: "User not found" });
+  const admin: IAdmin = await isPropertyInDatabase("email", email);
+  if (admin && !admin.activationStatus) {
+    return res.status(404).json({ message: "Account deactivated" });
   }
+
+  if(!admin) return res.status(400).send({message: "Incorrect login details"})
+  const passwordMatch = await bcrypt.compare(password, <string>admin.password);
+  if(passwordMatch) {
+    const token = generateAdminToken(admin._id);
+    res.cookie("Token", token);
+    res.cookie("Name", admin.firstname);
+    res.cookie("Id", admin._id);
+
+    return res.status(200).json({ token, data: admin });
+  }
+  return res.status(400).json({ error: true, message: "Invalid login detail" });
+  
 });
 
 const adminProfileImage = asyncHandler(async (req: Request, res: Response) => {
   if (req.file === undefined) return res.send("You must select a file.");
   const id = req.cookies.Id;
-  await Admin.updateOne(
-    { _id: id },
-    { profile_img: req.file?.path, cloudinary_id: req.file?.filename }
-  );
+  await updateAdminProfileImg(id, req.file?.path, req.file?.filename);
   const findAdmin = await Admin.findById(id);
 
   res.status(201).json({ message: "Uploaded file successfully", findAdmin });
@@ -220,13 +199,13 @@ const changeAdminPhoneNumber = asyncHandler(
 
     const findAdmin = await Admin.findById(id);
     if (findAdmin) {
-      await Admin.updateOne({ _id: id }, { phone: req.body.phone });
+      await updateAdminPhoneNo(id, req.body.phone);
 
       res.status(201).json({
         message: "Phone number updated successfully",
       });
     } else {
-      res.status(404).json({ message: "Admin accountnot found" });
+      res.status(404).json({ message: "Admin account not found" });
     }
   }
 );

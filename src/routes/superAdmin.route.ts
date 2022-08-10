@@ -28,6 +28,8 @@ const {
   superUserLogin,
   changePassword,
   superUserProfileImage,
+  getSuperAdminProfile,
+  viewAllAdmins,
   logoutSuperAdmin,
 } = require("../controllers/superadmin.controller");
 const {
@@ -40,10 +42,12 @@ const {
 } = require("../controllers/users.controller");
 
 
-router.post("/superuser/create", createSuperUser);
-router.post("/superuser/login", superUserLogin);
-router.get("/superuser/logout", logoutSuperAdmin);
+router.post("/create", createSuperUser);
+router.post("/login", superUserLogin);
+router.get("/logout", logoutSuperAdmin);
 router.post("/change/password", superAdminProtect, changePassword);
+router.get("/profile", superAdminProtect, getSuperAdminProfile);
+router.get("/all/admins", superAdminProtect, viewAllAdmins);
 router.post("/upload", superAdminProtect, uploads.single("file"), superUserProfileImage);
 
 router.post("/user/create", superAdminProtect, registerUser);
@@ -54,16 +58,17 @@ router.post("/user/calculate/score/:id", superAdminProtect, calScore);
 router.get("/user/getscores/:id", superAdminProtect, getScores);
 
 router.get("/stacks", stacksShield, viewAllStacks);
-router.get("/stack", stacksShield2, viewStack);
 router.post("/createstack", superAdminProtect, createStack);
 router.post("/editstack/:id", superAdminProtect, editStack);
 router.post("/deletestack/:id", superAdminProtect, deleteStack);
 
-//functions on admin
 router.get("/admin/:adminId", superAdminProtect,  getAdmin);
 router.post("/admin/create", superAdminProtect,  createAdmin);
-router.put("/admin/update/:adminId", adminProtect,  updateAdmin);
-router.delete("/admin/delete/:adminId", superAdminProtect, deleteAdmin);
-router.put("/admin/deactivate/:adminId/:action", superAdminProtect, setdminActivationStatus );
+router.put("/admin/update/:adminId", superAdminProtect,  updateAdmin);
+router.delete("/admin/delete/:adminId", superAdminProtect,  deleteAdmin);
+router.put(
+  "/admin/setadminstatus/:action/:adminId/", superAdminProtect,
+  setdminActivationStatus
+);
 
 module.exports = router;
