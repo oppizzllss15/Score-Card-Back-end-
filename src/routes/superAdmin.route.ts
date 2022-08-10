@@ -63,11 +63,11 @@ router.post("/editstack/:id", superAdminProtect, editStack);
 router.post("/deletestack/:id", superAdminProtect, deleteStack);
 
 router.get("/admin/:adminId", superAdminProtect,  getAdmin);
-router.post("/admin/create",  createAdmin);
-router.put("/admin/update/:adminId", adminProtect,  updateAdmin);
-router.delete("/admin/delete/:adminId",  deleteAdmin);
+router.post("/admin/create",superAdminProtect,  createAdmin);
+router.put("/admin/update/:adminId", superAdminProtect,  updateAdmin);
+router.delete("/admin/delete/:adminId", superAdminProtect, deleteAdmin);
 router.put(
-  "/admin/status/:action/:adminId",adminProtect,
+  "/admin/status/:action/:adminId",superAdminProtect,
   setdminActivationStatus
 );
 
