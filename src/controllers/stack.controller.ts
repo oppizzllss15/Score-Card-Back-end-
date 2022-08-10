@@ -1,7 +1,6 @@
 const asyncHandler = require("express-async-handler");
 const Stacks = require("../models/stack");
 const SuperUser = require("../models/superAdmin.model");
-const mongoose = require("mongoose");
 // import { Admin } from "../models/admin.model";
 const Admin = require("../models/admin.model")
 import express, { Request, Response, NextFunction } from "express";
@@ -16,13 +15,7 @@ const stacksShield = asyncHandler(
     const superUser = await SuperUser.findOne({ _id: userID });
 
     if (superUser) next();
-    // else if (adminUser) {
-    //   res.status(403).json({
-    //     status: "Failed",
-    //     message: `Hi ${adminUser.firstname}, you can only access the stack you have been assigned to`,
-    //   });
-    //   return;
-    // }
+
     else {
       res.status(403).json({
         status: "Failed",
@@ -69,17 +62,9 @@ const viewAllStacks = asyncHandler(async (req: Request, res: Response) => {
 const viewStack = asyncHandler(async (req: Request, res: Response) => {
   const userID = req.cookies.Id;
   console.log(userID);
-  const admin = await Admin.findOne({ _id: userID });
-  console.log(admin);
-  const stack = admin.stack[0];
-  console.log(stack);
-  const adminStack: IUser[] = [];
+  const admin: IAdmin = await Admin.findOne({ _id: userID });
 
-  // for (let el in stack) {
-  //   const user: IUser = await Stacks.find({ _id: el });
-  //   console.log(user);
-  //   adminStack.push(user);
-  // }
+  const adminStack: IUser[] = [];
 
   for (let i = 0; i < admin.stack.length; i++) {
     const user: IUser = await Stacks.find({ _id: admin.stack[i] });

@@ -7,7 +7,12 @@ const {
 } = require("../utils/utils");
 const asyncHandler = require("express-async-handler");
 import { Request, Response, NextFunction } from "express";
-const Super = require("../models/superAdmin.model");
+const {
+  findSuperUser,
+  createSuperHandler,
+  updateSuperUserPassword,
+  updateSuperUserProfileImg,
+} = require("../services/superadmin.service");
 const bcrypt = require("bcryptjs");
 
 const createSuperUser = asyncHandler(async (req: Request, res: Response) => {
@@ -37,22 +42,23 @@ const createSuperUser = asyncHandler(async (req: Request, res: Response) => {
     throw new Error("Passwords do not match");
   }
 
-  const existingData = await Super.find();
+  const existingData = await findSuperUser();
   if (existingData.length > 0) {
     res.status(401);
     throw new Error("Super admin already exist");
   }
 
-  const createData = await Super.create({
-    firstname: firstname,
-    lastname: lastname,
-    email: email.toLowerCase(),
-    stack: stack,
-    secret: process.env.SECRET_PASS,
-    squad: squad,
-    password: await passwordHandler(password),
-    phone: phone,
-  });
+  const hashedPass = await passwordHandler(password);
+  const createData = await createSuperHandler(
+    firstname,
+    lastname,
+    email,
+    stack,
+    process.env.SECRET_PASS,
+    squad,
+    hashedPass,
+    phone
+  );
 
   const token = generateSuperAdminToken(createData._id);
   res.cookie("Token", token);
@@ -72,7 +78,7 @@ const superUserLogin = asyncHandler(async (req: Request, res: Response) => {
     password: password,
   });
 
-  const user = await Super.find();
+  const user = await findSuperUser();
 
   if (
     user[0].email === email.toLowerCase() &&
@@ -95,7 +101,6 @@ const superUserLogin = asyncHandler(async (req: Request, res: Response) => {
   }
 });
 
-
 const changePassword = asyncHandler(async (req: Request, res: Response) => {
   await passwordChange().validateAsync({
     newPassword: req.body.newPassword,
@@ -109,32 +114,43 @@ const changePassword = asyncHandler(async (req: Request, res: Response) => {
     throw new Error("Passwords do not match");
   }
 
-  const superUser = await Super.find();
-  await Super.updateOne(
-    { _id: superUser[0]._id },
-    {
-      password: await passwordHandler(newPassword),
-    }
-  );
+  const superUser = await findSuperUser();
+  const newHashedPass = await passwordHandler(newPassword);
+  await updateSuperUserPassword(superUser[0]._id, newHashedPass);
   res.status(201).json({
     message: "Password successfully changed",
   });
 });
 
-
 const superUserProfileImage = asyncHandler(
   async (req: Request, res: Response, next: NextFunction) => {
     if (req.file === undefined) return res.send("you must select a file.");
     const id = req.cookies.Id;
-    await Super.updateOne(
-      { _id: id },
-      { profile_img: req.file?.path, cloudinary_id: req.file?.filename }
-    );
-    const findSuper = await Super.find();
+    await updateSuperUserProfileImg(id, req.file?.path, req.file?.filename);
+    const findSuper = await findSuperUser();
 
     res
       .status(201)
       .json({ message: "Uploaded file successfully", user: findSuper[0] });
+  }
+);
+
+const getSuperAdminProfile = asyncHandler(
+  async (req: Request, res: Response) => {
+    const findSuper = await findSuperUser();
+
+    if (findSuper.length === 0) {
+      res.status(404);
+      throw new Error("No Super Admin Profile found");
+    }
+
+    res.status(201).json({
+      firstname: findSuper[0].firstname,
+      lastname: findSuper[0].lastname,
+      email: findSuper[0].email,
+      stack: findSuper[0].stack,
+      squad: findSuper[0].squad,
+    });
   }
 );
 
@@ -146,15 +162,13 @@ const logoutSuperAdmin = asyncHandler(async (req: Request, res: Response) => {
   res.status(201).json({ message: "Logged out successfully" });
 });
 
-
-
 //ADMIN FUNCTIONS
-
 
 module.exports = {
   createSuperUser,
   superUserLogin,
   changePassword,
   superUserProfileImage,
+  getSuperAdminProfile,
   logoutSuperAdmin,
 };

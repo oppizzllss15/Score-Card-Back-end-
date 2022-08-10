@@ -28,6 +28,7 @@ const {
   superUserLogin,
   changePassword,
   superUserProfileImage,
+  getSuperAdminProfile,
   logoutSuperAdmin,
 } = require("../controllers/superadmin.controller");
 const {
@@ -40,10 +41,11 @@ const {
 } = require("../controllers/users.controller");
 
 
-router.post("/superuser/create", createSuperUser);
-router.post("/superuser/login", superUserLogin);
-router.get("/superuser/logout", logoutSuperAdmin);
+router.post("/create", createSuperUser);
+router.post("/login", superUserLogin);
+router.get("/logout", logoutSuperAdmin);
 router.post("/change/password", superAdminProtect, changePassword);
+router.get("/profile", superAdminProtect, getSuperAdminProfile);
 router.post("/upload", superAdminProtect, uploads.single("file"), superUserProfileImage);
 
 router.post("/user/create", superAdminProtect, registerUser);
