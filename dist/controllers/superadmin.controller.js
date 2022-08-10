@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-const { superAdminValidator, generateAdminToken, passwordHandler, userLogin, passwordChange, } = require("../utils/utils");
+const { superAdminValidator, generateSuperAdminToken, passwordHandler, userLogin, passwordChange, } = require("../utils/utils");
 const asyncHandler = require("express-async-handler");
 const Super = require("../models/superAdmin.model");
 const bcrypt = require("bcryptjs");
@@ -35,7 +35,7 @@ const createSuperUser = asyncHandler(async (req, res) => {
         password: await passwordHandler(password),
         phone: phone,
     });
-    const token = generateAdminToken(createData._id);
+    const token = generateSuperAdminToken(createData._id);
     res.cookie("Token", token);
     res.cookie("Id", createData._id);
     res.cookie("Name", createData.firstname);
@@ -54,7 +54,7 @@ const superUserLogin = asyncHandler(async (req, res) => {
     if (user[0].email === email.toLowerCase() &&
         (await bcrypt.compare(password, user[0].password)) &&
         user[0].secret === process.env.SECRET_PASS) {
-        const token = await generateAdminToken(user[0]._id);
+        const token = await generateSuperAdminToken(user[0]._id);
         res.cookie("Token", token);
         res.cookie("Id", user[0]._id);
         res.cookie("Name", user[0].firstname);
@@ -86,10 +86,28 @@ const changePassword = asyncHandler(async (req, res) => {
         message: "Password successfully changed",
     });
 });
+const superUserProfileImage = asyncHandler(async (req, res, next) => {
+    var _a, _b;
+    if (req.file === undefined)
+        return res.send("you must select a file.");
+    const id = req.cookies.Id;
+    await Super.updateOne({ _id: id }, { profile_img: (_a = req.file) === null || _a === void 0 ? void 0 : _a.path, cloudinary_id: (_b = req.file) === null || _b === void 0 ? void 0 : _b.filename });
+    const findSuper = await Super.find();
+    res
+        .status(201)
+        .json({ message: "Uploaded file successfully", user: findSuper[0] });
+});
 const logoutSuperAdmin = asyncHandler(async (req, res) => {
     res.cookie("Token", "");
     res.cookie("Id", "");
     res.cookie("Name", "");
     res.status(201).json({ message: "Logged out successfully" });
 });
-module.exports = { createSuperUser, superUserLogin, changePassword, logoutSuperAdmin };
+//ADMIN FUNCTIONS
+module.exports = {
+    createSuperUser,
+    superUserLogin,
+    changePassword,
+    superUserProfileImage,
+    logoutSuperAdmin,
+};

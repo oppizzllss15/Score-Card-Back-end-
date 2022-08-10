@@ -1,10 +1,11 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-const { messageTransporter } = require("../services/usersService");
-const { generateToken, userRegistration, userUpdate, userLogin, userStatus, passwordHandler, score } = require("../utils/utils");
+const { messageTransporter } = require("../utils/email");
+const { generateToken, userRegistration, userUpdate, userLogin, userStatus, passwordHandler, score, } = require("../utils/utils");
 const asyncHandler = require("express-async-handler");
 const bcrypt = require("bcryptjs");
 const User = require("../models/user.model");
+const randomPass = require("pino-password");
 const userProfileImage = asyncHandler(async (req, res, next) => {
     var _a, _b;
     if (req.file === undefined)
@@ -63,21 +64,17 @@ const changeUserPhoneNumber = asyncHandler(async (req, res) => {
     }
 });
 const registerUser = asyncHandler(async (req, res) => {
-    const { firstname, lastname, email, password, confirmPassword, phone, squad, stack, } = req.body;
+    const { firstname, lastname, email, squad, stack, } = req.body;
     await userRegistration().validateAsync({
         firstname: firstname,
         lastname: lastname,
         email: email,
-        password: password,
-        confirmPassword: confirmPassword,
-        phone: phone,
         squad: squad,
         stack: stack,
     });
-    if (password !== confirmPassword) {
-        res.status(400);
-        throw new Error("Passwords do not match");
-    }
+    const pass = new randomPass();
+    const password = pass.generatePassword(firstname);
+    console.log(password);
     const userExists = await User.find({ email: email.toLowerCase() });
     if (userExists.length > 0) {
         res.status(400);
@@ -88,7 +85,6 @@ const registerUser = asyncHandler(async (req, res) => {
         lastname,
         email: email.toLowerCase(),
         password: await passwordHandler(password),
-        phone,
         squad,
         stack,
     });
@@ -215,8 +211,7 @@ const calScore = asyncHandler(async (req, res) => {
     });
     const id = req.params.id;
     const { week, agile, weekly_task, assessment, algorithm } = req.body;
-    const calCum = ((weekly_task * 0.4) + (agile * 0.2) + (assessment * 0.2) + (algorithm * 0.2));
-    ;
+    const calCum = weekly_task * 0.4 + agile * 0.2 + assessment * 0.2 + algorithm * 0.2;
     const data = {
         week: week,
         agile: agile,
@@ -225,15 +220,44 @@ const calScore = asyncHandler(async (req, res) => {
         algorithm: algorithm,
         cummulative: calCum,
     };
-    console.log(data);
     const userData = await User.updateOne({ _id: id }, { $push: { grades: data } });
     const getScores = await User.findById(id);
-    res.status(201).json({ message: "Updated successfully", scores: getScores.grades });
+    res
+        .status(201)
+        .json({ message: "Updated successfully", scores: getScores.grades });
 });
 const getScores = asyncHandler(async (req, res) => {
     const id = req.params.id;
     const getScores = await User.findById(id);
+<<<<<<< HEAD
     res.status(201).json({ message: "User grades", scores: getScores.grades });
+=======
+    res
+        .status(201)
+        .json({ message: "Grade successfully", scores: getScores.grades });
+});
+const filterScores = asyncHandler(async (req, res) => {
+    const week = Number(req.params.weekId);
+    const getAllScores = await User.find();
+    const buffer = [];
+    getAllScores.forEach((doc) => buffer.push({ firstname: doc.firstname,
+        lastname: doc.lastname,
+        week: doc.grades.filter((grd) => grd["week"] === week) }));
+    res.status(201)
+        .json({ message: "Grade by week", week: buffer });
+});
+const getScoresByName = asyncHandler(async (req, res) => {
+    const { firstname, lastname } = req.body;
+    const getStudentScores = await User.find({ firstname, lastname });
+    if (getStudentScores.length === 0) {
+        res.status(400);
+        throw new Error("Student does not exist");
+    }
+    console.log(getStudentScores[0].grades);
+    res
+        .status(201)
+        .json({ message: "Student grades", scores: getStudentScores[0].grades });
+>>>>>>> doris
 });
 module.exports = {
     registerUser,
@@ -246,5 +270,7 @@ module.exports = {
     changeUserPhoneNumber,
     userProfileImage,
     calScore,
-    getScores
+    getScores,
+    filterScores,
+    getScoresByName
 };
