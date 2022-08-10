@@ -14,5 +14,7 @@ const uploads = (0, multer_1.default)({ storage });
 router.get("/profile", adminProtect, adminProfile);
 router.post("/login", loginAdmin);
 router.post("/upload", adminProtect, uploads.single("file"), adminProfileImage);
+// User routes
+router.get("/user/filterscores/:weekId", filterScores);
+router.post("/user/score/name", getScoresByName);
 module.exports = router;
-//  adminProtect,

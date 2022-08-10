@@ -2,8 +2,8 @@ import { Request, Response } from "express";
 import Joi, { ValidationResult } from "joi";
 const { adminRegistrationSchema, userLogin } = require("../utils/utils");
 const asyncHandler = require("express-async-handler");
+const  Admin = require("../models/admin.model");
 import bcrypt from "bcrypt";
-import { Admin } from "../models/admin.model";
 
 const { passwordHandler, generateAdminToken } = require("../utils/utils");
 const { messageTransporter } = require("../utils/email");

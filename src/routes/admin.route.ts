@@ -12,13 +12,6 @@ import multer from "multer";
 const uploads = multer({storage})
 
 router.get("/profile", adminProtect, adminProfile);
-<<<<<<< HEAD
-router.post("/login" ,loginAdmin);
-router.post("/upload", adminProtect, uploads.single("file"), adminProfileImage);
-
-module.exports = router;
-//  adminProtect,
-=======
 router.post("/login", loginAdmin);
 router.post("/upload", adminProtect, uploads.single("file"), adminProfileImage);
 
@@ -27,4 +20,3 @@ router.get("/user/filterscores/:weekId", filterScores);
 router.post("/user/score/name", getScoresByName);
 
 module.exports = router;
->>>>>>> doris
