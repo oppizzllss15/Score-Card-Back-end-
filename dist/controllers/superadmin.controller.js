@@ -3,6 +3,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const { superAdminValidator, generateSuperAdminToken, passwordHandler, userLogin, passwordChange, } = require("../utils/utils");
 const asyncHandler = require("express-async-handler");
 const { findSuperUser, createSuperHandler, updateSuperUserPassword, updateSuperUserProfileImg, } = require("../services/superadmin.service");
+const { viewAdminDetails } = require("../services/admin.service");
 const bcrypt = require("bcryptjs");
 const createSuperUser = asyncHandler(async (req, res) => {
     const { firstname, lastname, email, stack, squad, password, phone, confirmPassword, } = req.body;
@@ -102,6 +103,10 @@ const getSuperAdminProfile = asyncHandler(async (req, res) => {
         squad: findSuper[0].squad,
     });
 });
+const viewAllAdmins = asyncHandler(async (req, res) => {
+    const allAdmin = await viewAdminDetails();
+    res.status(200).json({ Admins: allAdmin });
+});
 const logoutSuperAdmin = asyncHandler(async (req, res) => {
     res.cookie("Token", "");
     res.cookie("Id", "");
@@ -113,6 +118,7 @@ module.exports = {
     createSuperUser,
     superUserLogin,
     changePassword,
+    viewAllAdmins,
     superUserProfileImage,
     getSuperAdminProfile,
     logoutSuperAdmin,

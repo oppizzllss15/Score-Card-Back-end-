@@ -6,6 +6,19 @@ async function addAdmin(admin) {
     const newAdmin = await admin_model_1.Admin.create(admin);
     return newAdmin ? newAdmin : null;
 }
+//view all admin
+async function viewAdminDetails() {
+    const allAdmins = await admin_model_1.Admin.find();
+    return allAdmins;
+}
+// update admin profile_img
+const updateAdminProfileImg = async (id, filePath, filename) => {
+    await admin_model_1.Admin.updateOne({ _id: id }, { profile_img: filePath, cloudinary_id: filename });
+};
+// update admin phone number
+const updateAdminPhoneNo = async (id, data) => {
+    await admin_model_1.Admin.updateOne({ _id: id }, { phone: data });
+};
 //edit admin
 async function editAdmin(adminid, admin) {
     const newAdmin = await admin_model_1.Admin.findByIdAndUpdate(adminid, {
@@ -46,6 +59,9 @@ module.exports = {
     editAdmin,
     getAdminById,
     removeAdmin,
+    viewAdminDetails,
     editAdminStatus,
     isPropertyInDatabase,
+    updateAdminProfileImg,
+    updateAdminPhoneNo,
 };

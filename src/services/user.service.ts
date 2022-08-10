@@ -1,5 +1,3 @@
-import console from "console";
-
 const User = require("../models/user.model");
 
 const findUserByEmail = async (email: string) => {
