@@ -284,7 +284,7 @@ const calScore = asyncHandler(async (req: Request, res: Response) => {
     weekly_task: weekly_task,
     assessment: assessment,
     algorithm: algorithm,
-    cummulative: calCum.toFixed(1),
+    cummulative: calCum.toFixed(2),
   };
 
   const userData = await updateUserScore(id, data);

@@ -7,7 +7,7 @@ var express = require("express");
 var router = express.Router();
 const { adminProtect } = require("../middlewares/authenticate");
 const { loginAdmin, adminProfileImage, adminProfile } = require("../controllers/admin.controller");
-const { stacksShield2, viewStack } = require('../controllers/stack.controller');
+const { viewStack, stacksShield2, } = require("../controllers/stack.controller");
 const { filterScores, getScoresByName } = require("../controllers/users.controller");
 const { storage } = require("../utils/upload");
 const multer_1 = __importDefault(require("multer"));
@@ -16,6 +16,7 @@ router.get("/profile", adminProtect, adminProfile);
 router.post("/login", loginAdmin);
 router.get("/stack", stacksShield2, viewStack);
 router.post("/upload", adminProtect, uploads.single("file"), adminProfileImage);
+router.get("/stack", adminProtect, viewStack);
 // User routes
 router.get("/user/filterscores/:weekId", filterScores);
 router.post("/user/score/name", getScoresByName);

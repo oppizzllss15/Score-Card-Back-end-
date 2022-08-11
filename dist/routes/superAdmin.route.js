@@ -9,7 +9,7 @@ const { superAdminProtect, adminProtect } = require("../middlewares/authenticate
 const { storage } = require("../utils/upload");
 const multer_1 = __importDefault(require("multer"));
 const uploads = (0, multer_1.default)({ storage });
-const { createStack, editStack, deleteStack, viewAllStacks, viewStack, stacksShield, stacksShield2, } = require("../controllers/stack.controller");
+const { createStack, editStack, deleteStack, viewAllStacks, stacksShield } = require("../controllers/stack.controller");
 const { createAdmin, setdminActivationStatus, deleteAdmin, getAdmin, updateAdmin } = require("../controllers/admin.controller");
 const { createSuperUser, superUserLogin, changePassword, superUserProfileImage, getSuperAdminProfile, viewAllAdmins, logoutSuperAdmin, } = require("../controllers/superadmin.controller");
 const { registerUser, updateUser, deactivateUser, deleteUser, calScore, getScores, } = require("../controllers/users.controller");
@@ -18,7 +18,7 @@ router.post("/login", superUserLogin);
 router.get("/logout", logoutSuperAdmin);
 router.post("/change/password", superAdminProtect, changePassword);
 router.get("/profile", superAdminProtect, getSuperAdminProfile);
-router.get("/all/admins", superAdminProtect, viewAllAdmins);
+router.get("/all/admin", superAdminProtect, viewAllAdmins);
 router.post("/upload", superAdminProtect, uploads.single("file"), superUserProfileImage);
 router.post("/user/create", superAdminProtect, registerUser);
 router.post("/user/update/:id", superAdminProtect, updateUser);
