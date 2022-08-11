@@ -11,7 +11,21 @@ describe("should create an admin",  () => {
     beforeAll( async () => { await connectDB(); app = require('../../dist/__test__/appp' ); })
     afterAll( async () => { await disconnectDB(); if(app){app.close();}} );
     
-    const userData = {
+    
+    const superadmin = {
+
+        "firstname": "Orange2 ",
+        "lastname": "fruit ",
+        "email": "aonge2@decagonhq.com",
+        "stack": "62ec4998a226d04d51c22eca",
+        "password": "thanks",
+        "squad": "11",
+        "confirmPassword": "thanks",
+        "phone": "07034667861",
+        "role": "Stack asssociate"
+    }
+
+    const adminData = {
 
         "firstname": "Orange2 ",
         "lastname": "fruit ",
@@ -20,28 +34,31 @@ describe("should create an admin",  () => {
         "squad": "11",
         "role": "Stack asssociate"
     }
-    let authorId = "";
-    const stackData = {
-        "name": "node"
-    }
     
-    test(" '/superadmin/admin/create should create ", async () => {
-      const res = await request(app).post("/superadmin/admin/create").send(userData);
+    let authorId = "";
+    
+    
+    test(" 'create superadmin should create ", async () => {
+      const res = await request(app).post("/superadmin/create").send(superadmin);
       expect(res.status).toBe(201);
-      adminId = JSON.parse(res.text).data._id;
-      admin = JSON.parse(res.text).data;
+      token = res.headers["set-cookie"];
       //console.log(adminId + " admin id")
     });
     
-    test(" 'admin login should work; create token ", async () => {
-      const res = await request(app).post("/admin/login").send(admin);
-      expect(res.status).toBe(200);
+    test(" 'superadmin login should work; create token ", async () => {
+      const res = await request(app).post("/superadmin/login").send(superadmin);
+      expect(res.status).toBe(201);
       token = res.headers['set-cookie'];
     });
-    
+
+    test(" '/superadmin/admin/create should create ", async () => {
+      const res = await request(app).post("/superadmin/admin/create").send(adminData).set("Cookie", token);
+      expect(res.status).toBe(201);
+      adminId = JSON.parse(res.text).data._id;
+    });
     
     test(" '/superadmin/admin/update should edit admin", async () => {
-        let res = await request(app).put(`/superadmin/admin/update/${adminId}`).send(userData).set("Cookie", token);
+        let res = await request(app).put(`/superadmin/admin/update/${adminId}`).send(adminData).set("Cookie", token);
         
         expect(res.status).toBe(200);
         adminId = JSON.parse(res.text).data._id;
@@ -67,4 +84,5 @@ describe("should create an admin",  () => {
         adminId = JSON.parse(res.text).data._id;
         //console.log(adminId + " admin id")
     });
+
 })
