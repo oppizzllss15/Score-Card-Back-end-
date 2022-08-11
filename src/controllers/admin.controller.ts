@@ -60,9 +60,7 @@ const createAdmin = asyncHandler(async (req: Request, res: Response) => {
   const password = uuidv1.v1().substr(0, 8).padStart("0", 8);
   admin.password = await passwordHandler(password);
 
-  //sendEmailToAdmin(admin.email, admin.password)
 
-  //const registeredAdmin = await addAdmin(admin);
   const registeredAdmin = await addAdmin({
     firstname: admin.firstname,
     lastname: admin.lastname,
