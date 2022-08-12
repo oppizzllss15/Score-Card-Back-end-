@@ -6,6 +6,7 @@ const asyncHandler = require("express-async-handler");
 const { findSuperAdminByEmail, findSuperUser, createSuperHandler, updateSuperUserPassword, updateSuperUserProfileImg, updateSuperUserTicket, validateSuperUserTicketLink, resetSuperUserSecureTicket, } = require("../services/superadmin.service");
 const { viewAdminDetails } = require("../services/admin.service");
 const bcrypt = require("bcryptjs");
+const jwt = require("jsonwebtoken");
 const createSuperUser = asyncHandler(async (req, res) => {
     const { firstname, lastname, email, stack, squad, password, phone, confirmPassword, } = req.body;
     await superAdminValidator().validateAsync({

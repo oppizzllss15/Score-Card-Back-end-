@@ -31,6 +31,7 @@ const {
   updateAdminPassword,
   resetAdminSecureTicket,
 } = require("../services/admin.service");
+const jwt = require("jsonwebtoken");
 
 const ADMIN_EMAIL_DOMAIN = "decagon.dev";
 

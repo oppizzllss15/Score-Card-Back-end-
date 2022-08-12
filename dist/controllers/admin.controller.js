@@ -11,6 +11,7 @@ const { messageTransporter, passwordLinkTransporter, } = require("../utils/email
 require("dotenv").config();
 const uuidv1 = require("uuid");
 const { addAdmin, editAdmin, editAdminStatus, updateAdminProfileImg, getAdminById, updateAdminPhoneNo, findAdminByEmail, updateAdminTicket, validateAdminTicketLink, updateAdminPassword, resetAdminSecureTicket, } = require("../services/admin.service");
+const jwt = require("jsonwebtoken");
 const ADMIN_EMAIL_DOMAIN = "decagon.dev";
 const getAdmin = asyncHandler(async (req, res) => {
     const admim = await getAdminById(req.params.adminId);
