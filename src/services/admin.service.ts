@@ -9,7 +9,7 @@ async function addAdmin(admin: IAdmin) {
 //view all admin
 async function viewAdminDetails() {
   const allAdmins = await Admin.find();
-  return allAdmins
+  return allAdmins;
 }
 
 // update admin profile_img
@@ -62,12 +62,38 @@ async function removeAdmin(adminid: string) {
 }
 
 //delete admin
-async function isPropertyInDatabase<T>(property: string, value: T): Promise<any> {
+async function isPropertyInDatabase<T>(
+  property: string,
+  value: T
+): Promise<any> {
   let propertyObject: any;
   propertyObject[property] = value;
   const admin = await Admin.find({ propertyObject });
   return admin.length > 0 ? admin[0] : false;
 }
+
+const findAdminByEmail = async (email: string) => {
+  const adminExists = await Admin.find({ email: email.toLowerCase() });
+  return adminExists;
+};
+
+const updateAdminTicket = async (id: string, ticket: string) => {
+  await Admin.updateOne({ _id: id }, { password_ticket: ticket });
+};
+
+const validateAdminTicketLink = async (id: string, ticket: string) => {
+  const user = await Admin.find({ _id: id, password_ticket: ticket });
+  return user;
+};
+
+const updateAdminPassword = async (id: string, password: string) => {
+  await Admin.updateOne({ _id: id }, { password: password });
+};
+
+const resetAdminSecureTicket = async (id: string) => {
+  await Admin.updateOne({ _id: id }, { password_ticket: null });
+};
+
 module.exports = {
   addAdmin,
   editAdmin,
@@ -78,4 +104,9 @@ module.exports = {
   isPropertyInDatabase,
   updateAdminProfileImg,
   updateAdminPhoneNo,
+  findAdminByEmail,
+  updateAdminTicket,
+  validateAdminTicketLink,
+  updateAdminPassword,
+  resetAdminSecureTicket,
 };

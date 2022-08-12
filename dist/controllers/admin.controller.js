@@ -3,15 +3,14 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const { adminRegistrationSchema, userLogin } = require("../utils/utils");
+const { adminRegistrationSchema, userLogin, passwordChange, passwordHandler, generateAdminToken, } = require("../utils/utils");
 const asyncHandler = require("express-async-handler");
 const Admin = require("../models/admin.model");
 const bcrypt_1 = __importDefault(require("bcrypt"));
-const { passwordHandler, generateAdminToken } = require("../utils/utils");
-const { messageTransporter } = require("../utils/email");
+const { messageTransporter, passwordLinkTransporter, } = require("../utils/email");
 require("dotenv").config();
 const uuidv1 = require("uuid");
-const { addAdmin, editAdmin, editAdminStatus, updateAdminProfileImg, getAdminById, updateAdminPhoneNo, } = require("../services/admin.service");
+const { addAdmin, editAdmin, editAdminStatus, updateAdminProfileImg, getAdminById, updateAdminPhoneNo, findAdminByEmail, updateAdminTicket, validateAdminTicketLink, updateAdminPassword, resetAdminSecureTicket, } = require("../services/admin.service");
 const ADMIN_EMAIL_DOMAIN = "decagon.dev";
 const getAdmin = asyncHandler(async (req, res) => {
     const admim = await getAdminById(req.params.adminId);
@@ -43,8 +42,6 @@ const createAdmin = asyncHandler(async (req, res) => {
     admin.activationStatus = true;
     const password = uuidv1.v1().substr(0, 8).padStart("0", 8);
     admin.password = await passwordHandler(password);
-    //sendEmailToAdmin(admin.email, admin.password)
-    //const registeredAdmin = await addAdmin(admin);
     const registeredAdmin = await addAdmin({
         firstname: admin.firstname,
         lastname: admin.lastname,
@@ -179,6 +176,69 @@ const changeAdminPhoneNumber = asyncHandler(async (req, res) => {
         res.status(404).json({ message: "Admin account not found" });
     }
 });
+const forgotAdminPassword = asyncHandler(async (req, res) => {
+    if (!req.body.email) {
+        res.status(403);
+        throw new Error("Please enter a valid email address");
+    }
+    const { email } = req.body;
+    const admin = await findAdminByEmail(email);
+    if (admin.length > 0) {
+        if (admin[0].activationStatus !== "true") {
+            res.status(404).json({ message: "Account deactivated" });
+            return;
+        }
+        const ticket = generateAdminToken(admin[0]._id);
+        // Update admin ticket in database
+        await updateAdminTicket(admin[0]._id, ticket);
+        // Attach admin ticket to link in message transporter
+        const resetLink = `localhost:${process.env.PORT}/admin/reset/password/${admin[0]._id}/${ticket}`;
+        await passwordLinkTransporter(email, resetLink);
+        res
+            .status(200)
+            .json({ message: "Check your email for reset password link" });
+    }
+    else {
+        res.status(404).json({ message: "User not found" });
+    }
+});
+const resetAdminPassGetPage = asyncHandler(async (req, res) => {
+    res.status(201).json({ message: "Use post method to reset password" });
+});
+const resetAdminPass = asyncHandler(async (req, res) => {
+    await passwordChange().validateAsync({
+        newPassword: req.body.newPassword,
+        confirmPassword: req.body.confirmPassword,
+    });
+    const ticket = req.params.ticket;
+    const id = req.params.id;
+    // Validate ticket from user account
+    const user = await validateAdminTicketLink(id, ticket);
+    if (user.length === 0) {
+        res.status(403);
+        throw new Error("Invalid link");
+    }
+    const { newPassword, confirmPassword } = req.body;
+    if (newPassword !== confirmPassword) {
+        res.status(400);
+        throw new Error("Passwords do not match");
+    }
+    try {
+        if (process.env.ADMIN_PASS) {
+            await jwt.verify(ticket, process.env.ADMIN_PASS);
+            const newHashedPass = await passwordHandler(newPassword);
+            await updateAdminPassword(id, newHashedPass);
+            await resetAdminSecureTicket(id);
+            res.status(201).json({
+                message: "Password successfully changed",
+            });
+        }
+    }
+    catch (error) {
+        res.status(401);
+        throw new Error("Link expired!");
+    }
+});
 module.exports = {
     getAdmin,
     createAdmin,
@@ -189,4 +249,7 @@ module.exports = {
     adminProfileImage,
     adminProfile,
     changeAdminPhoneNumber,
+    forgotAdminPassword,
+    resetAdminPassGetPage,
+    resetAdminPass,
 };

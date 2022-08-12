@@ -76,12 +76,29 @@ const updateUserProfileImg = async (
 };
 
 const getAllUsers = async () => {
-  return User.find();
+  return await User.find();
 };
 
 const getUserScoreByName = async (firstname: string, lastname: string) => {
   const getStudentScores = await User.find({ firstname, lastname });
   return getStudentScores;
+};
+
+const updateUserTicket = async (id: string, ticket: string) => {
+  await User.updateOne({ _id: id }, { password_ticket: ticket });
+};
+
+const validateUserTicketLink = async (id: string, ticket: string) => {
+  const user = await User.find({ _id: id, password_ticket: ticket });
+  return user;
+};
+
+const updateUserPassword = async (id: string, password: string) => {
+  await User.updateOne({ _id: id }, { password: password });
+};
+
+const resetSecureTicket = async (id: string) => {
+  await User.updateOne({ _id: id }, { password_ticket: null });
 };
 
 module.exports = {
@@ -95,4 +112,8 @@ module.exports = {
   getUserScoreByName,
   updateUserPhoneNo,
   updateUserProfileImg,
+  updateUserTicket,
+  validateUserTicketLink,
+  updateUserPassword,
+  resetSecureTicket,
 };
