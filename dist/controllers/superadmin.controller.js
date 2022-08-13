@@ -47,6 +47,10 @@ const superUserLogin = asyncHandler(async (req, res) => {
         password: password,
     });
     const user = await findSuperUser();
+    if (user.length === 0) {
+        res.status(404);
+        throw new Error("Not registered");
+    }
     if (user[0].email === email.toLowerCase() &&
         (await bcrypt.compare(password, user[0].password)) &&
         user[0].secret === process.env.SECRET_PASS) {

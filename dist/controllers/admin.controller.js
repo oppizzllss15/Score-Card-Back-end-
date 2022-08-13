@@ -127,6 +127,12 @@ const loginAdmin = asyncHandler(async (req, res) => {
         return res.status(404).json({ error: true, message: "User not found" });
     }
 });
+const logoutAdmin = asyncHandler(async (req, res) => {
+    res.cookie("Token", "");
+    res.cookie("Id", "");
+    res.cookie("Name", "");
+    res.status(201).json({ message: "Logged out successfully" });
+});
 const adminProfileImage = asyncHandler(async (req, res) => {
     var _a, _b;
     if (req.file === undefined)
@@ -247,6 +253,7 @@ module.exports = {
     deleteAdmin,
     setdminActivationStatus,
     loginAdmin,
+    logoutAdmin,
     adminProfileImage,
     adminProfile,
     changeAdminPhoneNumber,

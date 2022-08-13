@@ -179,6 +179,14 @@ const loginAdmin = asyncHandler(async (req: Request, res: Response) => {
   }
 });
 
+const logoutAdmin = asyncHandler(async (req: Request, res: Response) => {
+  res.cookie("Token", "");
+  res.cookie("Id", "");
+  res.cookie("Name", "");
+
+  res.status(201).json({ message: "Logged out successfully" });
+});
+
 const adminProfileImage = asyncHandler(async (req: Request, res: Response) => {
   if (req.file === undefined) return res.send("You must select a file.");
   const id = req.cookies.Id;
@@ -319,6 +327,7 @@ module.exports = {
   deleteAdmin,
   setdminActivationStatus,
   loginAdmin,
+  logoutAdmin,
   adminProfileImage,
   adminProfile,
   changeAdminPhoneNumber,
