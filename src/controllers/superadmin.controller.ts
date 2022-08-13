@@ -5,16 +5,25 @@ const {
   userLogin,
   passwordChange,
 } = require("../utils/utils");
+const {
+  messageTransporter,
+  passwordLinkTransporter,
+} = require("../utils/email");
 const asyncHandler = require("express-async-handler");
 import { Request, Response, NextFunction } from "express";
 const {
+  findSuperAdminByEmail,
   findSuperUser,
   createSuperHandler,
   updateSuperUserPassword,
   updateSuperUserProfileImg,
+  updateSuperUserTicket,
+  validateSuperUserTicketLink,
+  resetSuperUserSecureTicket,
 } = require("../services/superadmin.service");
-const {viewAdminDetails} = require("../services/admin.service");
+const { viewAdminDetails } = require("../services/admin.service");
 const bcrypt = require("bcryptjs");
+const jwt = require("jsonwebtoken");
 
 const createSuperUser = asyncHandler(async (req: Request, res: Response) => {
   const {
@@ -62,6 +71,7 @@ const createSuperUser = asyncHandler(async (req: Request, res: Response) => {
   );
 
   const token = generateSuperAdminToken(createData._id);
+  await messageTransporter(email, firstname, password, squad);
   res.cookie("Token", token);
   res.cookie("Id", createData._id);
   res.cookie("Name", createData.firstname);
@@ -81,12 +91,18 @@ const superUserLogin = asyncHandler(async (req: Request, res: Response) => {
 
   const user = await findSuperUser();
 
+  if (user.length === 0) {
+    res.status(404);
+    throw new Error("Not registered");
+  }
+
   if (
     user[0].email === email.toLowerCase() &&
     (await bcrypt.compare(password, user[0].password)) &&
     user[0].secret === process.env.SECRET_PASS
   ) {
     const token = await generateSuperAdminToken(user[0]._id);
+    await resetSuperUserSecureTicket(user[0]._id);
 
     res.cookie("Token", token);
     res.cookie("Id", user[0]._id);
@@ -156,8 +172,8 @@ const getSuperAdminProfile = asyncHandler(
 );
 
 const viewAllAdmins = asyncHandler(async (req: Request, res: Response) => {
-  const allAdmin  =  await viewAdminDetails()
-  res.status(200).json({ message: "All admin in database", Admins: allAdmin })
+  const allAdmin = await viewAdminDetails();
+  res.status(200).json({ message: "All admin in database", Admins: allAdmin });
 });
 
 const logoutSuperAdmin = asyncHandler(async (req: Request, res: Response) => {
@@ -168,7 +184,80 @@ const logoutSuperAdmin = asyncHandler(async (req: Request, res: Response) => {
   res.status(201).json({ message: "Logged out successfully" });
 });
 
-//ADMIN FUNCTIONS
+const forgotSuperAdminPassword = asyncHandler(
+  async (req: Request, res: Response) => {
+    if (!req.body.email) {
+      res.status(403);
+      throw new Error("Please enter a valid email address");
+    }
+
+    const { email } = req.body;
+    const user = await findSuperAdminByEmail(email);
+
+    if (user.length > 0) {
+      const ticket = generateSuperAdminToken(user[0]._id);
+
+      // Update user ticket in database
+      await updateSuperUserTicket(user[0]._id, ticket);
+
+      // Attach user ticket to link in message transporter
+      const resetLink = `localhost:${process.env.PORT}/superadmin/reset/password/${user[0]._id}/${ticket}`;
+      await passwordLinkTransporter(email, resetLink);
+      res
+        .status(200)
+        .json({ message: "Check your email for reset password link" });
+    } else {
+      res.status(404).json({ message: "User not found" });
+    }
+  }
+);
+
+const resetSuperAdminPassGetPage = asyncHandler(
+  async (req: Request, res: Response) => {
+    res.status(201).json({ message: "Use post method to reset password" });
+  }
+);
+
+const resetSuperAdminPass = asyncHandler(
+  async (req: Request, res: Response) => {
+    await passwordChange().validateAsync({
+      newPassword: req.body.newPassword,
+      confirmPassword: req.body.confirmPassword,
+    });
+    const ticket = req.params.ticket;
+    const id = req.params.id;
+
+    // Validate ticket from user account
+    const user = await validateSuperUserTicketLink(id, ticket);
+    if (user.length === 0) {
+      res.status(403);
+      throw new Error("Invalid link");
+    }
+
+    const { newPassword, confirmPassword } = req.body;
+
+    if (newPassword !== confirmPassword) {
+      res.status(400);
+      throw new Error("Passwords do not match");
+    }
+
+    try {
+      if (process.env.SECRET_PASS) {
+        await jwt.verify(ticket, process.env.SECRET_PASS);
+
+        const newHashedPass = await passwordHandler(newPassword);
+        await updateSuperUserPassword(id, newHashedPass);
+        await resetSuperUserSecureTicket(id);
+        res.status(201).json({
+          message: "Password successfully changed",
+        });
+      }
+    } catch (error) {
+      res.status(401);
+      throw new Error("Link expired!");
+    }
+  }
+);
 
 module.exports = {
   createSuperUser,
@@ -178,4 +267,7 @@ module.exports = {
   superUserProfileImage,
   getSuperAdminProfile,
   logoutSuperAdmin,
+  forgotSuperAdminPassword,
+  resetSuperAdminPassGetPage,
+  resetSuperAdminPass,
 };

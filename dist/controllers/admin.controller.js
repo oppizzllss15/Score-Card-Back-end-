@@ -3,15 +3,15 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const { adminRegistrationSchema, userLogin } = require("../utils/utils");
+const { adminRegistrationSchema, userLogin, passwordChange, passwordHandler, generateAdminToken, } = require("../utils/utils");
 const asyncHandler = require("express-async-handler");
+const Admin = require("../models/admin.model");
 const bcrypt_1 = __importDefault(require("bcrypt"));
-const admin_model_1 = require("../models/admin.model");
-const { passwordHandler, generateAdminToken } = require("../utils/utils");
-const { messageTransporter } = require("../utils/email");
+const { messageTransporter, passwordLinkTransporter, } = require("../utils/email");
 require("dotenv").config();
 const uuidv1 = require("uuid");
-const { addAdmin, editAdmin, editAdminStatus, updateAdminProfileImg, getAdminById, updateAdminPhoneNo, } = require("../services/admin.service");
+const { addAdmin, editAdmin, editAdminStatus, updateAdminProfileImg, getAdminById, updateAdminPhoneNo, findAdminByEmail, updateAdminTicket, validateAdminTicketLink, updateAdminPassword, resetAdminSecureTicket, } = require("../services/admin.service");
+const jwt = require("jsonwebtoken");
 const ADMIN_EMAIL_DOMAIN = "decagon.dev";
 const getAdmin = asyncHandler(async (req, res) => {
     const admim = await getAdminById(req.params.adminId);
@@ -32,7 +32,7 @@ const createAdmin = asyncHandler(async (req, res) => {
             .status(400)
             .send({ error: true, message: "Please use an official email" });
     }
-    const isUserInRegistered = await admin_model_1.Admin.find({
+    const isUserInRegistered = await Admin.find({
         email: req.body.email.toLowerCase(),
     });
     if (isUserInRegistered.length > 0)
@@ -42,10 +42,7 @@ const createAdmin = asyncHandler(async (req, res) => {
     let admin = req.body;
     admin.activationStatus = true;
     const password = uuidv1.v1().substr(0, 8).padStart("0", 8);
-    console.log(password);
     admin.password = await passwordHandler(password);
-    //sendEmailToAdmin(admin.email, admin.password)
-    //const registeredAdmin = await addAdmin(admin);
     const registeredAdmin = await addAdmin({
         firstname: admin.firstname,
         lastname: admin.lastname,
@@ -75,7 +72,7 @@ const updateAdmin = asyncHandler(async (req, res) => {
     const result = await editAdmin({ _id: adminId }, { ...req.body });
     if (!result)
         return res.status(400).send({ message: "unable to register" });
-    const newAdmin = await admin_model_1.Admin.findById(adminId);
+    const newAdmin = await Admin.findById(adminId);
     const message = "successfully updated admin";
     return res.status(200).send({ data: newAdmin, message: message });
 });
@@ -98,7 +95,7 @@ const setdminActivationStatus = asyncHandler(async (req, res) => {
         return res.status(400).send({
             message: "unable to process action; Maybe no such admin was found",
         });
-    const newAdmin = await admin_model_1.Admin.findById(adminId);
+    const newAdmin = await Admin.findById(adminId);
     const message = "successfully deleted admin";
     return res.status(200).send({ data: newAdmin, message: message });
 });
@@ -108,9 +105,7 @@ const loginAdmin = asyncHandler(async (req, res) => {
         password: req.body.password,
     });
     const { email, password } = req.body;
-    console.log(email);
-    const admim = await admin_model_1.Admin.find({ email });
-    console.log(admim);
+    const admim = await Admin.find({ email });
     if (admim.length > 0) {
         if (!admim[0].activationStatus) {
             return res.status(404).json({ message: "Account deactivated" });
@@ -132,13 +127,19 @@ const loginAdmin = asyncHandler(async (req, res) => {
         return res.status(404).json({ error: true, message: "User not found" });
     }
 });
+const logoutAdmin = asyncHandler(async (req, res) => {
+    res.cookie("Token", "");
+    res.cookie("Id", "");
+    res.cookie("Name", "");
+    res.status(201).json({ message: "Logged out successfully" });
+});
 const adminProfileImage = asyncHandler(async (req, res) => {
     var _a, _b;
     if (req.file === undefined)
         return res.send("You must select a file.");
     const id = req.cookies.Id;
     await updateAdminProfileImg(id, (_a = req.file) === null || _a === void 0 ? void 0 : _a.path, (_b = req.file) === null || _b === void 0 ? void 0 : _b.filename);
-    const findAdmin = await admin_model_1.Admin.findById(id);
+    const findAdmin = await Admin.findById(id);
     res.status(201).json({ message: "Uploaded file successfully", findAdmin });
 });
 const adminProfile = asyncHandler(async (req, res) => {
@@ -147,7 +148,7 @@ const adminProfile = asyncHandler(async (req, res) => {
         res.status(400);
         throw new Error("Provide Admin id");
     }
-    const findAdmin = await admin_model_1.Admin.findById(id);
+    const findAdmin = await Admin.findById(id);
     if (findAdmin) {
         res.status(201).json({
             firstname: findAdmin.firstname,
@@ -171,7 +172,7 @@ const changeAdminPhoneNumber = asyncHandler(async (req, res) => {
         res.status(400);
         throw new Error("Provide user new phone number");
     }
-    const findAdmin = await admin_model_1.Admin.findById(id);
+    const findAdmin = await Admin.findById(id);
     if (findAdmin) {
         await updateAdminPhoneNo(id, req.body.phone);
         res.status(201).json({
@@ -182,6 +183,69 @@ const changeAdminPhoneNumber = asyncHandler(async (req, res) => {
         res.status(404).json({ message: "Admin account not found" });
     }
 });
+const forgotAdminPassword = asyncHandler(async (req, res) => {
+    if (!req.body.email) {
+        res.status(403);
+        throw new Error("Please enter a valid email address");
+    }
+    const { email } = req.body;
+    const admin = await findAdminByEmail(email);
+    if (admin.length > 0) {
+        if (admin[0].activationStatus !== "true") {
+            res.status(404).json({ message: "Account deactivated" });
+            return;
+        }
+        const ticket = generateAdminToken(admin[0]._id);
+        // Update admin ticket in database
+        await updateAdminTicket(admin[0]._id, ticket);
+        // Attach admin ticket to link in message transporter
+        const resetLink = `localhost:${process.env.PORT}/admin/reset/password/${admin[0]._id}/${ticket}`;
+        await passwordLinkTransporter(email, resetLink);
+        res
+            .status(200)
+            .json({ message: "Check your email for reset password link" });
+    }
+    else {
+        res.status(404).json({ message: "User not found" });
+    }
+});
+const resetAdminPassGetPage = asyncHandler(async (req, res) => {
+    res.status(201).json({ message: "Use post method to reset password" });
+});
+const resetAdminPass = asyncHandler(async (req, res) => {
+    await passwordChange().validateAsync({
+        newPassword: req.body.newPassword,
+        confirmPassword: req.body.confirmPassword,
+    });
+    const ticket = req.params.ticket;
+    const id = req.params.id;
+    // Validate ticket from user account
+    const user = await validateAdminTicketLink(id, ticket);
+    if (user.length === 0) {
+        res.status(403);
+        throw new Error("Invalid link");
+    }
+    const { newPassword, confirmPassword } = req.body;
+    if (newPassword !== confirmPassword) {
+        res.status(400);
+        throw new Error("Passwords do not match");
+    }
+    try {
+        if (process.env.ADMIN_PASS) {
+            await jwt.verify(ticket, process.env.ADMIN_PASS);
+            const newHashedPass = await passwordHandler(newPassword);
+            await updateAdminPassword(id, newHashedPass);
+            await resetAdminSecureTicket(id);
+            res.status(201).json({
+                message: "Password successfully changed",
+            });
+        }
+    }
+    catch (error) {
+        res.status(401);
+        throw new Error("Link expired!");
+    }
+});
 module.exports = {
     getAdmin,
     createAdmin,
@@ -189,7 +253,11 @@ module.exports = {
     deleteAdmin,
     setdminActivationStatus,
     loginAdmin,
+    logoutAdmin,
     adminProfileImage,
     adminProfile,
     changeAdminPhoneNumber,
+    forgotAdminPassword,
+    resetAdminPassGetPage,
+    resetAdminPass,
 };
