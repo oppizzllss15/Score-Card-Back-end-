@@ -39,7 +39,7 @@ router.post("/deletestack/:id", superAdminProtect, deleteStack);
 // Admins
 router.get("/admin/:adminId", superAdminProtect, getAdmin);
 router.post("/admin/create", superAdminProtect, createAdmin);
-router.put("/admin/update/:adminId", adminProtect, updateAdmin);
+router.put("/admin/update/:adminId", updateAdmin);
 router.delete("/admin/delete/:adminId", superAdminProtect, deleteAdmin);
 router.put("/admin/deactivate/:adminId/:action", superAdminProtect, setdminActivationStatus);
 module.exports = router;
