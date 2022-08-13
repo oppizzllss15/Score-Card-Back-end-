@@ -10,9 +10,9 @@ const bcrypt_1 = __importDefault(require("bcrypt"));
 const { messageTransporter, passwordLinkTransporter, } = require("../utils/email");
 require("dotenv").config();
 const uuidv1 = require("uuid");
-const { addAdmin, editAdmin, editAdminStatus, updateAdminProfileImg, getAdminById, updateAdminPhoneNo, findAdminByEmail, updateAdminTicket, validateAdminTicketLink, updateAdminPassword, resetAdminSecureTicket, } = require("../services/admin.service");
+const { addAdmin, editAdmin, editAdminStatus, removeAdmin, updateAdminProfileImg, getAdminById, updateAdminPhoneNo, findAdminByEmail, updateAdminTicket, validateAdminTicketLink, updateAdminPassword, resetAdminSecureTicket, isPropertyInDatabase, } = require("../services/admin.service");
 const jwt = require("jsonwebtoken");
-const ADMIN_EMAIL_DOMAIN = "decagon.dev";
+const ADMIN_EMAIL_DOMAIN = "decagonhq.com";
 const getAdmin = asyncHandler(async (req, res) => {
     const admim = await getAdminById(req.params.adminId);
     if (admim)
@@ -32,10 +32,8 @@ const createAdmin = asyncHandler(async (req, res) => {
             .status(400)
             .send({ error: true, message: "Please use an official email" });
     }
-    const isUserInRegistered = await Admin.find({
-        email: req.body.email.toLowerCase(),
-    });
-    if (isUserInRegistered.length > 0)
+    const isUserInRegistered = await isPropertyInDatabase("email", req.body.email);
+    if (isUserInRegistered)
         return res
             .status(400)
             .send({ message: "Email already in use, try another" });
@@ -57,9 +55,10 @@ const createAdmin = asyncHandler(async (req, res) => {
         return res
             .status(400)
             .send({ message: "Ussername already in use, try another" });
+    registeredAdmin.password = password;
     return res.status(201).send({
         data: registeredAdmin,
-        message: "Successfully created admin, password has been sent to " + admin.email,
+        message: `Successfully created admin, password: (${password}) has been sent to ${admin.email}`,
     });
 });
 const updateAdmin = asyncHandler(async (req, res) => {
@@ -75,30 +74,31 @@ const updateAdmin = asyncHandler(async (req, res) => {
     const result = await editAdmin({ _id: adminId }, { ...req.body });
     if (!result)
         return res.status(400).send({ message: "unable to register" });
-    const newAdmin = await Admin.findById(adminId);
+    const newAdmin = await getAdminById(adminId);
     const message = "successfully updated admin";
     return res.status(200).send({ data: newAdmin, message: message });
 });
 const deleteAdmin = asyncHandler(async (req, res) => {
     const adminId = req.params.adminId || req.body.adminId;
-    const result = await deleteAdmin(adminId);
+    const result = await removeAdmin(adminId);
     if (!result) {
         return res.status(400).send({ message: "unable processing action" });
     }
-    const newAdmin = await getAdminById(adminId);
     const message = "successfully deleted admin";
-    return res.status(200).send({ data: newAdmin, message: message });
+    return res.status(200).send({ data: result, message: message });
 });
 const setdminActivationStatus = asyncHandler(async (req, res) => {
     const adminId = req.params.adminId || req.body.adminId;
     const action = req.params.action || req.body.action;
-    const activationStatus = /activate/i.test(action) ? true : false;
-    const result = await editAdminStatus(adminId, { activationStatus });
+    const activationStatus = /^activate$/i.test(action.trim()) ? true : false;
+    const result = await editAdminStatus(adminId, activationStatus);
     if (!result)
-        return res.status(400).send({
+        return res
+            .status(400)
+            .send({
             message: "unable to process action; Maybe no such admin was found",
         });
-    const newAdmin = await Admin.findById(adminId);
+    const newAdmin = await getAdminById(adminId);
     const message = "successfully deleted admin";
     return res.status(200).send({ data: newAdmin, message: message });
 });
@@ -108,27 +108,21 @@ const loginAdmin = asyncHandler(async (req, res) => {
         password: req.body.password,
     });
     const { email, password } = req.body;
-    const admim = await Admin.find({ email });
-    if (admim.length > 0) {
-        if (!admim[0].activationStatus) {
-            return res.status(404).json({ message: "Account deactivated" });
-        }
-        const passwordMatch = await bcrypt_1.default.compare(password, admim[0].password);
-        if (passwordMatch) {
-            const token = generateAdminToken(admim[0]._id.toString());
-            res.cookie("Token", token);
-            res.cookie("Name", admim[0].firstname);
-            res.cookie("Id", admim[0]._id);
-            res.status(201).json({ token, data: admim[0] });
-        }
-        else {
-            res.status(400).json({ error: true, message: "Invalid password" });
-            return;
-        }
+    const admin = await isPropertyInDatabase("email", email);
+    if (admin && !admin.activationStatus) {
+        return res.status(404).json({ message: "Account deactivated" });
     }
-    else {
-        return res.status(404).json({ error: true, message: "User not found" });
+    if (!admin)
+        return res.status(400).send({ message: "Incorrect login details" });
+    const passwordMatch = await bcrypt_1.default.compare(password, admin.password);
+    if (passwordMatch) {
+        const token = generateAdminToken(admin._id);
+        res.cookie("Token", token);
+        res.cookie("Name", admin.firstname);
+        res.cookie("Id", admin._id);
+        return res.status(200).json({ token, data: admin });
     }
+    return res.status(400).json({ error: true, message: "Invalid login detail" });
 });
 const logoutAdmin = asyncHandler(async (req, res) => {
     res.cookie("Token", "");

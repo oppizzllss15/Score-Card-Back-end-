@@ -10,6 +10,8 @@ const {
   getSpecificStack,
   createAStack,
 } = require("../services/stack.service");
+
+const Devs = require("../models/user.model");
 import express, { Request, Response, NextFunction } from "express";
 
 // const toId = mongoose.Schema.types.ObjectId
@@ -95,6 +97,7 @@ const createStack = asyncHandler(async (req: Request, res: Response) => {
 
 const editStack = asyncHandler(async (req: Request, res: Response) => {
   const { name, image } = req.body;
+
   const id = req.params.id;
 
   const stack = await getSpecificStack(id);
@@ -119,11 +122,15 @@ const deleteStack = asyncHandler(async (req: Request, res: Response) => {
   const id = req.params.id;
 
   const removeStack = await deleteAStack(id);
-  
+
+  const removeUsersInStack = await Devs.deleteMany({ stack: id });
 
   res.status(201).json({
     status: "Success",
-    message: "Had to let you go",
+    message: {
+      removeStack,
+      removeUsersInStack,
+    },
   });
   return;
 });

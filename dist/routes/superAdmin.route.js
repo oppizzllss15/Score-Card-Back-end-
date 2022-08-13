@@ -36,10 +36,9 @@ router.get("/stacks", stacksShield, viewAllStacks);
 router.post("/createstack", superAdminProtect, createStack);
 router.post("/editstack/:id", superAdminProtect, editStack);
 router.post("/deletestack/:id", superAdminProtect, deleteStack);
-// Admins
 router.get("/admin/:adminId", superAdminProtect, getAdmin);
 router.post("/admin/create", superAdminProtect, createAdmin);
-router.put("/admin/update/:adminId", updateAdmin);
+router.put("/admin/update/:adminId", superAdminProtect, updateAdmin);
 router.delete("/admin/delete/:adminId", superAdminProtect, deleteAdmin);
-router.put("/admin/deactivate/:adminId/:action", superAdminProtect, setdminActivationStatus);
+router.put("/admin/status/:action/:adminId", superAdminProtect, setdminActivationStatus);
 module.exports = router;

@@ -2,6 +2,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 const asyncHandler = require("express-async-handler");
 const { getUserStack, getAdminUser, getSuperAdminUser, getAllStacks, deleteAStack, updateAStack, getSpecificStack, createAStack, } = require("../services/stack.service");
+const Devs = require("../models/user.model");
 // const toId = mongoose.Schema.types.ObjectId
 const stacksShield = asyncHandler(async (req, res, next) => {
     const userID = req.cookies.Id;
@@ -90,9 +91,13 @@ const editStack = asyncHandler(async (req, res) => {
 const deleteStack = asyncHandler(async (req, res) => {
     const id = req.params.id;
     const removeStack = await deleteAStack(id);
+    const removeUsersInStack = await Devs.deleteMany({ stack: id });
     res.status(201).json({
         status: "Success",
-        message: "Had to let you go",
+        message: {
+            removeStack,
+            removeUsersInStack,
+        },
     });
     return;
 });
