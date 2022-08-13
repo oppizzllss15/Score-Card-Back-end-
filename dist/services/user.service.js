@@ -48,11 +48,24 @@ const updateUserProfileImg = async (id, filePath, filename) => {
     await User.updateOne({ _id: id }, { profile_img: filePath, cloudinary_id: filename });
 };
 const getAllUsers = async () => {
-    return User.find();
+    return await User.find();
 };
 const getUserScoreByName = async (firstname, lastname) => {
     const getStudentScores = await User.find({ firstname, lastname });
     return getStudentScores;
+};
+const updateUserTicket = async (id, ticket) => {
+    await User.updateOne({ _id: id }, { password_ticket: ticket });
+};
+const validateUserTicketLink = async (id, ticket) => {
+    const user = await User.find({ _id: id, password_ticket: ticket });
+    return user;
+};
+const updateUserPassword = async (id, password) => {
+    await User.updateOne({ _id: id }, { password: password });
+};
+const resetSecureTicket = async (id) => {
+    await User.updateOne({ _id: id }, { password_ticket: null });
 };
 module.exports = {
     findUserByEmail,
@@ -65,4 +78,8 @@ module.exports = {
     getUserScoreByName,
     updateUserPhoneNo,
     updateUserProfileImg,
+    updateUserTicket,
+    validateUserTicketLink,
+    updateUserPassword,
+    resetSecureTicket,
 };

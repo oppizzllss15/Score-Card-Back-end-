@@ -1,6 +1,6 @@
-import mongoose, { Mongoose, Schema, Model } from "mongoose";
+const adminDB = require("mongoose");
 
-const adminSchema = new mongoose.Schema(
+const adminSchema = adminDB.Schema(
   {
     firstname: String,
     lastname: String,
@@ -10,11 +10,12 @@ const adminSchema = new mongoose.Schema(
     },
     password: String,
     phonenumber: String,
+    password_ticket: String,
     profile_img: String,
     cloudinary_id: String,
     stack: [
       {
-        type: Schema.Types.ObjectId,
+        type: adminDB.Schema.Types.ObjectId,
         ref: "Stacks",
       },
     ],
@@ -25,4 +26,4 @@ const adminSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-module.exports = mongoose.model("Admin", adminSchema);
+module.exports = adminDB.model("Admin", adminSchema);

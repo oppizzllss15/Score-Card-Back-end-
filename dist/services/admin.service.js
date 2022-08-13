@@ -53,6 +53,23 @@ async function isPropertyInDatabase(property, value) {
     const admin = await Admin.find({ propertyObject });
     return admin.length > 0 ? admin[0] : false;
 }
+const findAdminByEmail = async (email) => {
+    const adminExists = await Admin.find({ email: email.toLowerCase() });
+    return adminExists;
+};
+const updateAdminTicket = async (id, ticket) => {
+    await Admin.updateOne({ _id: id }, { password_ticket: ticket });
+};
+const validateAdminTicketLink = async (id, ticket) => {
+    const user = await Admin.find({ _id: id, password_ticket: ticket });
+    return user;
+};
+const updateAdminPassword = async (id, password) => {
+    await Admin.updateOne({ _id: id }, { password: password });
+};
+const resetAdminSecureTicket = async (id) => {
+    await Admin.updateOne({ _id: id }, { password_ticket: null });
+};
 module.exports = {
     addAdmin,
     editAdmin,
@@ -63,4 +80,9 @@ module.exports = {
     isPropertyInDatabase,
     updateAdminProfileImg,
     updateAdminPhoneNo,
+    findAdminByEmail,
+    updateAdminTicket,
+    validateAdminTicketLink,
+    updateAdminPassword,
+    resetAdminSecureTicket,
 };

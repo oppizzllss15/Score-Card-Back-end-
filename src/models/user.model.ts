@@ -6,6 +6,7 @@ const userData = UserDb.Schema({
   email: String,
   password: String,
   phone: String,
+  password_ticket: String,
   profile_img: String,
   cloudinary_id: String,
   stack: {

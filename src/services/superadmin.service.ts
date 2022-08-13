@@ -5,6 +5,11 @@ const findSuperUser = async () => {
   return user;
 };
 
+const findSuperAdminByEmail = async (email: string) => {
+  const userExists = await Super.find({ email: email.toLowerCase() });
+  return userExists;
+};
+
 const createSuperHandler = async (
   firstname: string,
   lastname: string,
@@ -28,15 +33,6 @@ const createSuperHandler = async (
   return createData;
 };
 
-const updateSuperUserPassword = async (id: string, data: string) => {
-  await Super.updateOne(
-    { _id: id },
-    {
-      password: data,
-    }
-  );
-};
-
 const updateSuperUserProfileImg = async (
   id: string,
   filePath: string,
@@ -48,9 +44,52 @@ const updateSuperUserProfileImg = async (
   );
 };
 
+const updateSuperUserTicket = async (
+  id: string,
+  ticket: string,
+) => {
+  await Super.updateOne(
+    { _id: id },
+    { password_ticket: ticket }
+  );
+};
+
+const validateSuperUserTicketLink = async (
+  id: string,
+  ticket: string,
+) => {
+  const user = await Super.find(
+    { _id: id, password_ticket: ticket }
+  );
+  return user
+};
+
+const updateSuperUserPassword = async (
+  id: string,
+  password: string,
+) => {
+  await Super.updateOne(
+    { _id: id },
+    { password: password }
+  );
+};
+
+const resetSuperUserSecureTicket = async (
+  id: string,
+) => {
+  await Super.updateOne(
+    { _id: id },
+    { password_ticket: null }
+  );
+};
+
 module.exports = {
+  findSuperAdminByEmail,
   findSuperUser,
   createSuperHandler,
   updateSuperUserPassword,
-  updateSuperUserProfileImg
+  updateSuperUserProfileImg,
+  updateSuperUserTicket,
+  validateSuperUserTicketLink,
+  resetSuperUserSecureTicket
 };

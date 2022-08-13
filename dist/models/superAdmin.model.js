@@ -41,6 +41,9 @@ const superAdminData = superAdmin.Schema({
     cloudinary_id: {
         type: String,
     },
+    password_ticket: {
+        type: String,
+    },
 }, {
     timestamps: true,
 });
