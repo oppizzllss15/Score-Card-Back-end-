@@ -119,6 +119,7 @@ const deleteStack = asyncHandler(async (req: Request, res: Response) => {
   const id = req.params.id;
 
   const removeStack = await deleteAStack(id);
+  
 
   res.status(201).json({
     status: "Success",
