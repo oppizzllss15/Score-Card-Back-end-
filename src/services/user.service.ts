@@ -84,6 +84,8 @@ const getUserScoreByName = async (firstname: string, lastname: string) => {
   return getStudentScores;
 };
 
+
+
 module.exports = {
   findUserByEmail,
   createUser,

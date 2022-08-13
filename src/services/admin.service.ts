@@ -61,7 +61,7 @@ async function removeAdmin(adminid: string) {
   return deletedAdmin ? deletedAdmin : false;
 }
 
-//delete admin
+//check data is in database
 async function isPropertyInDatabase<T>(property: string, value: T): Promise<IAdmin>{
   let propertyObject: {[key: string]: T} = {}
   propertyObject[property] = value;
