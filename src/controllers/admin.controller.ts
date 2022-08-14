@@ -6,6 +6,7 @@ const {
   passwordChange,
   passwordHandler,
   generateAdminToken,
+  adminUpdateSchema,
 } = require("../utils/utils");
 const asyncHandler = require("express-async-handler");
 const Admin = require("../models/admin.model");
@@ -107,11 +108,8 @@ const createAdmin = asyncHandler(async (req: Request, res: Response) => {
 });
 
 const updateAdmin = asyncHandler(async (req: Request, res: Response) => {
-  const validation: ValidationResult = adminRegistrationSchema.validate(
-    req.body
-  );
+  const validation: ValidationResult = adminUpdateSchema.validate(req.body);
 
-  const { stack } = req.body;
   if (validation.error)
     return res
       .status(400)
@@ -119,7 +117,11 @@ const updateAdmin = asyncHandler(async (req: Request, res: Response) => {
 
   const adminId = req.params.adminId || req.body.adminId;
 
-  const result = await editAdmin({ _id: adminId }, { ...req.body });
+  const { stack } = req.body;
+  const oldadmin = await Admin.findOne({ _id: adminId });
+
+
+  const result = await editAdmin(adminId, req.body);
 
   if (!result) return res.status(400).send({ message: "unable to register" });
 
@@ -155,11 +157,9 @@ const setdminActivationStatus = asyncHandler(
     const result = await editAdminStatus(adminId, activationStatus);
 
     if (!result)
-      return res
-        .status(400)
-        .send({
-          message: "unable to process action; Maybe no such admin was found",
-        });
+      return res.status(400).send({
+        message: "unable to process action; Maybe no such admin was found",
+      });
 
     const newAdmin = await getAdminById(adminId);
 

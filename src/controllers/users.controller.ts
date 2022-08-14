@@ -311,7 +311,7 @@ const calScore = asyncHandler(async (req: Request, res: Response) => {
 const getScores = asyncHandler(async (req: Request, res: Response) => {
   const id = req.params.id;
   const getScores = await findUserById(id);
-  console.log(id);
+
   if (getScores) {
     res
       .status(201)
@@ -349,7 +349,6 @@ const getScoresByName = asyncHandler(async (req: Request, res: Response) => {
     res.status(400);
     throw new Error("Student does not exist");
   }
-  console.log(getStudentScores[0].grades);
   res
     .status(201)
     .json({ message: "Student grades", scores: getStudentScores[0].grades });
@@ -430,21 +429,20 @@ const resetUserPass = asyncHandler(async (req: Request, res: Response) => {
   }
 });
 
+const getUserCummulatives = asyncHandler(
+  async (req: Request, res: Response) => {
+    const user: IUser = await findUserById(req.params.userId);
 
-const getUserCummulatives = asyncHandler( async (req: Request, res: Response) => {
-  
-  const user: IUser = await findUserById(req.params.userId);
-  
-  if(!user) return res.status(400).json({message: "No user found"});
-  
-  const data = {
-    user,
-    scores: user.grades
+    if (!user) return res.status(400).json({ message: "No user found" });
+
+    const data = {
+      user,
+      scores: user.grades,
+    };
+
+    return res.status(200).json({ data });
   }
-
-  return res.status(200).json({data})
-
-})
+);
 
 module.exports = {
   registerUser,
@@ -463,5 +461,5 @@ module.exports = {
   forgotUserPassword,
   resetUserPassGetPage,
   resetUserPass,
-  getUserCummulatives
+  getUserCummulatives,
 };

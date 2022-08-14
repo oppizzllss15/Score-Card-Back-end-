@@ -243,7 +243,6 @@ const calScore = asyncHandler(async (req, res) => {
 const getScores = asyncHandler(async (req, res) => {
     const id = req.params.id;
     const getScores = await findUserById(id);
-    console.log(id);
     if (getScores) {
         res
             .status(201)
@@ -272,7 +271,6 @@ const getScoresByName = asyncHandler(async (req, res) => {
         res.status(400);
         throw new Error("Student does not exist");
     }
-    console.log(getStudentScores[0].grades);
     res
         .status(201)
         .json({ message: "Student grades", scores: getStudentScores[0].grades });
@@ -346,7 +344,7 @@ const getUserCummulatives = asyncHandler(async (req, res) => {
         return res.status(400).json({ message: "No user found" });
     const data = {
         user,
-        scores: user.grades
+        scores: user.grades,
     };
     return res.status(200).json({ data });
 });
@@ -367,5 +365,5 @@ module.exports = {
     forgotUserPassword,
     resetUserPassGetPage,
     resetUserPass,
-    getUserCummulatives
+    getUserCummulatives,
 };
