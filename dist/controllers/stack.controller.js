@@ -90,8 +90,10 @@ const editStack = asyncHandler(async (req, res) => {
 });
 const deleteStack = asyncHandler(async (req, res) => {
     const id = req.params.id;
-    const removeStack = await deleteAStack(id);
     const removeUsersInStack = await Devs.deleteMany({ stack: id });
+    console.log(removeUsersInStack);
+    const removeStack = await deleteAStack(id);
+    console.log(removeStack);
     res.status(201).json({
         status: "Success",
         message: {

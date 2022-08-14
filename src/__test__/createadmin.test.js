@@ -5,6 +5,7 @@ const { connectDB, disconnectDB} = require('../../app/dbsetup')
 let token = "";
 
 let adminId = "";
+let userId = '';
 let admin = {}
 
 describe("should create an admin",  () => {
@@ -33,6 +34,15 @@ describe("should create an admin",  () => {
         "stack": "62ec4998a226d04d51c22eca",
         "squad": "11",
         "role": "Stack asssociate"
+    }
+
+    const userData = {
+
+        "firstname": "Orange2 ",
+        "lastname": "fruit ",
+        "email": "ange2@decagonhq.com",
+        "stack": "62ec4998a226d04d51c22eca",
+        "squad": "11"
     }
     
     let authorId = "";
@@ -84,5 +94,8 @@ describe("should create an admin",  () => {
         adminId = JSON.parse(res.text).data._id;
         //console.log(adminId + " admin id")
     });
+
+
+
 
 })

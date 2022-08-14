@@ -90,6 +90,7 @@ const registerUser = asyncHandler(async (req, res) => {
         await messageTransporter(email, firstname, password, squad);
         res.status(201).json({
             userId: user._id,
+            password,
             firstname: user.firstname,
             lastname: user.lastname,
             email: user.email,
@@ -339,6 +340,16 @@ const resetUserPass = asyncHandler(async (req, res) => {
         throw new Error("Link expired!");
     }
 });
+const getUserCummulatives = asyncHandler(async (req, res) => {
+    const user = await findUserById(req.params.userId);
+    if (!user)
+        return res.status(400).json({ message: "No user found" });
+    const data = {
+        user,
+        scores: user.grades
+    };
+    return res.status(200).json({ data });
+});
 module.exports = {
     registerUser,
     loginUser,
@@ -356,4 +367,5 @@ module.exports = {
     forgotUserPassword,
     resetUserPassGetPage,
     resetUserPass,
+    getUserCummulatives
 };

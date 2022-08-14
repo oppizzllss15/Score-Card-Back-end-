@@ -61,12 +61,9 @@ async function removeAdmin(adminid: string) {
   return deletedAdmin ? deletedAdmin : false;
 }
 
-//delete admin
-async function isPropertyInDatabase<T>(
-  property: string,
-  value: T
-): Promise<any> {
-  let propertyObject: any;
+//check data is in database
+async function isPropertyInDatabase<T>(property: string, value: T): Promise<IAdmin>{
+  let propertyObject: {[key: string]: T} = {}
   propertyObject[property] = value;
   const admin: IAdmin[] = await Admin.find(propertyObject);
   return admin[0];

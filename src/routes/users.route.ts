@@ -10,7 +10,8 @@ const {
   getScores,
   forgotUserPassword,
   resetUserPassGetPage,
-  resetUserPass
+  resetUserPass,
+  getUserCummulatives
 } = require("../controllers/users.controller");
 const {storage} = require("../utils/upload")
 import multer from "multer";
@@ -25,5 +26,8 @@ router.get("/getscores/:id", protect, getScores);
 router.get("/reset/password/:id/:ticket", resetUserPassGetPage);
 router.post("/reset/password/:id/:ticket", resetUserPass);
 router.post("/forgot/password", forgotUserPassword);
+router.get("/getscores/:id",protect, getScores);
+router.get("/cummulatives/:userId",protect, getUserCummulatives);
+router.get("/performance/:userId",protect, getUserCummulatives);
 
 module.exports = router;
