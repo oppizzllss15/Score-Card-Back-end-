@@ -118,8 +118,7 @@ const updateAdmin = asyncHandler(async (req: Request, res: Response) => {
       .send({ message: "Admin Detail: " + validation.error.message });
 
   const adminId = req.params.adminId || req.body.adminId;
-  // const admin = await Admin.findOne(adminId)
-  // console.log(admin);
+
   const result = await editAdmin({ _id: adminId }, { ...req.body });
 
   if (!result) return res.status(400).send({ message: "unable to register" });
