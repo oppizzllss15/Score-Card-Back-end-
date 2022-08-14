@@ -46,7 +46,7 @@ async function removeAdmin(adminid) {
     const deletedAdmin = await Admin.findByIdAndRemove(adminid);
     return deletedAdmin ? deletedAdmin : false;
 }
-//delete admin
+//check data is in database
 async function isPropertyInDatabase(property, value) {
     let propertyObject = {};
     propertyObject[property] = value;

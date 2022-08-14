@@ -87,6 +87,14 @@ const adminRegistrationSchema = Joi.object({
     squad: Joi.number().required(),
     role: Joi.string(),
 });
+const adminUpdateSchema = Joi.object({
+    firstname: Joi.string().min(3),
+    lastname: Joi.string().min(3),
+    email: Joi.string().email(),
+    stack: Joi.string(),
+    squad: Joi.number(),
+    role: Joi.string(),
+});
 module.exports = {
     superAdminValidator,
     userLogin,
@@ -100,4 +108,5 @@ module.exports = {
     userStatus,
     score,
     adminRegistrationSchema,
+    adminUpdateSchema
 };
