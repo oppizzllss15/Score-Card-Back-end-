@@ -314,7 +314,7 @@ const getScores = asyncHandler(async (req: Request, res: Response) => {
 const filterScores = asyncHandler(async (req: Request, res: Response) => {
   const week = Number(req.params.weekId);
   const getAllScores = await getAllUsers();
-  const buffer: any[] = [];
+  const buffer: object[] = [];
 
   getAllScores.forEach(
     (doc: { lastname: string; firstname: string; grades: any }) =>
