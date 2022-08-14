@@ -304,7 +304,7 @@ const getScores = asyncHandler(async (req: Request, res: Response) => {
   if (getScores) {
     res
       .status(201)
-      .json({ message: "Grade successfully", scores: getScores.grades });
+      .json({ message: "All your score", scores: getScores.grades });
   } else {
     res.status(404);
     throw new Error("User not found");

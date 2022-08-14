@@ -5,8 +5,10 @@ const {
     loginAdmin,
     adminProfileImage,
     adminProfile
-  } = require("../controllers/admin.controller");
-const { filterScores, getScoresByName } = require("../controllers/users.controller");
+} = require("../controllers/admin.controller");
+  
+
+const { filterScores, getScoresByName, calScore, getScores } = require("../controllers/users.controller");
 const {storage} = require("../utils/upload")
 import multer from "multer";
 const uploads = multer({storage})
@@ -16,7 +18,9 @@ router.post("/login", loginAdmin);
 router.post("/upload", adminProtect, uploads.single("file"), adminProfileImage);
 
 // User routes
+router.get("/scores/:id", adminProtect, getScores);
 router.get("/user/filterscores/:weekId", filterScores);
+router.post("/user/addscore", adminProtect, calScore);
 router.post("/user/score/name", getScoresByName);
 
 module.exports = router;
