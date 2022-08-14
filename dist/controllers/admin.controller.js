@@ -44,11 +44,11 @@ const createAdmin = asyncHandler(async (req, res) => {
     });
 });
 const updateAdmin = asyncHandler(async (req, res) => {
-    const validation = adminRegistrationSchema.validate(req.body);
+    const validation = adminUpdateSchema.validate(req.body);
     if (validation.error)
         return res.status(400).send({ message: "Admin Detail: " + validation.error.message });
     const adminId = req.params.adminId || req.body.adminId;
-    const result = await editAdmin({ _id: adminId }, req.body);
+    const result = await editAdmin(adminId, req.body);
     if (!result)
         return res.status(400).send({ message: "unable to register" });
     const newAdmin = await getAdminById(adminId);

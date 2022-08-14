@@ -2,9 +2,9 @@ interface IAdmin {
   _id?: string;
   firstname?: string;
   lastname?: string;
-  email: string;
+  email?: string;
   password?: string;
-  phonenumber: string;
+  phonenumber?: string;
   profile_img?: string;
   stack: string[];
   phone?: string;
