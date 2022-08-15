@@ -10,9 +10,7 @@ const {
   editStack,
   deleteStack,
   viewAllStacks,
-  viewStack,
-  stacksShield,
-  stacksShield2,
+  stacksShield
 } = require("../controllers/stack.controller");
 
 const {
@@ -58,16 +56,17 @@ router.post("/user/calculate/score/:id", superAdminProtect, calScore);
 router.get("/user/getscores/:id", superAdminProtect, getScores);
 
 router.get("/stacks", stacksShield, viewAllStacks);
-router.get("/stack", stacksShield2, viewStack);
 router.post("/createstack", superAdminProtect, createStack);
 router.post("/editstack/:id", superAdminProtect, editStack);
 router.post("/deletestack/:id", superAdminProtect, deleteStack);
 
-//functions on admin
 router.get("/admin/:adminId", superAdminProtect,  getAdmin);
-router.post("/admin/create", superAdminProtect,  createAdmin);
-router.put("/admin/update/:adminId", adminProtect,  updateAdmin);
+router.post("/admin/create",superAdminProtect,  createAdmin);
+router.put("/admin/update/:adminId", superAdminProtect,  updateAdmin);
 router.delete("/admin/delete/:adminId", superAdminProtect, deleteAdmin);
-router.put("/admin/deactivate/:adminId/:action", superAdminProtect, setdminActivationStatus );
+router.put(
+  "/admin/status/:action/:adminId",superAdminProtect,
+  setdminActivationStatus
+);
 
 module.exports = router;

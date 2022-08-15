@@ -81,18 +81,17 @@ const superAdminProtect = asyncHandler(
   }
 );
 
-const adminProtect = asyncHandler(
-  async (req: Request, res: Response, next: NextFunction) => {
+const adminProtect = asyncHandler( async (req: Request, res: Response, next: NextFunction) => {
     let token = req.cookies.Token;
 
     if (token) {
       try {
-        if (process.env.ADMIN_PASS) {
-          const adminToken = await jwt.verify(token, process.env.ADMIN_PASS);
-          if (adminToken) {
-            next();
-          }
+          
+        const adminToken = await jwt.verify(token, process.env.ADMIN_PASS);
+        if (adminToken) {
+          next();
         }
+        
       } catch (error) {
         res.status(401);
         throw new Error("Not authorized as Admin");

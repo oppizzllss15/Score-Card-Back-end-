@@ -129,6 +129,7 @@ const registerUser = asyncHandler(async (req: Request, res: Response) => {
     await messageTransporter(email, firstname, password, squad);
     res.status(201).json({
       userId: user._id,
+      password,
       firstname: user.firstname,
       lastname: user.lastname,
       email: user.email,
@@ -285,7 +286,7 @@ const calScore = asyncHandler(async (req: Request, res: Response) => {
     weekly_task: weekly_task,
     assessment: assessment,
     algorithm: algorithm,
-    cummulative: calCum.toFixed(1),
+    cummulative: calCum.toFixed(2),
   };
 
   const userData = await updateUserScore(id, data);
@@ -346,7 +347,30 @@ const getScoresByName = asyncHandler(async (req: Request, res: Response) => {
 
 
 
+const getUserCummulatives = asyncHandler( async (req: Request, res: Response) => {
+  
+  const user: IUser = await findUserById(req.params.userId);
+  
+  if(!user) return res.status(400).json({message: "No user found"});
+  
+  let cummulatives: {week: number, cummulative: number}[] = []
+  
+  if(/cummulative/i.test(req.url)){
+  
+    cummulatives = user.grades.map((grade) => { return {week: grade.week, cummulative: grade.cummulative}})
+  
+  }
 
+  let data = {
+    user,
+    grades: user.grades,
+    cummulatives
+  }
+
+
+  return res.status(200).json({data})
+
+})
 
 module.exports = {
   registerUser,
@@ -362,4 +386,5 @@ module.exports = {
   getScores,
   filterScores,
   getScoresByName,
+  getUserCummulatives
 };

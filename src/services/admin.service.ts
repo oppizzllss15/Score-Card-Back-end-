@@ -1,4 +1,4 @@
-import { Admin } from "../models/admin.model";
+const Admin = require("../models/admin.model");
 
 //create admin
 async function addAdmin(admin: IAdmin) {
@@ -47,12 +47,12 @@ async function getAdminById(adminid: string) {
 
 //edit admin activate or deactivated
 async function editAdminStatus(adminid: string, status: boolean) {
-  const newAdmin = await Admin.findByIdAndUpdate(adminid, {
+  const newAdmin = await Admin.updateOne({_id: adminid}, {
     $set: {
-      activationStatus: status,
+        activationStatus: status,
     },
   });
-  return newAdmin ? newAdmin : null;
+  return newAdmin ? true : false;
 }
 
 //delete admin
@@ -61,13 +61,14 @@ async function removeAdmin(adminid: string) {
   return deletedAdmin ? deletedAdmin : false;
 }
 
-//delete admin
-async function isPropertyInDatabase<T>(property: string, value: T): Promise<any> {
-  let propertyObject: any;
+//check data is in database
+async function isPropertyInDatabase<T>(property: string, value: T): Promise<IAdmin>{
+  let propertyObject: {[key: string]: T} = {}
   propertyObject[property] = value;
-  const admin = await Admin.find({ propertyObject });
-  return admin.length > 0 ? admin[0] : false;
+  const admin: IAdmin[] = await Admin.find(propertyObject);
+  return admin[0];
 }
+
 module.exports = {
   addAdmin,
   editAdmin,

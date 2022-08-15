@@ -1,17 +1,11 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const asyncHandler = require("express-async-handler");
-const Stacks = require("../models/stack");
-const SuperUser = require("../models/superAdmin.model");
-// import { Admin } from "../models/admin.model";
-const Admin = require("../models/admin.model");
+const { getUserStack, getAdminUser, getSuperAdminUser, getAllStacks, deleteAStack, updateAStack, getSpecificStack, createAStack, } = require("../services/stack.service");
 // const toId = mongoose.Schema.types.ObjectId
 const stacksShield = asyncHandler(async (req, res, next) => {
     const userID = req.cookies.Id;
-    console.log(userID);
-    const adminUser = await Admin.find({ _id: userID });
-    console.log(adminUser);
-    const superUser = await SuperUser.findOne({ _id: userID });
+    const superUser = await getSuperAdminUser(userID);
     if (superUser)
         next();
     else {
@@ -24,8 +18,8 @@ const stacksShield = asyncHandler(async (req, res, next) => {
 });
 const stacksShield2 = asyncHandler(async (req, res, next) => {
     const userID = req.cookies.Id;
-    const superUser = await SuperUser.findOne({ _id: userID });
-    const admin = await Admin.findOne({ _id: userID });
+    const superUser = await getSuperAdminUser(userID);
+    const admin = await getAdminUser(userID);
     if (admin)
         next();
     else if (superUser) {
@@ -43,7 +37,7 @@ const stacksShield2 = asyncHandler(async (req, res, next) => {
     }
 });
 const viewAllStacks = asyncHandler(async (req, res) => {
-    const allStacks = await Stacks.find({}, { _id: 0, __v: 0 });
+    const allStacks = await getAllStacks();
     res.status(200).json({
         status: "Success",
         message: {
@@ -54,12 +48,10 @@ const viewAllStacks = asyncHandler(async (req, res) => {
 });
 const viewStack = asyncHandler(async (req, res) => {
     const userID = req.cookies.Id;
-    console.log(userID);
-    const admin = await Admin.findOne({ _id: userID });
+    const admin = await getAdminUser(userID);
     const adminStack = [];
     for (let i = 0; i < admin.stack.length; i++) {
-        const user = await Stacks.find({ _id: admin.stack[i] });
-        console.log(user);
+        const user = await getSpecificStack(admin.stack[i]);
         adminStack.push(user);
     }
     res.status(200).json({
@@ -69,8 +61,7 @@ const viewStack = asyncHandler(async (req, res) => {
     return;
 });
 const createStack = asyncHandler(async (req, res) => {
-    const { name, image } = req.body;
-    const newStack = await Stacks.create(req.body);
+    const newStack = await createAStack(req.body);
     res.status(201).json({
         status: "Success",
         message: {
@@ -82,28 +73,28 @@ const createStack = asyncHandler(async (req, res) => {
 const editStack = asyncHandler(async (req, res) => {
     const { name, image } = req.body;
     const id = req.params.id;
-    const stack = await Stacks.findOne({ _id: id });
+    const stack = await getSpecificStack(id);
     const input = {
         image: image || stack.image,
         name: name || stack.name,
     };
-    const updInput = await Stacks.findByIdAndUpdate(id, input, {
-        new: true,
-    });
+    const updInput = await updateAStack(id, input);
     res.status(201).json({
         status: "Success",
         message: {
             updInput,
         },
     });
+    return;
 });
 const deleteStack = asyncHandler(async (req, res) => {
     const id = req.params.id;
-    const removeStack = await Stacks.findOneAndRemove({ _id: id });
+    const removeStack = await deleteAStack(id);
     res.status(201).json({
         status: "Success",
         message: "Had to let you go",
     });
+    return;
 });
 module.exports = {
     createStack,
