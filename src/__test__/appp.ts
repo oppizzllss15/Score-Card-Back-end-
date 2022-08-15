@@ -9,6 +9,7 @@ const express = require('express')
 
 const SuperAdminRouter = require('../routes/superAdmin.route')
 const AdminRouter = require('../routes/admin.route')
+const UserRouter = require('../routes/users.route')
 
 
 const app: Express = express();
@@ -32,7 +33,8 @@ app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/superadmin', SuperAdminRouter);
-app.use('/admin', AdminRouter);;
+app.use('/admin', AdminRouter);
+app.use('/users', UserRouter);
 
 // catch 404 and forward to error handler
 app.use(function(req: Request, res: Response, next: NextFunction) {

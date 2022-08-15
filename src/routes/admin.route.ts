@@ -3,6 +3,7 @@ var router = express.Router();
 const { adminProtect } = require("../middlewares/authenticate")
 const {
     loginAdmin,
+    logoutAdmin,
     adminProfileImage,
     adminProfile
   } = require("../controllers/admin.controller");
@@ -17,6 +18,7 @@ const uploads = multer({storage})
 
 router.get("/profile", adminProtect, adminProfile);
 router.post("/login", loginAdmin);
+router.get("/logout", logoutAdmin)
 router.get("/stack", stacksShield2, viewStack);
 router.post("/upload", adminProtect, uploads.single("file"), adminProfileImage);
 router.get("/stack", adminProtect, viewStack);

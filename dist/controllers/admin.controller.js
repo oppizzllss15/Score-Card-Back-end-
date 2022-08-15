@@ -3,7 +3,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const { adminRegistrationSchema, userLogin } = require("../utils/utils");
+const { adminRegistrationSchema, userLogin, adminUpdateSchema } = require("../utils/utils");
 const asyncHandler = require("express-async-handler");
 const Admin = require("../models/admin.model");
 const bcrypt_1 = __importDefault(require("bcrypt"));
@@ -97,6 +97,12 @@ const loginAdmin = asyncHandler(async (req, res) => {
     }
     return res.status(400).json({ error: true, message: "Invalid login detail" });
 });
+const logoutAdmin = asyncHandler(async (req, res) => {
+    res.cookie("Token", "");
+    res.cookie("Id", "");
+    res.cookie("Name", "");
+    res.status(200).json({ message: "Logged out successfully" });
+});
 const adminProfileImage = asyncHandler(async (req, res) => {
     var _a, _b;
     if (req.file === undefined)
@@ -154,6 +160,7 @@ module.exports = {
     deleteAdmin,
     setdminActivationStatus,
     loginAdmin,
+    logoutAdmin,
     adminProfileImage,
     adminProfile,
     changeAdminPhoneNumber,

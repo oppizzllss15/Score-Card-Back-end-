@@ -75,11 +75,9 @@ const adminProtect = asyncHandler(async (req, res, next) => {
     let token = req.cookies.Token;
     if (token) {
         try {
-            if (process.env.ADMIN_PASS) {
-                const adminToken = await jwt.verify(token, process.env.ADMIN_PASS);
-                if (adminToken) {
-                    next();
-                }
+            const adminToken = await jwt.verify(token, process.env.ADMIN_PASS);
+            if (adminToken) {
+                next();
             }
         }
         catch (error) {

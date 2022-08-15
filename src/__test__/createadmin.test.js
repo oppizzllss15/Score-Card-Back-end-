@@ -51,6 +51,8 @@ describe("should create an admin",  () => {
     test(" 'create superadmin should create ", async () => {
       const res = await request(app).post("/superadmin/create").send(superadmin);
       expect(res.status).toBe(201);
+      expect(res.body).toHaveProperty("user");
+      expect(res.body.user).toHaveProperty("_id");
       token = res.headers["set-cookie"];
       //console.log(adminId + " admin id")
     });
@@ -58,12 +60,15 @@ describe("should create an admin",  () => {
     test(" 'superadmin login should work; create token ", async () => {
       const res = await request(app).post("/superadmin/login").send(superadmin);
       expect(res.status).toBe(201);
+      expect(res.headers['set-cookie']).toBeTruthy();
       token = res.headers['set-cookie'];
     });
 
     test(" '/superadmin/admin/create should create ", async () => {
       const res = await request(app).post("/superadmin/admin/create").send(adminData).set("Cookie", token);
       expect(res.status).toBe(201);
+      expect(res.body).toHaveProperty("data");
+      expect(res.body.data).toHaveProperty("_id");  
       adminId = JSON.parse(res.text).data._id;
     });
     

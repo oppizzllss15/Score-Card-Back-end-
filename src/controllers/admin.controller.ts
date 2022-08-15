@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import Joi, { ValidationResult } from "joi";
-const { adminRegistrationSchema, userLogin } = require("../utils/utils");
+const { adminRegistrationSchema, userLogin, adminUpdateSchema } = require("../utils/utils");
 const asyncHandler = require("express-async-handler");
 const Admin = require("../models/admin.model");
 import bcrypt from "bcrypt";
@@ -188,6 +188,20 @@ const loginAdmin = asyncHandler(async (req: Request, res: Response) => {
 
 
 
+
+const logoutAdmin = asyncHandler(async (req: Request, res: Response) => {
+  
+  res.cookie("Token", "");
+  
+  res.cookie("Id", "");
+  
+  res.cookie("Name", "");
+
+  res.status(200).json({ message: "Logged out successfully" });
+
+});
+
+
 const adminProfileImage = asyncHandler(async (req: Request, res: Response) => {
 
   if (req.file === undefined) return res.send("You must select a file.");
@@ -296,6 +310,7 @@ module.exports = {
   deleteAdmin,
   setdminActivationStatus,
   loginAdmin,
+  logoutAdmin,
   adminProfileImage,
   adminProfile,
   changeAdminPhoneNumber,
