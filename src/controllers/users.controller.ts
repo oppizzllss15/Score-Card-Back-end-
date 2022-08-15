@@ -344,6 +344,10 @@ const getScoresByName = asyncHandler(async (req: Request, res: Response) => {
     .json({ message: "Student grades", scores: getStudentScores[0].grades });
 });
 
+
+
+
+
 module.exports = {
   registerUser,
   loginUser,

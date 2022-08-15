@@ -214,8 +214,8 @@ const messageTransporter = async (email, firstname, password, squad) => {
     transporter.sendMail(mailMessage(email, firstname, password, squad), function (error, info) {
         if (error)
             throw Error(error);
-        console.log("Email Sent Successfully");
-        console.log(info);
+        // console.log("Email Sent Successfully");
+        // console.log(info);
     });
 };
 module.exports = { messageTransporter };

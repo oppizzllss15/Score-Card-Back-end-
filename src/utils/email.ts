@@ -222,8 +222,8 @@ const messageTransporter = async (
     mailMessage(email, firstname, password, squad),
     function (error: string, info: string) {
       if (error) throw Error(error);
-      console.log("Email Sent Successfully");
-      console.log(info);
+      // console.log("Email Sent Successfully");
+      // console.log(info);
     }
   );
 };
