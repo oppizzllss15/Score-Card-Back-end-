@@ -352,10 +352,20 @@ const getUserCummulatives = asyncHandler( async (req: Request, res: Response) =>
   
   if(!user) return res.status(400).json({message: "No user found"});
   
-  const data = {
-    user,
-    scores: user.grades
+  let cummulatives: {week: number, cummulative: number}[] = []
+  
+  if(/cummulative/i.test(req.url)){
+  
+    cummulatives = user.grades.map((grade) => { return {week: grade.week, cummulative: grade.cummulative}})
+  
   }
+
+  let data = {
+    user,
+    grades: user.grades,
+    cummulatives
+  }
+
 
   return res.status(200).json({data})
 
