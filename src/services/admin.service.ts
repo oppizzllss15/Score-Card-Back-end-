@@ -36,6 +36,7 @@ async function editAdmin(adminid: string, admin: IAdmin) {
       ...admin,
     },
   });
+  console.log(newAdmin);
   return newAdmin ? newAdmin : null;
 }
 

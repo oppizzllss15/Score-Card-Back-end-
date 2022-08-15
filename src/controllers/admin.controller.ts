@@ -1,5 +1,6 @@
 import { Request, Response } from "express";
 import Joi, { ValidationResult } from "joi";
+var debug = require("debug")("live-project-scorecard-sq011a:server");
 const {
   adminRegistrationSchema,
   userLogin,
@@ -116,17 +117,13 @@ const updateAdmin = asyncHandler(async (req: Request, res: Response) => {
       .send({ message: "Admin Detail: " + validation.error.message });
 
   const adminId = req.params.adminId || req.body.adminId;
-
-  const { stack } = req.body;
-  const oldadmin = await Admin.findOne({ _id: adminId });
-
-
-  const result = await editAdmin(adminId, req.body);
+  const oldAdmin = await getAdminById(adminId);
+  const result = await editAdmin(adminId, oldAdmin,req.body);
 
   if (!result) return res.status(400).send({ message: "unable to register" });
 
   const newAdmin = await getAdminById(adminId);
-
+  console.log(newAdmin);
   const message = "successfully updated admin";
 
   return res.status(200).send({ data: newAdmin, message: message });

@@ -25,6 +25,7 @@ async function editAdmin(adminid, admin) {
             ...admin,
         },
     });
+    console.log(newAdmin);
     return newAdmin ? newAdmin : null;
 }
 //get admin

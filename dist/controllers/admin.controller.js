@@ -3,6 +3,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+var debug = require("debug")("live-project-scorecard-sq011a:server");
 const { adminRegistrationSchema, userLogin, passwordChange, passwordHandler, generateAdminToken, adminUpdateSchema, } = require("../utils/utils");
 const asyncHandler = require("express-async-handler");
 const Admin = require("../models/admin.model");
@@ -68,12 +69,12 @@ const updateAdmin = asyncHandler(async (req, res) => {
             .status(400)
             .send({ message: "Admin Detail: " + validation.error.message });
     const adminId = req.params.adminId || req.body.adminId;
-    const { stack } = req.body;
-    const oldadmin = await Admin.findOne({ _id: adminId });
-    const result = await editAdmin(adminId, req.body);
+    const oldAdmin = await getAdminById(adminId);
+    const result = await editAdmin(adminId, oldAdmin, req.body);
     if (!result)
         return res.status(400).send({ message: "unable to register" });
     const newAdmin = await getAdminById(adminId);
+    console.log(newAdmin);
     const message = "successfully updated admin";
     return res.status(200).send({ data: newAdmin, message: message });
 });
