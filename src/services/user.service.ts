@@ -1,8 +1,17 @@
 const User = require("../models/user.model");
+import { NextFunction, Request, Response } from "express";
+const { superUserLogin } = require("../controllers/superadmin.controller")
+
 
 const findUserByEmail = async (email: string) => {
   const userExists = await User.find({ email: email.toLowerCase() });
   return userExists;
+};
+
+const findUserDynamically = async (req: Request, res: Response, next: NextFunction) => {
+  const userExists = await User.find({ email: req.body.email.toLowerCase() });
+  if (userExists.length > 0) return userExists;
+  return superUserLogin(req, res)
 };
 
 const createUser = async (
@@ -116,4 +125,5 @@ module.exports = {
   validateUserTicketLink,
   updateUserPassword,
   resetSecureTicket,
+  findUserDynamically
 };

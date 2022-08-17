@@ -20,6 +20,7 @@ const {
   updateSuperUserTicket,
   validateSuperUserTicketLink,
   resetSuperUserSecureTicket,
+  findSuperUserDynamically
 } = require("../services/superadmin.service");
 const { viewAdminDetails } = require("../services/admin.service");
 const bcrypt = require("bcryptjs");
@@ -89,7 +90,7 @@ const superUserLogin = asyncHandler(async (req: Request, res: Response) => {
     password: password,
   });
 
-  const user = await findSuperUser();
+  const user = await findSuperUserDynamically(req, res);
 
   if (user.length === 0) {
     res.status(404);
