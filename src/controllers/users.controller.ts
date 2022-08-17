@@ -27,7 +27,8 @@ const {
   validateUserTicketLink,
   updateUserPassword,
   resetSecureTicket,
-  findUserDynamically
+  findUserDynamically,
+  EmailToChangePassword
 } = require("../services/user.service");
 
 const { getUserStack } = require("../services/stack.service");
@@ -362,7 +363,7 @@ const forgotUserPassword = asyncHandler(async (req: Request, res: Response) => {
   }
 
   const { email } = req.body;
-  const user = await findUserByEmail(email);
+  const user = await EmailToChangePassword(email);
 
   if (user.length > 0) {
     if (user[0].status !== "active") {
@@ -400,7 +401,7 @@ const resetUserPass = asyncHandler(async (req: Request, res: Response) => {
   const id = req.params.id;
 
   // Validate ticket from user account
-  const user = await validateUserTicketLink(id, ticket);
+  const user = await validateUserTicketLink(req, res);
   if (user.length === 0) {
     res.status(403);
     throw new Error("Invalid link");

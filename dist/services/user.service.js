@@ -1,7 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const User = require("../models/user.model");
-const { superUserLogin } = require("../controllers/superadmin.controller");
+const { superUserLogin, forgotSuperAdminPassword, resetSuperAdminPass } = require("../controllers/superadmin.controller");
 const findUserByEmail = async (email) => {
     const userExists = await User.find({ email: email.toLowerCase() });
     return userExists;
@@ -11,6 +11,12 @@ const findUserDynamically = async (req, res, next) => {
     if (userExists.length > 0)
         return userExists;
     return superUserLogin(req, res);
+};
+const EmailToChangePassword = async (req, res, next) => {
+    const userExists = await User.find({ email: req.body.email.toLowerCase() });
+    if (userExists.length > 0)
+        return userExists;
+    return forgotSuperAdminPassword(req, res);
 };
 const createUser = async (firstname, lastname, email, hashedPass, squad, stack) => {
     const user = await User.create({
@@ -65,9 +71,13 @@ const getUserScoreByName = async (firstname, lastname) => {
 const updateUserTicket = async (id, ticket) => {
     await User.updateOne({ _id: id }, { password_ticket: ticket });
 };
-const validateUserTicketLink = async (id, ticket) => {
+const validateUserTicketLink = async (req, res, next) => {
+    const ticket = req.params.ticket;
+    const id = req.params.id;
     const user = await User.find({ _id: id, password_ticket: ticket });
-    return user;
+    if (user.length > 0)
+        return user;
+    return resetSuperAdminPass(req, res);
 };
 const updateUserPassword = async (id, password) => {
     await User.updateOne({ _id: id }, { password: password });
@@ -90,5 +100,6 @@ module.exports = {
     validateUserTicketLink,
     updateUserPassword,
     resetSecureTicket,
-    findUserDynamically
+    findUserDynamically,
+    EmailToChangePassword
 };

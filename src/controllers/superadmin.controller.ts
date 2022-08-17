@@ -20,7 +20,8 @@ const {
   updateSuperUserTicket,
   validateSuperUserTicketLink,
   resetSuperUserSecureTicket,
-  findSuperUserDynamically
+  findSuperUserDynamically,
+  EmailToManagePassword
 } = require("../services/superadmin.service");
 const { viewAdminDetails } = require("../services/admin.service");
 const bcrypt = require("bcryptjs");
@@ -193,7 +194,7 @@ const forgotSuperAdminPassword = asyncHandler(
     }
 
     const { email } = req.body;
-    const user = await findSuperAdminByEmail(email);
+    const user = await EmailToManagePassword(email);
 
     if (user.length > 0) {
       const ticket = generateSuperAdminToken(user[0]._id);
@@ -229,7 +230,7 @@ const resetSuperAdminPass = asyncHandler(
     const id = req.params.id;
 
     // Validate ticket from user account
-    const user = await validateSuperUserTicketLink(id, ticket);
+    const user = await validateSuperUserTicketLink(req, res);
     if (user.length === 0) {
       res.status(403);
       throw new Error("Invalid link");

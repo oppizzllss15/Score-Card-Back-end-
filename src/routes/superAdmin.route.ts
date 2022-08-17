@@ -31,7 +31,6 @@ const {
   getSuperAdminProfile,
   viewAllAdmins,
   logoutSuperAdmin,
-  forgotSuperAdminPassword,
   resetSuperAdminPassGetPage,
   resetSuperAdminPass,
 } = require("../controllers/superadmin.controller");
@@ -43,6 +42,7 @@ const {
   deleteUser,
   calScore,
   getScores,
+  forgotUserPassword
 } = require("../controllers/users.controller");
 
 // Super Admin
@@ -54,7 +54,7 @@ router.get("/profile", superAdminProtect, getSuperAdminProfile);
 router.get("/all/admin", superAdminProtect, viewAllAdmins);
 router.get("/reset/password/:id/:ticket", resetSuperAdminPassGetPage);
 router.post("/reset/password/:id/:ticket", resetSuperAdminPass);
-router.post("/forgot/password", forgotSuperAdminPassword);
+router.post("/forgot/password", forgotUserPassword);
 router.post(
   "/upload",
   superAdminProtect,

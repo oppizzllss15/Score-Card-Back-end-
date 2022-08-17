@@ -3,7 +3,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const { superAdminValidator, generateSuperAdminToken, passwordHandler, userLogin, passwordChange, } = require("../utils/utils");
 const { messageTransporter, passwordLinkTransporter, } = require("../utils/email");
 const asyncHandler = require("express-async-handler");
-const { findSuperAdminByEmail, findSuperUser, createSuperHandler, updateSuperUserPassword, updateSuperUserProfileImg, updateSuperUserTicket, validateSuperUserTicketLink, resetSuperUserSecureTicket, findSuperUserDynamically } = require("../services/superadmin.service");
+const { findSuperAdminByEmail, findSuperUser, createSuperHandler, updateSuperUserPassword, updateSuperUserProfileImg, updateSuperUserTicket, validateSuperUserTicketLink, resetSuperUserSecureTicket, findSuperUserDynamically, EmailToManagePassword } = require("../services/superadmin.service");
 const { viewAdminDetails } = require("../services/admin.service");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
@@ -127,7 +127,7 @@ const forgotSuperAdminPassword = asyncHandler(async (req, res) => {
         throw new Error("Please enter a valid email address");
     }
     const { email } = req.body;
-    const user = await findSuperAdminByEmail(email);
+    const user = await EmailToManagePassword(email);
     if (user.length > 0) {
         const ticket = generateSuperAdminToken(user[0]._id);
         // Update user ticket in database
@@ -154,7 +154,7 @@ const resetSuperAdminPass = asyncHandler(async (req, res) => {
     const ticket = req.params.ticket;
     const id = req.params.id;
     // Validate ticket from user account
-    const user = await validateSuperUserTicketLink(id, ticket);
+    const user = await validateSuperUserTicketLink(req, res);
     if (user.length === 0) {
         res.status(403);
         throw new Error("Invalid link");

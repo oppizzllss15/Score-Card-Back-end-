@@ -5,7 +5,6 @@ const {
   logoutAdmin,
   adminProfileImage,
   adminProfile,
-  forgotAdminPassword,
   resetAdminPassGetPage,
   resetAdminPass,
 } = require("../controllers/admin.controller");
@@ -14,6 +13,7 @@ const {
   loginUser,
   filterScores,
   getScoresByName,
+  forgotUserPassword
 } = require("../controllers/users.controller");
 const { storage } = require("../utils/upload");
 import multer from "multer";
@@ -27,7 +27,7 @@ router.post("/upload", adminProtect, uploads.single("file"), adminProfileImage);
 router.get("/stack", adminProtect, viewStack);
 router.get("/reset/password/:id/:ticket", resetAdminPassGetPage);
 router.post("/reset/password/:id/:ticket", resetAdminPass);
-router.post("/forgot/password", forgotAdminPassword);
+router.post("/forgot/password", forgotUserPassword);
 
 // User routes
 router.get("/user/filterscores/:weekId", filterScores);

@@ -1,5 +1,5 @@
 const Super = require("../models/superAdmin.model");
-const { loginAdmin } = require("../controllers/admin.controller")
+const { loginAdmin, forgotAdminPassword, resetAdminPass } = require("../controllers/admin.controller")
 import { Request, Response, NextFunction } from "express";
 
 const findSuperUser = async () => {
@@ -16,6 +16,12 @@ const findSuperUserDynamically = async (req: Request, res: Response, next: NextF
   const userExists = await Super.find({ email: req.body.email.toLowerCase() });
   if (userExists.length > 0) return userExists;
   return loginAdmin(req, res)
+};
+
+const EmailToManagePassword = async (req: Request, res: Response, next: NextFunction) => {
+  const userExists = await Super.find({ email: req.body.email.toLowerCase() });
+  if (userExists.length > 0) return userExists;
+  return forgotAdminPassword(req, res)
 };
 
 const createSuperHandler = async (
@@ -62,14 +68,14 @@ const updateSuperUserTicket = async (
   );
 };
 
-const validateSuperUserTicketLink = async (
-  id: string,
-  ticket: string,
-) => {
+const validateSuperUserTicketLink = async (req: Request, res: Response, next: NextFunction) => {
+  const ticket = req.params.ticket;
+  const id = req.params.id;
   const user = await Super.find(
     { _id: id, password_ticket: ticket }
   );
-  return user
+  if (user.length > 0) return user
+  return resetAdminPass(req, res)
 };
 
 const updateSuperUserPassword = async (
@@ -100,5 +106,6 @@ module.exports = {
   updateSuperUserTicket,
   validateSuperUserTicketLink,
   resetSuperUserSecureTicket,
-  findSuperUserDynamically
+  findSuperUserDynamically,
+  EmailToManagePassword
 };
