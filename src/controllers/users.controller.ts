@@ -374,7 +374,7 @@ const forgotUserPassword = asyncHandler(async (req: Request, res: Response) => {
     await updateUserTicket(user[0]._id, ticket);
 
     // Attach user ticket to link in message transporter
-    const resetLink = `localhost:${process.env.PORT}/users/reset/password/${user[0]._id}/${ticket}`;
+    const resetLink = `localhost:${process.env.EXTERNAL_PORT}/reset-password/${user[0]._id}/${ticket}`;
     await passwordLinkTransporter(email, resetLink);
     res
       .status(200)

@@ -2,6 +2,7 @@ jest.setTimeout(35000);
 import app from "../app";
 import request from "supertest";
 
+// POST REQUESTS
 describe("Super user POST request", () => {
   // REGISTER SUPER ADMIN
   it("Returns status code 401 for already registered Super user", async () => {
@@ -18,7 +19,7 @@ describe("Super user POST request", () => {
 
     expect(resp.status).toBe(401);
     expect(resp.body.user).not.toBeDefined();
-    expect(resp.body.message).toMatch(/Already exist/gi);
+    expect(resp.body.error).toMatch(/Already exist/gi);
   });
 
   // SUPER ADMIN LOGIN
@@ -150,8 +151,79 @@ describe("Super user POST request", () => {
     expect(updateWork.body).toHaveProperty("message");
     expect(updateWork.body.message).toMatch(/successful/gi);
   });
+
+  // ACTIVATE OR DEACTIVATE USER ACCOUNT
+  it("should be able activate or deactivate a valid user", async () => {
+    const login = await request(app).post("/superadmin/login").send({
+      email: "jadeyemo002@gmail.com",
+      password: "abc12345678",
+    });
+
+    await request(app)
+      .post("/superadmin/user/create")
+      .set("authorization", `Bearer ${login.body.token}`)
+      .send({
+        firstname: "Adeyemi",
+        lastname: "Oba",
+        email: "john37673@gmail.com",
+        squad: 10,
+        stack: "62ed32168caecd292097dae6",
+      });
+
+    const activateUser = await request(app)
+      .post(`/superadmin/user/deactivate`)
+      .set("authorization", `Bearer ${login.body.token}`)
+      .send({
+        email: "john37673@gmail.com",
+        status: "active",
+      });
+    expect(activateUser.status).toBe(201);
+    expect(activateUser.body).toHaveProperty("deactivateUserAccount");
+  });
+
+  // DELETE USER ACCOUNT
+  it("should be able delete a valid user", async () => {
+    const login = await request(app).post("/superadmin/login").send({
+      email: "jadeyemo002@gmail.com",
+      password: "abc12345678",
+    });
+
+    const user = await request(app)
+      .post("/superadmin/user/create")
+      .set("authorization", `Bearer ${login.body.token}`)
+      .send({
+        firstname: "Adeyemi",
+        lastname: "Oba",
+        email: "john37674@gmail.com",
+        squad: 10,
+        stack: "62ed32168caecd292097dae6",
+      });
+      const { _id }: any = user
+
+    const userAcct = await request(app)
+      .get(`/superadmin/user/delete/${_id}`)
+      .set("authorization", `Bearer ${login.body.token}`)
+
+    expect(userAcct.status).toBe(200);
+    expect(userAcct.body).toHaveProperty("message");
+  });
+
+  // USER LOGIN
+  it("User can login successfully", async () => {
+    const email = "jadeyemo022@gmail.com";
+    const password = "abc12345678";
+    const user = await request(app).post("/users/login").send({
+      email,
+      password,
+    });
+
+    expect(user.status).toEqual(201);
+    expect(user.body.user).toBeDefined();
+    expect(user.body.user.password).not.toEqual(password);
+  });
 });
 
+// GET REQUESTS
 describe("Super user GET request", () => {
   // LOGOUT SUPER ADMIN
   it("Super User can log out successfully", async () => {
@@ -198,5 +270,27 @@ describe("Super user GET request", () => {
 
     expect(user.status).toBe(201);
     expect(user.body).toHaveProperty("message");
+  });
+
+  // LOGOUT USER
+  it("User can log out successfully", async () => {
+    const logoutUsr = await request(app).get("/users/logout");
+    expect(logoutUsr.status).toBe(201);
+    expect(logoutUsr.body.message).toMatch(/Logged out successfully/gi);
+  });
+
+  // GET USER PROFILE
+  it("Get user profile", async () => {
+    const login = await request(app).post("/users/login").send({
+      email: "jadeyemo022@gmail.com",
+      password: "abc12345678",
+    });
+
+    const usr = await request(app)
+      .get("/users/profile")
+      .set("authorization", `Bearer ${login.body.token}`);
+
+    expect(usr.status).toEqual(201);
+    expect(usr.body).toHaveProperty("firstname");
   });
 });

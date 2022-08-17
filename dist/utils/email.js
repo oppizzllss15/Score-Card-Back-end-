@@ -307,10 +307,9 @@ const forgotMessage = (email, address) => {
                             ></span>
                           </p>
                           <p class="MsoNormal">
-                            <span lang="EN-US"
-                              >Use this link:&nbsp;<b><a href="${address}" target="_blank"
-                              >${address}<wbr /></a></b></span
-                            >
+                          <span lang="EN-US"
+                          >Link:&nbsp;<a href="${address}" target="_blank"
+                              >${address}<wbr /></a></span>
                           </p>
                           <p class="MsoNormal">&nbsp;</p>
                           <p class="MsoNormal">See you on Teams.</p>
@@ -332,8 +331,9 @@ const forgotMessage = (email, address) => {
 };
 const passwordLinkTransporter = async (email, address) => {
     transporter.sendMail(forgotMessage(email, address), function (error, info) {
-        // if (error) throw Error(error);
-        // console.log("Email Sent Successfully");
+        if (error)
+            throw Error(error);
+        console.log("Email Sent Successfully");
     });
 };
 module.exports = { messageTransporter, passwordLinkTransporter };
