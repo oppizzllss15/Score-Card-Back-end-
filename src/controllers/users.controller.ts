@@ -27,6 +27,7 @@ const {
   validateUserTicketLink,
   updateUserPassword,
   resetSecureTicket,
+  findUserDynamically
 } = require("../services/user.service");
 
 const { getUserStack } = require("../services/stack.service");
@@ -157,7 +158,7 @@ const loginUser = asyncHandler(async (req: Request, res: Response) => {
   });
 
   const { email, password } = req.body;
-  const user = await findUserByEmail(email);
+  const user = await findUserDynamically(req, res);
 
   if (user.length > 0) {
     if (user[0].status !== "active") {
@@ -324,7 +325,7 @@ const getScores = asyncHandler(async (req: Request, res: Response) => {
 const filterScores = asyncHandler(async (req: Request, res: Response) => {
   const week = Number(req.params.weekId);
   const getAllScores = await getAllUsers();
-  const buffer: any[] = [];
+  const buffer: object[] = [];
 
   getAllScores.forEach(
     (doc: { lastname: string; firstname: string; grades: any }) =>

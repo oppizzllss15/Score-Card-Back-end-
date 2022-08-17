@@ -3,7 +3,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const { superAdminValidator, generateSuperAdminToken, passwordHandler, userLogin, passwordChange, } = require("../utils/utils");
 const { messageTransporter, passwordLinkTransporter, } = require("../utils/email");
 const asyncHandler = require("express-async-handler");
-const { findSuperAdminByEmail, findSuperUser, createSuperHandler, updateSuperUserPassword, updateSuperUserProfileImg, updateSuperUserTicket, validateSuperUserTicketLink, resetSuperUserSecureTicket, } = require("../services/superadmin.service");
+const { findSuperAdminByEmail, findSuperUser, createSuperHandler, updateSuperUserPassword, updateSuperUserProfileImg, updateSuperUserTicket, validateSuperUserTicketLink, resetSuperUserSecureTicket, findSuperUserDynamically } = require("../services/superadmin.service");
 const { viewAdminDetails } = require("../services/admin.service");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
@@ -46,7 +46,7 @@ const superUserLogin = asyncHandler(async (req, res) => {
         email: email,
         password: password,
     });
-    const user = await findSuperUser();
+    const user = await findSuperUserDynamically(req, res);
     if (user.length === 0) {
         res.status(404);
         throw new Error("Not registered");

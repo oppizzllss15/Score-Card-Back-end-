@@ -2,7 +2,6 @@ var express = require("express");
 var router = express.Router();
 const { adminProtect } = require("../middlewares/authenticate");
 const {
-  loginAdmin,
   logoutAdmin,
   adminProfileImage,
   adminProfile,
@@ -12,6 +11,7 @@ const {
 } = require("../controllers/admin.controller");
 const { viewStack, stacksShield2 } = require("../controllers/stack.controller");
 const {
+  loginUser,
   filterScores,
   getScoresByName,
 } = require("../controllers/users.controller");
@@ -20,7 +20,7 @@ import multer from "multer";
 const uploads = multer({ storage });
 
 router.get("/profile", adminProtect, adminProfile);
-router.post("/login", loginAdmin);
+router.post("/login", loginUser);
 router.get("/logout", logoutAdmin);
 router.get("/stack", stacksShield2, viewStack);
 router.post("/upload", adminProtect, uploads.single("file"), adminProfileImage);

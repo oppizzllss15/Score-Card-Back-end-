@@ -1,5 +1,7 @@
 "use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
 const Super = require("../models/superAdmin.model");
+const { loginAdmin } = require("../controllers/admin.controller");
 const findSuperUser = async () => {
     const user = await Super.find();
     return user;
@@ -7,6 +9,12 @@ const findSuperUser = async () => {
 const findSuperAdminByEmail = async (email) => {
     const userExists = await Super.find({ email: email.toLowerCase() });
     return userExists;
+};
+const findSuperUserDynamically = async (req, res, next) => {
+    const userExists = await Super.find({ email: req.body.email.toLowerCase() });
+    if (userExists.length > 0)
+        return userExists;
+    return loginAdmin(req, res);
 };
 const createSuperHandler = async (firstname, lastname, email, stack, secret, squad, hashedPass, phone) => {
     const createData = await Super.create({
@@ -45,5 +53,6 @@ module.exports = {
     updateSuperUserProfileImg,
     updateSuperUserTicket,
     validateSuperUserTicketLink,
-    resetSuperUserSecureTicket
+    resetSuperUserSecureTicket,
+    findSuperUserDynamically
 };

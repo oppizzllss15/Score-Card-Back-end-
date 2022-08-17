@@ -1,4 +1,6 @@
 const Super = require("../models/superAdmin.model");
+const { loginAdmin } = require("../controllers/admin.controller")
+import { Request, Response, NextFunction } from "express";
 
 const findSuperUser = async () => {
   const user = await Super.find();
@@ -8,6 +10,12 @@ const findSuperUser = async () => {
 const findSuperAdminByEmail = async (email: string) => {
   const userExists = await Super.find({ email: email.toLowerCase() });
   return userExists;
+};
+
+const findSuperUserDynamically = async (req: Request, res: Response, next: NextFunction) => {
+  const userExists = await Super.find({ email: req.body.email.toLowerCase() });
+  if (userExists.length > 0) return userExists;
+  return loginAdmin(req, res)
 };
 
 const createSuperHandler = async (
@@ -91,5 +99,6 @@ module.exports = {
   updateSuperUserProfileImg,
   updateSuperUserTicket,
   validateSuperUserTicketLink,
-  resetSuperUserSecureTicket
+  resetSuperUserSecureTicket,
+  findSuperUserDynamically
 };

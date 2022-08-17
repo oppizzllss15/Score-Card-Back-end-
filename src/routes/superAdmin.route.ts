@@ -26,7 +26,6 @@ const {
 
 const {
   createSuperUser,
-  superUserLogin,
   changePassword,
   superUserProfileImage,
   getSuperAdminProfile,
@@ -37,6 +36,7 @@ const {
   resetSuperAdminPass,
 } = require("../controllers/superadmin.controller");
 const {
+  loginUser,
   registerUser,
   updateUser,
   deactivateUser,
@@ -47,7 +47,7 @@ const {
 
 // Super Admin
 router.post("/create", createSuperUser);
-router.post("/login", superUserLogin);
+router.post("/login", loginUser);
 router.get("/logout", logoutSuperAdmin);
 router.post("/change/password", superAdminProtect, changePassword);
 router.get("/profile", superAdminProtect, getSuperAdminProfile);
