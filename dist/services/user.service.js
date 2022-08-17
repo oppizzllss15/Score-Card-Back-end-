@@ -54,6 +54,9 @@ const getUserScoreByName = async (firstname, lastname) => {
     const getStudentScores = await User.find({ firstname, lastname });
     return getStudentScores;
 };
+const changeUserPassword = async (id, password) => {
+    await User.updateOne({ _id: id }, { password: password });
+};
 module.exports = {
     findUserByEmail,
     createUser,
@@ -65,4 +68,5 @@ module.exports = {
     getUserScoreByName,
     updateUserPhoneNo,
     updateUserProfileImg,
+    changeUserPassword,
 };

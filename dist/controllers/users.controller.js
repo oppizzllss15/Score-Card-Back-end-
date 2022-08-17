@@ -1,8 +1,8 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const { messageTransporter } = require("../utils/email");
-const { generateToken, userRegistration, userUpdate, userLogin, userStatus, passwordHandler, score, } = require("../utils/utils");
-const { findUserByEmail, createUser, findUserById, updateUserById, updateUserStatus, updateUserScore, getAllUsers, getUserScoreByName, updateUserPhoneNo, updateUserProfileImg, } = require("../services/user.service");
+const { generateToken, userRegistration, userUpdate, userLogin, userStatus, passwordHandler, score, passwordChange, } = require("../utils/utils");
+const { findUserByEmail, createUser, findUserById, updateUserById, updateUserStatus, updateUserScore, getAllUsers, getUserScoreByName, updateUserPhoneNo, updateUserProfileImg, changeUserPassword, } = require("../services/user.service");
 const { getUserStack } = require("../services/stack.service");
 const asyncHandler = require("express-async-handler");
 const bcrypt = require("bcryptjs");
@@ -235,18 +235,20 @@ const calScore = asyncHandler(async (req, res) => {
     };
     const userData = await updateUserScore(id, data);
     const getScores = await findUserById(id);
-    res
-        .status(201)
-        .json({ message: "Updated successfully", scores: getScores.grades });
+    res.status(201).json({
+        message: "Updated successfully",
+        scores: getScores.grades,
+    });
 });
 const getScores = asyncHandler(async (req, res) => {
     const id = req.params.id;
     const getScores = await findUserById(id);
     console.log(id);
     if (getScores) {
-        res
-            .status(201)
-            .json({ message: "All your score", scores: getScores.grades });
+        res.status(201).json({
+            message: "All your score",
+            scores: getScores.grades,
+        });
     }
     else {
         res.status(404);
@@ -272,9 +274,10 @@ const getScoresByName = asyncHandler(async (req, res) => {
         throw new Error("Student does not exist");
     }
     console.log(getStudentScores[0].grades);
-    res
-        .status(201)
-        .json({ message: "Student grades", scores: getStudentScores[0].grades });
+    res.status(201).json({
+        message: "Student grades",
+        scores: getStudentScores[0].grades,
+    });
 });
 const getUserCummulatives = asyncHandler(async (req, res) => {
     const user = await findUserById(req.params.userId);
@@ -282,14 +285,37 @@ const getUserCummulatives = asyncHandler(async (req, res) => {
         return res.status(400).json({ message: "No user found" });
     let cummulatives = [];
     if (/cummulative/i.test(req.url)) {
-        cummulatives = user.grades.map((grade) => { return { week: grade.week, cummulative: grade.cummulative }; });
+        cummulatives = user.grades.map((grade) => {
+            return { week: grade.week, cummulative: grade.cummulative };
+        });
     }
     let data = {
         user,
         grades: user.grades,
-        cummulatives
+        cummulatives,
     };
     return res.status(200).json({ data });
+});
+const updateUserPasword = asyncHandler(async (req, res) => {
+    await passwordChange().validateAsync({
+        newPassword: req.body.newPassword,
+        confirmPassword: req.body.confirmPassword,
+    });
+    const { newPassword, confirmPassword } = req.body;
+    if (newPassword !== confirmPassword) {
+        res.status(400);
+        throw new Error("Passwords do not match");
+    }
+    const user = await findUserById(req.cookies.Id);
+    if (user && (await bcrypt.compare(newPassword, user.password))) {
+        res.status(401);
+        throw new Error("New Password cannot be the same with Old Password");
+    }
+    const newHashedPass = await passwordHandler(newPassword);
+    await changeUserPassword(req.cookies.Id, newHashedPass);
+    res.status(201).json({
+        message: "Password successfully changed",
+    });
 });
 module.exports = {
     registerUser,
@@ -305,5 +331,6 @@ module.exports = {
     getScores,
     filterScores,
     getScoresByName,
-    getUserCummulatives
+    getUserCummulatives,
+    updateUserPasword,
 };

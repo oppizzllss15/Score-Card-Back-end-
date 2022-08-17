@@ -84,17 +84,27 @@ const getUserScoreByName = async (firstname: string, lastname: string) => {
   return getStudentScores;
 };
 
+const changeUserPassword = async (
+   id: string,
+   password: string
+) => {
+   await User.updateOne(
+      { _id: id },
+      { password: password }
+   );
+};
 
 
 module.exports = {
-  findUserByEmail,
-  createUser,
-  findUserById,
-  updateUserById,
-  updateUserStatus,
-  updateUserScore,
-  getAllUsers,
-  getUserScoreByName,
-  updateUserPhoneNo,
-  updateUserProfileImg,
+   findUserByEmail,
+   createUser,
+   findUserById,
+   updateUserById,
+   updateUserStatus,
+   updateUserScore,
+   getAllUsers,
+   getUserScoreByName,
+   updateUserPhoneNo,
+   updateUserProfileImg,
+   changeUserPassword,
 };
