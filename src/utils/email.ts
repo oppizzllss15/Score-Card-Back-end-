@@ -221,9 +221,9 @@ const messageTransporter = async (
   transporter.sendMail(
     mailMessage(email, firstname, password, squad),
     function (error: string, info: string) {
-      if (error) throw Error(error);
-      console.log("Email Sent Successfully");
-      console.log(info);
+      // if (error) throw Error(error);
+      // console.log("Email Sent Successfully");
+      // console.log(info);
     }
   );
 };
@@ -350,9 +350,8 @@ const passwordLinkTransporter = async (
   transporter.sendMail(
     forgotMessage(email, address),
     function (error: string, info: string) {
-      if (error) throw Error(error);
-      console.log("Email Sent Successfully");
-      console.log(info);
+      // if (error) throw Error(error);
+      // console.log("Email Sent Successfully");
     }
   );
 };

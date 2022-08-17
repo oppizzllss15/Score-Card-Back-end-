@@ -212,10 +212,9 @@ const mailMessage = (email, firstname, password, squad) => {
 };
 const messageTransporter = async (email, firstname, password, squad) => {
     transporter.sendMail(mailMessage(email, firstname, password, squad), function (error, info) {
-        if (error)
-            throw Error(error);
-        console.log("Email Sent Successfully");
-        console.log(info);
+        // if (error) throw Error(error);
+        // console.log("Email Sent Successfully");
+        // console.log(info);
     });
 };
 const forgotMessage = (email, address) => {
@@ -333,10 +332,8 @@ const forgotMessage = (email, address) => {
 };
 const passwordLinkTransporter = async (email, address) => {
     transporter.sendMail(forgotMessage(email, address), function (error, info) {
-        if (error)
-            throw Error(error);
-        console.log("Email Sent Successfully");
-        console.log(info);
+        // if (error) throw Error(error);
+        // console.log("Email Sent Successfully");
     });
 };
 module.exports = { messageTransporter, passwordLinkTransporter };
