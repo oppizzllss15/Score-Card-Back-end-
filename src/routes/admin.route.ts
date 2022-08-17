@@ -10,7 +10,7 @@ const {
   resetAdminPassGetPage,
   resetAdminPass,
 } = require("../controllers/admin.controller");
-const { viewStack, stacksShield2 } = require("../controllers/stack.controller");
+const { viewAdminStack, stacksShield2 } = require("../controllers/stack.controller");
 const {
   filterScores,
   getScoresByName,
@@ -22,9 +22,9 @@ const uploads = multer({ storage });
 router.get("/profile", adminProtect, adminProfile);
 router.post("/login", loginAdmin);
 router.get("/logout", logoutAdmin);
-router.get("/stack", stacksShield2, viewStack);
+router.get("/stack", stacksShield2, viewAdminStack);
 router.post("/upload", adminProtect, uploads.single("file"), adminProfileImage);
-router.get("/stack", adminProtect, viewStack);
+// router.get("/stack", adminProtect, viewStack);
 router.get("/reset/password/:id/:ticket", resetAdminPassGetPage);
 router.post("/reset/password/:id/:ticket", resetAdminPass);
 router.post("/forgot/password", forgotAdminPassword);

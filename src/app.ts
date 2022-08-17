@@ -11,7 +11,6 @@ const usersRouter = require('./routes/users.route');
 const adminRouter = require('./routes/admin.route');
 const superAdminRouter = require('./routes/superAdmin.route');
 
-
 const app = express();
 
 app.use(logger('dev'));

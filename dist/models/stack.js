@@ -1,5 +1,5 @@
 "use strict";
-const stack = require('mongoose');
+const stack = require("mongoose");
 const stackSchema = stack.Schema({
     image: {
         type: String,
@@ -10,6 +10,6 @@ const stackSchema = stack.Schema({
         type: String,
         required: true,
         unique: true,
-    }
+    },
 });
-module.exports = stack.model('Stacks', stackSchema);
+module.exports = stack.model("Stacks", stackSchema);

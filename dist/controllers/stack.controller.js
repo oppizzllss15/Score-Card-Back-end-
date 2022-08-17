@@ -48,7 +48,7 @@ const viewAllStacks = asyncHandler(async (req, res) => {
     });
     return;
 });
-const viewStack = asyncHandler(async (req, res) => {
+const viewAdminStack = asyncHandler(async (req, res) => {
     const userID = req.cookies.Id;
     const admin = await getAdminUser(userID);
     const adminStack = [];
@@ -137,7 +137,7 @@ module.exports = {
     editStack,
     deleteStack,
     viewAllStacks,
-    viewStack,
+    viewAdminStack,
     addStackToAdmin,
     stacksShield,
     stacksShield2,
