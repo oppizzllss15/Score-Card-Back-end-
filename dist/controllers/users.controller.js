@@ -282,7 +282,7 @@ const forgotUserPassword = asyncHandler(async (req, res) => {
         throw new Error("Please enter a valid email address");
     }
     const { email } = req.body;
-    const user = await EmailToChangePassword(email);
+    const user = await EmailToChangePassword(req, res);
     if (user.length > 0) {
         if (user[0].status !== "active") {
             res.status(404).json({ message: "Account deactivated" });

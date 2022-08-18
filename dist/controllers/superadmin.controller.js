@@ -127,13 +127,13 @@ const forgotSuperAdminPassword = asyncHandler(async (req, res) => {
         throw new Error("Please enter a valid email address");
     }
     const { email } = req.body;
-    const user = await EmailToManagePassword(email);
+    const user = await EmailToManagePassword(req, res);
     if (user.length > 0) {
         const ticket = generateSuperAdminToken(user[0]._id);
         // Update user ticket in database
         await updateSuperUserTicket(user[0]._id, ticket);
         // Attach user ticket to link in message transporter
-        const resetLink = `localhost:${process.env.PORT}/superadmin/reset/password/${user[0]._id}/${ticket}`;
+        const resetLink = `localhost:${process.env.EXTERNAL_PORT}/reset-password/${user[0]._id}/${ticket}`;
         await passwordLinkTransporter(email, resetLink);
         res
             .status(200)

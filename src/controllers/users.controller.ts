@@ -363,7 +363,7 @@ const forgotUserPassword = asyncHandler(async (req: Request, res: Response) => {
   }
 
   const { email } = req.body;
-  const user = await EmailToChangePassword(email);
+  const user = await EmailToChangePassword(req, res);
 
   if (user.length > 0) {
     if (user[0].status !== "active") {

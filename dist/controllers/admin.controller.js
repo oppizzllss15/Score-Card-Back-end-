@@ -191,15 +191,14 @@ const forgotAdminPassword = asyncHandler(async (req, res) => {
     const { email } = req.body;
     const admin = await findAdminByEmail(email);
     if (admin.length > 0) {
-        if (admin[0].activationStatus !== "true") {
+        if (!admin[0].activationStatus) {
             res.status(404).json({ message: "Account deactivated" });
-            return;
         }
         const ticket = generateAdminToken(admin[0]._id);
         // Update admin ticket in database
         await updateAdminTicket(admin[0]._id, ticket);
         // Attach admin ticket to link in message transporter
-        const resetLink = `localhost:${process.env.PORT}/admin/reset/password/${admin[0]._id}/${ticket}`;
+        const resetLink = `localhost:${process.env.EXTERNAL_PORT}/reset-password/${admin[0]._id}/${ticket}`;
         await passwordLinkTransporter(email, resetLink);
         res
             .status(200)
