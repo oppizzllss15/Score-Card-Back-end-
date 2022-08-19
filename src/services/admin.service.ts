@@ -9,7 +9,7 @@ async function addAdmin(admin: IAdmin) {
 //view all admin
 async function viewAdminDetails() {
   const allAdmins = await Admin.find();
-  return allAdmins
+  return allAdmins;
 }
 
 // update admin profile_img
@@ -36,6 +36,7 @@ async function editAdmin(adminid: string, admin: IAdmin) {
       ...admin,
     },
   });
+  console.log(newAdmin);
   return newAdmin ? newAdmin : null;
 }
 
@@ -47,11 +48,14 @@ async function getAdminById(adminid: string) {
 
 //edit admin activate or deactivated
 async function editAdminStatus(adminid: string, status: boolean) {
-  const newAdmin = await Admin.updateOne({_id: adminid}, {
-    $set: {
+  const newAdmin = await Admin.updateOne(
+    { _id: adminid },
+    {
+      $set: {
         activationStatus: status,
-    },
-  });
+      },
+    }
+  );
   return newAdmin ? true : false;
 }
 
@@ -62,11 +66,43 @@ async function removeAdmin(adminid: string) {
 }
 
 //check data is in database
-async function isPropertyInDatabase<T>(property: string, value: T): Promise<IAdmin>{
-  let propertyObject: {[key: string]: T} = {}
+async function isPropertyInDatabase<T>(
+  property: string,
+  value: T
+): Promise<IAdmin> {
+  let propertyObject: { [key: string]: T } = {};
   propertyObject[property] = value;
   const admin: IAdmin[] = await Admin.find(propertyObject);
   return admin[0];
+}
+
+const findAdminByEmail = async (email: string) => {
+  const adminExists = await Admin.find({ email: email.toLowerCase() });
+  return adminExists;
+};
+
+const updateAdminTicket = async (id: string, ticket: string) => {
+  await Admin.updateOne({ _id: id }, { password_ticket: ticket });
+};
+
+const validateAdminTicketLink = async (id: string, ticket: string) => {
+  const user = await Admin.find({ _id: id, password_ticket: ticket });
+  return user;
+};
+
+const updateAdminPassword = async (id: string, password: string) => {
+  await Admin.updateOne({ _id: id }, { password: password });
+};
+
+const resetAdminSecureTicket = async (id: string) => {
+  await Admin.updateOne({ _id: id }, { password_ticket: null });
+};
+
+//view admins
+async function getAdmins() {
+  const Admins = await Admin.find();
+  return Admins
+
 }
 
 module.exports = {
@@ -79,4 +115,10 @@ module.exports = {
   isPropertyInDatabase,
   updateAdminProfileImg,
   updateAdminPhoneNo,
+  findAdminByEmail,
+  updateAdminTicket,
+  validateAdminTicketLink,
+  updateAdminPassword,
+  resetAdminSecureTicket,
+  getAdmins
 };

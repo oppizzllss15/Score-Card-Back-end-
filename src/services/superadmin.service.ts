@@ -1,8 +1,27 @@
 const Super = require("../models/superAdmin.model");
+const { loginAdmin, forgotAdminPassword, resetAdminPass } = require("../controllers/admin.controller")
+import { Request, Response, NextFunction } from "express";
 
 const findSuperUser = async () => {
   const user = await Super.find();
   return user;
+};
+
+const findSuperAdminByEmail = async (email: string) => {
+  const userExists = await Super.find({ email: email.toLowerCase() });
+  return userExists;
+};
+
+const findSuperUserDynamically = async (req: Request, res: Response, next: NextFunction) => {
+  const userExists = await Super.find({ email: req.body.email.toLowerCase() });
+  if (userExists.length > 0) return userExists;
+  return loginAdmin(req, res)
+};
+
+const EmailToManagePassword = async (req: Request, res: Response, next: NextFunction) => {
+  const userExists = await Super.find({ email: req.body.email.toLowerCase() });
+  if (userExists.length > 0) return userExists;
+  return forgotAdminPassword(req, res)
 };
 
 const createSuperHandler = async (
@@ -28,15 +47,6 @@ const createSuperHandler = async (
   return createData;
 };
 
-const updateSuperUserPassword = async (id: string, data: string) => {
-  await Super.updateOne(
-    { _id: id },
-    {
-      password: data,
-    }
-  );
-};
-
 const updateSuperUserProfileImg = async (
   id: string,
   filePath: string,
@@ -48,9 +58,54 @@ const updateSuperUserProfileImg = async (
   );
 };
 
+const updateSuperUserTicket = async (
+  id: string,
+  ticket: string,
+) => {
+  await Super.updateOne(
+    { _id: id },
+    { password_ticket: ticket }
+  );
+};
+
+const validateSuperUserTicketLink = async (req: Request, res: Response, next: NextFunction) => {
+  const ticket = req.params.ticket;
+  const id = req.params.id;
+  const user = await Super.find(
+    { _id: id, password_ticket: ticket }
+  );
+  if (user.length > 0) return user
+  return resetAdminPass(req, res)
+};
+
+const updateSuperUserPassword = async (
+  id: string,
+  password: string,
+) => {
+  await Super.updateOne(
+    { _id: id },
+    { password: password }
+  );
+};
+
+const resetSuperUserSecureTicket = async (
+  id: string,
+) => {
+  await Super.updateOne(
+    { _id: id },
+    { password_ticket: null }
+  );
+};
+
 module.exports = {
+  findSuperAdminByEmail,
   findSuperUser,
   createSuperHandler,
   updateSuperUserPassword,
-  updateSuperUserProfileImg
+  updateSuperUserProfileImg,
+  updateSuperUserTicket,
+  validateSuperUserTicketLink,
+  resetSuperUserSecureTicket,
+  findSuperUserDynamically,
+  EmailToManagePassword
 };

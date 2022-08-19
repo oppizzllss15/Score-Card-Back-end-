@@ -1,8 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-const AdminModel = require('../models/superAdmin.model');
-const jwt = require('jsonwebtoken');
-const asyncHandler = require('express-async-handler');
+const jwt = require("jsonwebtoken");
+const asyncHandler = require("express-async-handler");
 const protect = asyncHandler(async (req, res, next) => {
     let token = req.cookies.Token;
     if (token) {
@@ -14,24 +13,24 @@ const protect = asyncHandler(async (req, res, next) => {
         }
         catch (error) {
             res.status(401);
-            throw new Error('Not authorized');
+            throw new Error("Not authorized");
         }
     }
     else if (req.headers.authorization &&
-        req.headers.authorization.startsWith('Bearer')) {
+        req.headers.authorization.startsWith("Bearer")) {
         try {
-            token = req.headers.authorization.split(' ')[1];
+            token = req.headers.authorization.split(" ")[1];
             await jwt.verify(token, process.env.JWT_SECRET);
             next();
         }
         catch (error) {
             res.status(401);
-            throw new Error('Not authorized');
+            throw new Error("Not authorized");
         }
     }
     if (!token) {
         res.status(401);
-        throw new Error('Not authorized, no token');
+        throw new Error("Not authorized, no token");
     }
 });
 const superAdminProtect = asyncHandler(async (req, res, next) => {
@@ -40,10 +39,7 @@ const superAdminProtect = asyncHandler(async (req, res, next) => {
         try {
             if (process.env.SECRET_PASS) {
                 await jwt.verify(token, process.env.SECRET_PASS);
-                const user = await AdminModel.find();
-                if (user[0].secret === process.env.SECRET_PASS) {
-                    next();
-                }
+                next();
             }
         }
         catch (error) {
@@ -56,10 +52,7 @@ const superAdminProtect = asyncHandler(async (req, res, next) => {
         try {
             token = req.headers.authorization.split(" ")[1];
             await jwt.verify(token, process.env.SECRET_PASS);
-            const user = await AdminModel.find();
-            if (user[0].secret === process.env.SECRET_PASS) {
-                next();
-            }
+            next();
         }
         catch (error) {
             res.status(401);

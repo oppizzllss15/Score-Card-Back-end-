@@ -1,4 +1,4 @@
-const adminDB = require('mongoose');
+const adminDB = require("mongoose");
 
 const adminSchema = adminDB.Schema(
   {
@@ -10,6 +10,7 @@ const adminSchema = adminDB.Schema(
     },
     password: String,
     phonenumber: String,
+    password_ticket: String,
     profile_img: String,
     cloudinary_id: String,
     stack: [

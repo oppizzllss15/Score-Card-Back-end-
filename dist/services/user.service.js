@@ -1,8 +1,22 @@
 "use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
 const User = require("../models/user.model");
+const { superUserLogin, forgotSuperAdminPassword, resetSuperAdminPass } = require("../controllers/superadmin.controller");
 const findUserByEmail = async (email) => {
     const userExists = await User.find({ email: email.toLowerCase() });
     return userExists;
+};
+const findUserDynamically = async (req, res, next) => {
+    const userExists = await User.find({ email: req.body.email.toLowerCase() });
+    if (userExists.length > 0)
+        return userExists;
+    return superUserLogin(req, res);
+};
+const EmailToChangePassword = async (req, res, next) => {
+    const userExists = await User.find({ email: req.body.email.toLowerCase() });
+    if (userExists.length > 0)
+        return userExists;
+    return forgotSuperAdminPassword(req, res);
 };
 const createUser = async (firstname, lastname, email, hashedPass, squad, stack) => {
     const user = await User.create({
@@ -48,14 +62,28 @@ const updateUserProfileImg = async (id, filePath, filename) => {
     await User.updateOne({ _id: id }, { profile_img: filePath, cloudinary_id: filename });
 };
 const getAllUsers = async () => {
-    return User.find();
+    return await User.find();
 };
 const getUserScoreByName = async (firstname, lastname) => {
     const getStudentScores = await User.find({ firstname, lastname });
     return getStudentScores;
 };
-const changeUserPassword = async (id, password) => {
+const updateUserTicket = async (id, ticket) => {
+    await User.updateOne({ _id: id }, { password_ticket: ticket });
+};
+const validateUserTicketLink = async (req, res, next) => {
+    const ticket = req.params.ticket;
+    const id = req.params.id;
+    const user = await User.find({ _id: id, password_ticket: ticket });
+    if (user.length > 0)
+        return user;
+    return resetSuperAdminPass(req, res);
+};
+const updateUserPassword = async (id, password) => {
     await User.updateOne({ _id: id }, { password: password });
+};
+const resetSecureTicket = async (id) => {
+    await User.updateOne({ _id: id }, { password_ticket: null });
 };
 module.exports = {
     findUserByEmail,
@@ -68,5 +96,10 @@ module.exports = {
     getUserScoreByName,
     updateUserPhoneNo,
     updateUserProfileImg,
-    changeUserPassword,
+    updateUserTicket,
+    validateUserTicketLink,
+    updateUserPassword,
+    resetSecureTicket,
+    findUserDynamically,
+    EmailToChangePassword
 };

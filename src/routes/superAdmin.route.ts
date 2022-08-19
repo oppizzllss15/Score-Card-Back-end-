@@ -1,16 +1,20 @@
 const express = require("express");
 const router = express.Router();
-const { superAdminProtect, adminProtect } = require("../middlewares/authenticate");
-const {storage} = require("../utils/upload")
+const {
+  superAdminProtect,
+  adminProtect,
+} = require("../middlewares/authenticate");
+const { storage } = require("../utils/upload");
 import multer from "multer";
-const uploads = multer({storage})
+const uploads = multer({ storage });
 
 const {
   createStack,
   editStack,
   deleteStack,
+  addStackToAdmin,
   viewAllStacks,
-  stacksShield
+  stacksShield,
 } = require("../controllers/stack.controller");
 
 const {
@@ -18,36 +22,50 @@ const {
   setdminActivationStatus,
   deleteAdmin,
   getAdmin,
-  updateAdmin
+  updateAdmin,
 } = require("../controllers/admin.controller");
 
 const {
   createSuperUser,
-  superUserLogin,
   changePassword,
   superUserProfileImage,
   getSuperAdminProfile,
   viewAllAdmins,
   logoutSuperAdmin,
+  resetSuperAdminPassGetPage,
+  resetSuperAdminPass,
+  viewAdmins
 } = require("../controllers/superadmin.controller");
 const {
+  loginUser,
   registerUser,
   updateUser,
   deactivateUser,
   deleteUser,
   calScore,
   getScores,
+  forgotUserPassword
 } = require("../controllers/users.controller");
 
-
+// Super Admin
 router.post("/create", createSuperUser);
-router.post("/login", superUserLogin);
+router.post("/login", loginUser);
 router.get("/logout", logoutSuperAdmin);
 router.post("/change/password", superAdminProtect, changePassword);
 router.get("/profile", superAdminProtect, getSuperAdminProfile);
 router.get("/all/admin", superAdminProtect, viewAllAdmins);
-router.post("/upload", superAdminProtect, uploads.single("file"), superUserProfileImage);
+router.get("/reset/password/:id/:ticket", resetSuperAdminPassGetPage);
+router.post("/reset/password/:id/:ticket", resetSuperAdminPass);
+router.post("/forgot/password", forgotUserPassword);
+router.post(
+  "/upload",
+  superAdminProtect,
+  uploads.single("file"),
+  superUserProfileImage
+);
+router.get("/superuser/viewAdmins",viewAdmins);
 
+// Users
 router.post("/user/create", superAdminProtect, registerUser);
 router.post("/user/update/:id", superAdminProtect, updateUser);
 router.get("/user/delete/:id", superAdminProtect, deleteUser);
@@ -55,17 +73,21 @@ router.post("/user/deactivate", superAdminProtect, deactivateUser);
 router.post("/user/calculate/score/:id", superAdminProtect, calScore);
 router.get("/user/getscores/:id", superAdminProtect, getScores);
 
+// Stacks
 router.get("/stacks", stacksShield, viewAllStacks);
 router.post("/createstack", superAdminProtect, createStack);
 router.post("/editstack/:id", superAdminProtect, editStack);
 router.post("/deletestack/:id", superAdminProtect, deleteStack);
+router.put("/addStack/:id", superAdminProtect, addStackToAdmin);
 
-router.get("/admin/:adminId", superAdminProtect,  getAdmin);
-router.post("/admin/create",superAdminProtect,  createAdmin);
-router.put("/admin/update/:adminId", superAdminProtect,  updateAdmin);
+// Admins
+router.get("/admin/:adminId", superAdminProtect, getAdmin);
+router.post("/admin/create", superAdminProtect, createAdmin);
+router.put("/admin/update/:adminId", superAdminProtect, updateAdmin);
 router.delete("/admin/delete/:adminId", superAdminProtect, deleteAdmin);
 router.put(
-  "/admin/status/:action/:adminId",superAdminProtect,
+  "/admin/status/:action/:adminId",
+  superAdminProtect,
   setdminActivationStatus
 );
 

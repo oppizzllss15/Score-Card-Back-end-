@@ -16,7 +16,7 @@ const mailMessage = (email: string, firstname: string, password: string, squad: 
   return {
     from: "from-example@email.com",
     to: `${email}`,
-    subject: "Scorecard",
+    subject: "Scorecard credentials",
     html: `<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "https://www.w3.org/TR/html4/strict.dtd">
     <html lang="en">
       <head>
@@ -221,11 +221,137 @@ const messageTransporter = async (
   transporter.sendMail(
     mailMessage(email, firstname, password, squad),
     function (error: string, info: string) {
-      if (error) throw Error(error);
+      // if (error) throw Error(error);
       // console.log("Email Sent Successfully");
       // console.log(info);
     }
   );
 };
 
-module.exports = { messageTransporter };
+
+const forgotMessage = (email: string, address: string) => {
+  return {
+    from: "from-example@email.com",
+    to: `${email}`,
+    subject: "Reset Scorecard Password",
+    html: `<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "https://www.w3.org/TR/html4/strict.dtd">
+    <html lang="en">
+      <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+        <style type="text/css" nonce="">
+          body,
+          td,
+          div,
+          p,
+          a,
+          input {
+            font-family: arial, sans-serif;
+          }
+        </style>
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <link
+          rel="shortcut icon"
+          href="https://ssl.gstatic.com/ui/v1/icons/mail/rfr/gmail.ico"
+          type="image/x-icon"
+        />
+        <title>Scorecard Student Email credentials</title>
+        <style type="text/css" nonce="">
+          body,
+          td {
+            font-size: 13px;
+          }
+          a:link,
+          a:active {
+            color: #1155cc;
+            text-decoration: none;
+          }
+          a:hover {
+            text-decoration: underline;
+            cursor: pointer;
+          }
+          a:visited {
+            color: #6611cc;
+          }
+          img {
+            border: 0px;
+          }
+          pre {
+            white-space: pre;
+            white-space: -moz-pre-wrap;
+            white-space: -o-pre-wrap;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            max-width: 800px;
+            overflow: auto;
+          }
+          .logo {
+            left: -7px;
+            position: relative;
+          }
+        </style>
+      </head>
+      <body>
+        <div class="bodycontainer">
+          <hr />
+          <table width="100%" cellpadding="12" cellspacing="0" border="0">
+            <tbody>
+              <tr>
+                <td>
+                  <div style="overflow: hidden">
+                    <font size="-1">
+                      <div
+                        lang="en-NG"
+                        link="#0563C1"
+                        vlink="#954F72"
+                        style="word-wrap: break-word"
+                      >
+                        <div class="m_766918947931841387WordSection1">
+                          <p class="MsoNormal">
+                            <span lang="EN-US"
+                              >Follow the link below to reset your password</span
+                            >
+                          </p>
+                          <p class="MsoNormal">
+                            <span lang="EN-US"
+                              >Email:&nbsp;<b
+                                ><a href="mailto:${email}" target="_blank"
+                                  >${email}<wbr /></a></b
+                            ></span>
+                          </p>
+                          <p class="MsoNormal">
+                          <span lang="EN-US"
+                          >Link:&nbsp;<a href="${address}" target="_blank"
+                              >${address}<wbr /></a></span>
+                          </p>
+                          <p class="MsoNormal">&nbsp;</p>
+                          <p class="MsoNormal">See you on Teams.</p>
+                          <p class="MsoNormal">&nbsp;</p>
+                          <p class="MsoNormal">&nbsp;</p>
+                        </div>
+                      </div>
+                    </font>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </body>
+    </html>    
+    ` 
+  };
+};
+
+const passwordLinkTransporter = async (
+  email: string,
+  address: string
+) => {
+  transporter.sendMail(
+    forgotMessage(email, address),
+    function (error: string, info: string) {
+      if (error) throw Error(error);
+      console.log("Email Sent Successfully");
+    }
+  );
+};
+module.exports = { messageTransporter, passwordLinkTransporter };

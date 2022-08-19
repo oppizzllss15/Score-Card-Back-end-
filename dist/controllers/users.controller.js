@@ -1,12 +1,13 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-const { messageTransporter } = require("../utils/email");
-const { generateToken, userRegistration, userUpdate, userLogin, userStatus, passwordHandler, score, passwordChange, } = require("../utils/utils");
-const { findUserByEmail, createUser, findUserById, updateUserById, updateUserStatus, updateUserScore, getAllUsers, getUserScoreByName, updateUserPhoneNo, updateUserProfileImg, changeUserPassword, } = require("../services/user.service");
+const { messageTransporter, passwordLinkTransporter, } = require("../utils/email");
+const { generateToken, userRegistration, userUpdate, userLogin, userStatus, passwordHandler, passwordChange, score, } = require("../utils/utils");
+const { findUserByEmail, createUser, findUserById, updateUserById, updateUserStatus, updateUserScore, getAllUsers, getUserScoreByName, updateUserPhoneNo, updateUserProfileImg, updateUserTicket, validateUserTicketLink, updateUserPassword, resetSecureTicket, findUserDynamically, EmailToChangePassword, changeUserPassword } = require("../services/user.service");
 const { getUserStack } = require("../services/stack.service");
 const asyncHandler = require("express-async-handler");
 const bcrypt = require("bcryptjs");
 const randomPass = require("pino-password");
+const jwt = require("jsonwebtoken");
 const userProfileImage = asyncHandler(async (req, res, next) => {
     var _a, _b;
     if (req.file === undefined)
@@ -107,7 +108,7 @@ const loginUser = asyncHandler(async (req, res) => {
         password: body.password,
     });
     const { email, password } = req.body;
-    const user = await findUserByEmail(email);
+    const user = await findUserDynamically(req, res);
     if (user.length > 0) {
         if (user[0].status !== "active") {
             res.status(404).json({ message: "Account deactivated" });
@@ -115,6 +116,7 @@ const loginUser = asyncHandler(async (req, res) => {
         }
         if (await bcrypt.compare(password, user[0].password)) {
             const token = generateToken(user[0]._id);
+            await resetSecureTicket(user[0]._id);
             res.cookie("Token", token);
             res.cookie("Name", user[0].firstname);
             res.cookie("Id", user[0]._id);
@@ -243,7 +245,6 @@ const calScore = asyncHandler(async (req, res) => {
 const getScores = asyncHandler(async (req, res) => {
     const id = req.params.id;
     const getScores = await findUserById(id);
-    console.log(id);
     if (getScores) {
         res.status(201).json({
             message: "All your score",
@@ -309,13 +310,76 @@ const updateUserPasword = asyncHandler(async (req, res) => {
     const user = await findUserById(req.cookies.Id);
     if (user && (await bcrypt.compare(newPassword, user.password))) {
         res.status(401);
-        throw new Error("New Password cannot be the same with Old Password");
+        throw new Error("New password cannot be the same with Old Password");
     }
     const newHashedPass = await passwordHandler(newPassword);
     await changeUserPassword(req.cookies.Id, newHashedPass);
     res.status(201).json({
         message: "Password successfully changed",
     });
+});
+const forgotUserPassword = asyncHandler(async (req, res) => {
+    if (!req.body.email) {
+        res.status(403);
+        throw new Error("Please enter a valid email address");
+    }
+    const { email } = req.body;
+    const user = await EmailToChangePassword(req, res);
+    if (user.length > 0) {
+        if (user[0].status !== "active") {
+            res.status(404).json({ message: "Account deactivated" });
+            return;
+        }
+        const ticket = generateToken(user[0]._id);
+        // Update user ticket in database
+        await updateUserTicket(user[0]._id, ticket);
+        // Attach user ticket to link in message transporter
+        const resetLink = `localhost:${process.env.EXTERNAL_PORT}/reset-password/${user[0]._id}/${ticket}`;
+        await passwordLinkTransporter(email, resetLink);
+        res
+            .status(200)
+            .json({ message: "Check your email for reset password link" });
+    }
+    else {
+        res.status(404).json({ message: "User not found" });
+    }
+});
+const resetUserPassGetPage = asyncHandler(async (req, res) => {
+    res.status(201).json({ message: "Use post method to reset password" });
+});
+const resetUserPass = asyncHandler(async (req, res) => {
+    await passwordChange().validateAsync({
+        newPassword: req.body.newPassword,
+        confirmPassword: req.body.confirmPassword,
+    });
+    const ticket = req.params.ticket;
+    const id = req.params.id;
+    // Validate ticket from user account
+    const user = await validateUserTicketLink(req, res);
+    if (user.length === 0) {
+        res.status(403);
+        throw new Error("Invalid link");
+    }
+    const { newPassword, confirmPassword } = req.body;
+    if (newPassword !== confirmPassword) {
+        res.status(400);
+        throw new Error("Passwords do not match");
+    }
+    try {
+        if (process.env.JWT_SECRET) {
+            await jwt.verify(ticket, process.env.JWT_SECRET);
+            const newHashedPass = await passwordHandler(newPassword);
+            await updateUserPassword(id, newHashedPass);
+            await resetSecureTicket(id);
+            res.status(201).json({
+                message: "Password successfully changed",
+            });
+        }
+    }
+    catch (error) {
+        res.status(401);
+        throw new Error("Link expired!");
+    }
 });
 module.exports = {
     registerUser,
@@ -331,6 +395,9 @@ module.exports = {
     getScores,
     filterScores,
     getScoresByName,
+    forgotUserPassword,
+    resetUserPassGetPage,
+    resetUserPass,
     getUserCummulatives,
     updateUserPasword,
 };
