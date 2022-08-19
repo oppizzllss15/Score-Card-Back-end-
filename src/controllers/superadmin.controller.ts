@@ -79,6 +79,7 @@ const createSuperUser = asyncHandler(async (req: Request, res: Response) => {
   res.status(201).json({
     user: createData,
     token: token,
+    message: "Sign Up Successful, Please Log in",
   });
 });
 
