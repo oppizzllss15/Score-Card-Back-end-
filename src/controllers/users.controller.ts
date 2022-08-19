@@ -316,6 +316,26 @@ const getScores = asyncHandler(async (req: Request, res: Response) => {
    }
 });
 
+
+// const deletescores = asyncHandler(async (req: Request, res: Response) => {
+
+//     const id = req.params.id;
+//     const getScores = await findUserById(id);
+//     console.log(id);
+//     if (getScores) {
+//         const deleteScores = await deleteUserScores(id);
+//         res.status(201).json({
+//           message: "All your score",
+//           scores: deleteScores.grades,
+//         });
+//     } else {
+//         res.status(404);
+//         throw new Error("User not found");
+//     }
+//   }
+
+//  });
+
 const filterScores = asyncHandler(async (req: Request, res: Response) => {
    const week = Number(req.params.weekId);
    const getAllScores = await getAllUsers();
