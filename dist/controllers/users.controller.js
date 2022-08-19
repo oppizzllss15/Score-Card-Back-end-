@@ -309,7 +309,7 @@ const updateUserPasword = asyncHandler(async (req, res) => {
     const user = await findUserById(req.cookies.Id);
     if (user && (await bcrypt.compare(newPassword, user.password))) {
         res.status(401);
-        throw new Error("New Password cannot be the same with Old Password");
+        throw new Error("New password cannot be the same with Old Password");
     }
     const newHashedPass = await passwordHandler(newPassword);
     await changeUserPassword(req.cookies.Id, newHashedPass);
