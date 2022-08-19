@@ -2,32 +2,32 @@ var express = require("express");
 var router = express.Router();
 const { adminProtect } = require("../middlewares/authenticate");
 const {
-  loginAdmin,
   logoutAdmin,
   adminProfileImage,
   adminProfile,
-  forgotAdminPassword,
   resetAdminPassGetPage,
   resetAdminPass,
 } = require("../controllers/admin.controller");
 const { viewAdminStack, stacksShield2 } = require("../controllers/stack.controller");
 const {
+  loginUser,
   filterScores,
   getScoresByName,
+  forgotUserPassword
 } = require("../controllers/users.controller");
 const { storage } = require("../utils/upload");
 import multer from "multer";
 const uploads = multer({ storage });
 
 router.get("/profile", adminProtect, adminProfile);
-router.post("/login", loginAdmin);
+router.post("/login", loginUser);
 router.get("/logout", logoutAdmin);
 router.get("/stack", stacksShield2, viewAdminStack);
 router.post("/upload", adminProtect, uploads.single("file"), adminProfileImage);
 // router.get("/stack", adminProtect, viewStack);
 router.get("/reset/password/:id/:ticket", resetAdminPassGetPage);
 router.post("/reset/password/:id/:ticket", resetAdminPass);
-router.post("/forgot/password", forgotAdminPassword);
+router.post("/forgot/password", forgotUserPassword);
 
 // User routes
 router.get("/user/filterscores/:weekId", filterScores);

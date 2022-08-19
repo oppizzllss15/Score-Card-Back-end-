@@ -1,12 +1,11 @@
-const express = require("express");
-const cookieParser = require("cookie-parser");
-const { errorHandler } = require("./middlewares/errorHandler");
-const logger = require("morgan");
-const cors = require("cors");
-
-require("dotenv").config();
-import { Request, Response, NextFunction } from "express";
-const { connectDB } = require("./database/db");
+const express = require('express');
+const cookieParser = require('cookie-parser');
+const { errorHandler } = require('./middlewares/errorHandler');
+const logger = require('morgan');
+import cors from "cors"
+require('dotenv').config();
+import { Request, Response, NextFunction} from 'express';
+const { connectDB } = require('./database/db');
 connectDB();
 
 const usersRouter = require("./routes/users.route");
@@ -15,8 +14,8 @@ const superAdminRouter = require("./routes/superAdmin.route");
 
 const app = express();
 
-app.use(cors());
-app.use(logger("dev"));
+app.use(cors())
+app.use(logger('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());

@@ -27,6 +27,9 @@ const {
   validateUserTicketLink,
   updateUserPassword,
   resetSecureTicket,
+  findUserDynamically,
+  EmailToChangePassword,
+  changeUserPassword
 } = require("../services/user.service");
 
 const { getUserStack } = require("../services/stack.service");
@@ -37,117 +40,117 @@ const jwt = require("jsonwebtoken");
 import { Request, Response, NextFunction } from "express";
 
 const userProfileImage = asyncHandler(
-  async (req: Request, res: Response, next: NextFunction) => {
-    if (req.file === undefined) return res.send("You must select a file.");
-    const id = req.cookies.Id;
-    await updateUserProfileImg(id, req.file?.path, req.file?.filename);
-    const findUser = await findUserById(id);
+   async (req: Request, res: Response, next: NextFunction) => {
+      if (req.file === undefined) return res.send("You must select a file.");
+      const id = req.cookies.Id;
+      await updateUserProfileImg(id, req.file?.path, req.file?.filename);
+      const findUser = await findUserById(id);
 
-    res.status(201).json({ message: "Uploaded file successfully", findUser });
-  }
+      res.status(201).json({ message: "Uploaded file successfully", findUser });
+   }
 );
 
 const userProfile = asyncHandler(async (req: Request, res: Response) => {
-  const id = req.cookies.Id;
-  if (!id) {
-    res.status(400);
-    throw new Error("Provide user id");
-  }
+   const id = req.cookies.Id;
+   if (!id) {
+      res.status(400);
+      throw new Error("Provide user id");
+   }
 
-  const findUser = await findUserById(id);
-  const userStack = await getUserStack(findUser.stack);
-  if (findUser) {
-    res.status(201).json({
-      firstname: findUser.firstname,
-      lastname: findUser.lastname,
-      email: findUser.email,
-      phone: findUser.phone,
-      stack: userStack,
-      squad: findUser.squad,
-    });
-  } else {
-    res.status(404).json({ message: "User not found" });
-  }
+   const findUser = await findUserById(id);
+   const userStack = await getUserStack(findUser.stack);
+   if (findUser) {
+      res.status(201).json({
+         firstname: findUser.firstname,
+         lastname: findUser.lastname,
+         email: findUser.email,
+         phone: findUser.phone,
+         stack: userStack,
+         squad: findUser.squad,
+      });
+   } else {
+      res.status(404).json({ message: "User not found" });
+   }
 });
 
 const changeUserPhoneNumber = asyncHandler(
-  async (req: Request, res: Response) => {
-    const id = req.cookies.Id;
-    if (!id) {
-      res.status(400);
-      throw new Error("Provide user id");
-    }
+   async (req: Request, res: Response) => {
+      const id = req.cookies.Id;
+      if (!id) {
+         res.status(400);
+         throw new Error("Provide user id");
+      }
 
-    if (!req.body.phone) {
-      res.status(400);
-      throw new Error("Provide user new phone number");
-    }
+      if (!req.body.phone) {
+         res.status(400);
+         throw new Error("Provide user new phone number");
+      }
 
-    const findUser = await findUserById(id);
-    if (findUser) {
-      await updateUserPhoneNo(id, req.body.phone);
-      const changedNo = await findUserById(id);
-      const userStack = await getUserStack(findUser.stack);
+      const findUser = await findUserById(id);
+      if (findUser) {
+         await updateUserPhoneNo(id, req.body.phone);
+         const changedNo = await findUserById(id);
+         const userStack = await getUserStack(findUser.stack);
 
-      res.status(201).json({
-        firstname: findUser.firstname,
-        lastname: findUser.lastname,
-        email: findUser.email,
-        phone: changedNo.phone,
-        stack: userStack,
-        squad: findUser.squad,
-      });
-    } else {
-      res.status(404).json({ message: "User not found" });
-    }
-  }
+         res.status(201).json({
+            firstname: findUser.firstname,
+            lastname: findUser.lastname,
+            email: findUser.email,
+            phone: changedNo.phone,
+            stack: userStack,
+            squad: findUser.squad,
+         });
+      } else {
+         res.status(404).json({ message: "User not found" });
+      }
+   }
 );
 
 const registerUser = asyncHandler(async (req: Request, res: Response) => {
-  const { firstname, lastname, email, squad, stack } = req.body;
-  await userRegistration().validateAsync({
-    firstname: firstname,
-    lastname: lastname,
-    email: email,
-    squad: squad,
-    stack: stack,
-  });
+   const { firstname, lastname, email, squad, stack } = req.body;
+   await userRegistration().validateAsync({
+      firstname: firstname,
+      lastname: lastname,
+      email: email,
+      squad: squad,
+      stack: stack,
+   });
 
-  const pass = new randomPass();
-  const password = pass.generatePassword(firstname);
+   const pass = new randomPass();
+   const password = pass.generatePassword(firstname);
 
-  const userExists = await findUserByEmail(email);
+   const userExists = await findUserByEmail(email);
 
-  if (userExists.length > 0) {
-    res.status(400);
-    throw new Error("User already exists");
-  }
+   if (userExists.length > 0) {
+      res.status(400);
+      throw new Error("User already exists");
+   }
 
-  const userStack = await getUserStack(stack);
-  const hashedPass = await passwordHandler(password);
-  const user = await createUser(
-    firstname,
-    lastname,
-    email,
-    hashedPass,
-    squad,
-    stack
-  );
+   const userStack = await getUserStack(stack);
+   const hashedPass = await passwordHandler(password);
+   const user = await createUser(
+      firstname,
+      lastname,
+      email,
+      hashedPass,
+      squad,
+      stack
+   );
 
-  if (user) {
-    await messageTransporter(email, firstname, password, squad);
-    res.status(201).json({
-      userId: user._id,
-      password,
-      firstname: user.firstname,
-      lastname: user.lastname,
-      email: user.email,
-      stack: userStack,
-      squad: user.squad,
-      status: user.status,
-      grades: user.grades,
-    });
-  }
+   if (user) {
+      await messageTransporter(email, firstname, password, squad);
+      res.status(201).json({
+         userId: user._id,
+         password,
+         firstname: user.firstname,
+         lastname: user.lastname,
+         email: user.email,
+         stack: userStack,
+         squad: user.squad,
+         status: user.status,
+         grades: user.grades,
+      });
+   }
 });
 
 const loginUser = asyncHandler(async (req: Request, res: Response) => {
@@ -158,7 +161,7 @@ const loginUser = asyncHandler(async (req: Request, res: Response) => {
   });
 
   const { email, password } = req.body;
-  const user = await findUserByEmail(email);
+  const user = await findUserDynamically(req, res);
 
   if (user.length > 0) {
     if (user[0].status !== "active") {
@@ -185,173 +188,222 @@ const loginUser = asyncHandler(async (req: Request, res: Response) => {
 });
 
 const updateUser = asyncHandler(async (req: Request, res: Response) => {
-  const id = req.params.id;
-  const body = req.body;
-  await userUpdate().validateAsync({
-    firstname: body.firstname,
-    lastname: body.lastname,
-    phone: body.phone,
-    squad: body.squad,
-    stack: body.stack,
-  });
+   const id = req.params.id;
+   const body = req.body;
+   await userUpdate().validateAsync({
+      firstname: body.firstname,
+      lastname: body.lastname,
+      phone: body.phone,
+      squad: body.squad,
+      stack: body.stack,
+   });
 
-  const { firstname, lastname, phone, squad, stack } = req.body;
-  const user = await findUserById(id);
+   const { firstname, lastname, phone, squad, stack } = req.body;
+   const user = await findUserById(id);
 
-  if (user) {
-    const newData = {
-      firstname: firstname || user.firstname,
-      lastname: lastname || user.lastname,
-      email: user.email,
-      password: user.password,
-      phone: phone || user.phone,
-      squad: squad || user.squad,
-      stack: stack || user.stack,
-      grades: user.grades,
-      profile_img: user.profile_img,
-      cloudinary_id: user.cloudinary_id,
-    };
+   if (user) {
+      const newData = {
+         firstname: firstname || user.firstname,
+         lastname: lastname || user.lastname,
+         email: user.email,
+         password: user.password,
+         phone: phone || user.phone,
+         squad: squad || user.squad,
+         stack: stack || user.stack,
+         grades: user.grades,
+         profile_img: user.profile_img,
+         cloudinary_id: user.cloudinary_id,
+      };
 
-    const updatedUser = await updateUserById(user._id, newData);
-    const userStack = await getUserStack(updatedUser.stack);
+      const updatedUser = await updateUserById(user._id, newData);
+      const userStack = await getUserStack(updatedUser.stack);
 
-    res.status(201).json({
-      message: "Updated successfully",
-      userId: updatedUser._id,
-      firstname: updatedUser.firstname,
-      lastname: updatedUser.lastname,
-      email: updatedUser.email,
-      stack: userStack,
-      squad: updatedUser.squad,
-      status: updatedUser.status,
-      grades: updatedUser.grades,
-    });
-  } else {
-    res.status(404).json({ message: "User not Found" });
-  }
+      res.status(201).json({
+         message: "Updated successfully",
+         userId: updatedUser._id,
+         firstname: updatedUser.firstname,
+         lastname: updatedUser.lastname,
+         email: updatedUser.email,
+         stack: userStack,
+         squad: updatedUser.squad,
+         status: updatedUser.status,
+         grades: updatedUser.grades,
+      });
+   } else {
+      res.status(404).json({ message: "User not Found" });
+   }
 });
 
 const deactivateUser = asyncHandler(async (req: Request, res: Response) => {
-  await userStatus().validateAsync({
-    email: req.body.email,
-    status: req.body.status,
-  });
-  const { email, status } = req.body;
+   await userStatus().validateAsync({
+      email: req.body.email,
+      status: req.body.status,
+   });
+   const { email, status } = req.body;
 
-  const findUser = await findUserByEmail(email);
-  if (findUser.length > 0) {
-    const deactivateUserAccount = await updateUserStatus(email, status);
-    res.status(201).json({
-      message: "Updated successfully",
-      deactivateUserAccount,
-    });
-  } else {
-    res.status(404).json({ message: "User not found" });
-  }
+   const findUser = await findUserByEmail(email);
+   if (findUser.length > 0) {
+      const deactivateUserAccount = await updateUserStatus(email, status);
+      res.status(201).json({
+         message: "Updated successfully",
+         deactivateUserAccount,
+      });
+   } else {
+      res.status(404).json({ message: "User not found" });
+   }
 });
 
 const deleteUser = asyncHandler(async (req: Request, res: Response) => {
-  const id = req.params.id;
-  if (!id) {
-    res.status(400);
-    throw new Error("Provide user email address");
-  }
+   const id = req.params.id;
+   if (!id) {
+      res.status(400);
+      throw new Error("Provide user email address");
+   }
 
-  const findUser = await findUserById(id);
-  if (findUser) {
-    await findUser.remove();
+   const findUser = await findUserById(id);
+   if (findUser) {
+      await findUser.remove();
 
-    res.status(201).json({
-      message: `${findUser.email} with id ${id} has been removed`,
-    });
-  } else {
-    res.status(404).json({ message: "User not found" });
-  }
+      res.status(201).json({
+         message: `${findUser.email} with id ${id} has been removed`,
+      });
+   } else {
+      res.status(404).json({ message: "User not found" });
+   }
 });
 
 const logoutUser = asyncHandler(async (req: Request, res: Response) => {
-  res.cookie("Token", "");
-  res.cookie("Id", "");
-  res.cookie("Name", "");
+   res.cookie("Token", "");
+   res.cookie("Id", "");
+   res.cookie("Name", "");
 
-  res.status(201).json({ message: "Logged out successfully" });
+   res.status(201).json({ message: "Logged out successfully" });
 });
 
+//adding score
 const calScore = asyncHandler(async (req: Request, res: Response) => {
-  await score().validateAsync({
-    week: req.body.week,
-    agile: req.body.agile,
-    weekly_task: req.body.weekly_task,
-    assessment: req.body.assessment,
-    algorithm: req.body.algorithm,
-  });
-  const id = req.params.id;
-  const { week, agile, weekly_task, assessment, algorithm } = req.body;
+   await score().validateAsync({
+      week: req.body.week,
+      agile: req.body.agile,
+      weekly_task: req.body.weekly_task,
+      assessment: req.body.assessment,
+      algorithm: req.body.algorithm,
+   });
+   const id = req.params.id;
+   const { week, agile, weekly_task, assessment, algorithm } = req.body;
 
-  const calCum =
-    weekly_task * 0.4 + agile * 0.2 + assessment * 0.2 + algorithm * 0.2;
-  const data = {
-    week: week,
-    agile: agile,
-    weekly_task: weekly_task,
-    assessment: assessment,
-    algorithm: algorithm,
-    cummulative: calCum.toFixed(2),
-  };
+   const calCum =
+      weekly_task * 0.4 + agile * 0.2 + assessment * 0.2 + algorithm * 0.2;
+   const data = {
+      week: week,
+      agile: agile,
+      weekly_task: weekly_task,
+      assessment: assessment,
+      algorithm: algorithm,
+      cummulative: calCum.toFixed(2),
+   };
 
-  const userData = await updateUserScore(id, data);
+   const userData = await updateUserScore(id, data);
 
-  const getScores = await findUserById(id);
+   const getScores = await findUserById(id);
 
-  res
-    .status(201)
-    .json({ message: "Updated successfully", scores: getScores.grades });
+   res.status(201).json({
+      message: "Updated successfully",
+      scores: getScores.grades,
+   });
 });
 
 const getScores = asyncHandler(async (req: Request, res: Response) => {
-  const id = req.params.id;
-  const getScores = await findUserById(id);
+   const id = req.params.id;
+   const getScores = await findUserById(id);
 
-  if (getScores) {
-    res
-      .status(201)
-      .json({ message: "Grade successfully", scores: getScores.grades });
-  } else {
-    res.status(404);
-    throw new Error("User not found");
-  }
+   if (getScores) {
+      res.status(201).json({
+         message: "All your score",
+         scores: getScores.grades,
+      });
+   } else {
+      res.status(404);
+      throw new Error("User not found");
+   }
 });
 
 const filterScores = asyncHandler(async (req: Request, res: Response) => {
-  const week = Number(req.params.weekId);
-  const getAllScores = await getAllUsers();
-  const buffer: any[] = [];
+   const week = Number(req.params.weekId);
+   const getAllScores = await getAllUsers();
+   const buffer: object[] = [];
 
-  getAllScores.forEach(
-    (doc: { lastname: string; firstname: string; grades: any }) =>
-      buffer.push({
-        firstname: doc.firstname,
-        lastname: doc.lastname,
-        week: doc.grades.filter(
-          (grd: { week: number }) => grd["week"] === week
-        ),
-      })
-  );
+   getAllScores.forEach(
+      (doc: { lastname: string; firstname: string; grades: any }) =>
+         buffer.push({
+            firstname: doc.firstname,
+            lastname: doc.lastname,
+            week: doc.grades.filter(
+               (grd: { week: number }) => grd["week"] === week
+            ),
+         })
+   );
 
-  res.status(201).json({ message: "Grade by week", week: buffer });
+   res.status(201).json({ message: "Grade by week", week: buffer });
 });
 
 const getScoresByName = asyncHandler(async (req: Request, res: Response) => {
-  const { firstname, lastname } = req.body;
-  const getStudentScores = await getUserScoreByName(firstname, lastname);
+   const { firstname, lastname } = req.body;
+   const getStudentScores = await getUserScoreByName(firstname, lastname);
 
-  if (getStudentScores.length === 0) {
-    res.status(400);
-    throw new Error("Student does not exist");
-  }
-  res
-    .status(201)
-    .json({ message: "Student grades", scores: getStudentScores[0].grades });
+   if (getStudentScores.length === 0) {
+      res.status(400);
+      throw new Error("Student does not exist");
+   }
+   console.log(getStudentScores[0].grades);
+   res.status(201).json({
+      message: "Student grades",
+      scores: getStudentScores[0].grades,
+   });
+});
+
+const getUserCummulatives = asyncHandler(
+   async (req: Request, res: Response) => {
+      const user: IUser = await findUserById(req.params.userId);
+      if (!user) return res.status(400).json({ message: "No user found" });
+      let cummulatives: { week: number; cummulative: number }[] = [];
+      if (/cummulative/i.test(req.url)) {
+         cummulatives = user.grades.map((grade) => {
+            return { week: grade.week, cummulative: grade.cummulative };
+         });
+      }
+      let data = {
+         user,
+         grades: user.grades,
+         cummulatives,
+      };
+      return res.status(200).json({ data });
+   }
+);
+
+const updateUserPasword = asyncHandler(async (req: Request, res: Response) => {
+   await passwordChange().validateAsync({
+      newPassword: req.body.newPassword,
+      confirmPassword: req.body.confirmPassword,
+   });
+
+   const { newPassword, confirmPassword } = req.body;
+
+   if (newPassword !== confirmPassword) {
+      res.status(400);
+      throw new Error("Passwords do not match");
+   }
+
+   const user = await findUserById(req.cookies.Id);
+   if (user && (await bcrypt.compare(newPassword, user.password))) {
+      res.status(401);
+      throw new Error("New password cannot be the same with Old Password");
+   }
+   const newHashedPass = await passwordHandler(newPassword);
+   await changeUserPassword(req.cookies.Id, newHashedPass);
+   res.status(201).json({
+      message: "Password successfully changed",
+   });
 });
 
 const forgotUserPassword = asyncHandler(async (req: Request, res: Response) => {
@@ -361,7 +413,7 @@ const forgotUserPassword = asyncHandler(async (req: Request, res: Response) => {
   }
 
   const { email } = req.body;
-  const user = await findUserByEmail(email);
+  const user = await EmailToChangePassword(req, res);
 
   if (user.length > 0) {
     if (user[0].status !== "active") {
@@ -374,7 +426,7 @@ const forgotUserPassword = asyncHandler(async (req: Request, res: Response) => {
     await updateUserTicket(user[0]._id, ticket);
 
     // Attach user ticket to link in message transporter
-    const resetLink = `localhost:${process.env.PORT}/users/reset/password/${user[0]._id}/${ticket}`;
+    const resetLink = `localhost:${process.env.EXTERNAL_PORT}/reset-password/${user[0]._id}/${ticket}`;
     await passwordLinkTransporter(email, resetLink);
     res
       .status(200)
@@ -399,7 +451,7 @@ const resetUserPass = asyncHandler(async (req: Request, res: Response) => {
   const id = req.params.id;
 
   // Validate ticket from user account
-  const user = await validateUserTicketLink(id, ticket);
+  const user = await validateUserTicketLink(req, res);
   if (user.length === 0) {
     res.status(403);
     throw new Error("Invalid link");
@@ -429,21 +481,6 @@ const resetUserPass = asyncHandler(async (req: Request, res: Response) => {
   }
 });
 
-const getUserCummulatives = asyncHandler(
-  async (req: Request, res: Response) => {
-    const user: IUser = await findUserById(req.params.userId);
-
-    if (!user) return res.status(400).json({ message: "No user found" });
-
-    const data = {
-      user,
-      scores: user.grades,
-    };
-
-    return res.status(200).json({ data });
-  }
-);
-
 module.exports = {
   registerUser,
   loginUser,
@@ -462,4 +499,5 @@ module.exports = {
   resetUserPassGetPage,
   resetUserPass,
   getUserCummulatives,
+   updateUserPasword,
 };

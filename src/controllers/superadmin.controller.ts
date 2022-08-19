@@ -20,8 +20,10 @@ const {
   updateSuperUserTicket,
   validateSuperUserTicketLink,
   resetSuperUserSecureTicket,
+  findSuperUserDynamically,
+  EmailToManagePassword
 } = require("../services/superadmin.service");
-const { viewAdminDetails } = require("../services/admin.service");
+const { viewAdminDetails, getAdmins } = require("../services/admin.service");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 
@@ -90,7 +92,7 @@ const superUserLogin = asyncHandler(async (req: Request, res: Response) => {
     password: password,
   });
 
-  const user = await findSuperUser();
+  const user = await findSuperUserDynamically(req, res);
 
   if (user.length === 0) {
     res.status(404);
@@ -184,6 +186,12 @@ const logoutSuperAdmin = asyncHandler(async (req: Request, res: Response) => {
 
   res.status(201).json({ message: "Logged out successfully" });
 });
+// logic that enable superAdmin view all registered admins
+const viewAdmins = asyncHandler(async( req: Request, res: Response ) => {
+   const admins = await getAdmins()
+  if( admins.length == 0 ) res.status( 404 ).send( 'No admins')
+  res.status( 200 ).json( admins )
+})
 
 const forgotSuperAdminPassword = asyncHandler(
   async (req: Request, res: Response) => {
@@ -193,7 +201,7 @@ const forgotSuperAdminPassword = asyncHandler(
     }
 
     const { email } = req.body;
-    const user = await findSuperAdminByEmail(email);
+    const user = await EmailToManagePassword(req, res);
 
     if (user.length > 0) {
       const ticket = generateSuperAdminToken(user[0]._id);
@@ -202,7 +210,7 @@ const forgotSuperAdminPassword = asyncHandler(
       await updateSuperUserTicket(user[0]._id, ticket);
 
       // Attach user ticket to link in message transporter
-      const resetLink = `localhost:${process.env.PORT}/superadmin/reset/password/${user[0]._id}/${ticket}`;
+      const resetLink = `localhost:${process.env.EXTERNAL_PORT}/reset-password/${user[0]._id}/${ticket}`;
       await passwordLinkTransporter(email, resetLink);
       res
         .status(200)
@@ -229,7 +237,7 @@ const resetSuperAdminPass = asyncHandler(
     const id = req.params.id;
 
     // Validate ticket from user account
-    const user = await validateSuperUserTicketLink(id, ticket);
+    const user = await validateSuperUserTicketLink(req, res);
     if (user.length === 0) {
       res.status(403);
       throw new Error("Invalid link");
@@ -271,4 +279,5 @@ module.exports = {
   forgotSuperAdminPassword,
   resetSuperAdminPassGetPage,
   resetSuperAdminPass,
+  viewAdmins
 };

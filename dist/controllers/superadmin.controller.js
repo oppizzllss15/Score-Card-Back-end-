@@ -3,8 +3,8 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const { superAdminValidator, generateSuperAdminToken, passwordHandler, userLogin, passwordChange, } = require("../utils/utils");
 const { messageTransporter, passwordLinkTransporter, } = require("../utils/email");
 const asyncHandler = require("express-async-handler");
-const { findSuperAdminByEmail, findSuperUser, createSuperHandler, updateSuperUserPassword, updateSuperUserProfileImg, updateSuperUserTicket, validateSuperUserTicketLink, resetSuperUserSecureTicket, } = require("../services/superadmin.service");
-const { viewAdminDetails } = require("../services/admin.service");
+const { findSuperAdminByEmail, findSuperUser, createSuperHandler, updateSuperUserPassword, updateSuperUserProfileImg, updateSuperUserTicket, validateSuperUserTicketLink, resetSuperUserSecureTicket, findSuperUserDynamically, EmailToManagePassword } = require("../services/superadmin.service");
+const { viewAdminDetails, getAdmins } = require("../services/admin.service");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const createSuperUser = asyncHandler(async (req, res) => {
@@ -47,7 +47,7 @@ const superUserLogin = asyncHandler(async (req, res) => {
         email: email,
         password: password,
     });
-    const user = await findSuperUser();
+    const user = await findSuperUserDynamically(req, res);
     if (user.length === 0) {
         res.status(404);
         throw new Error("Not registered");
@@ -122,19 +122,26 @@ const logoutSuperAdmin = asyncHandler(async (req, res) => {
     res.cookie("Name", "");
     res.status(201).json({ message: "Logged out successfully" });
 });
+// logic that enable superAdmin view all registered admins
+const viewAdmins = asyncHandler(async (req, res) => {
+    const admins = await getAdmins();
+    if (admins.length == 0)
+        res.status(404).send('No admins');
+    res.status(200).json(admins);
+});
 const forgotSuperAdminPassword = asyncHandler(async (req, res) => {
     if (!req.body.email) {
         res.status(403);
         throw new Error("Please enter a valid email address");
     }
     const { email } = req.body;
-    const user = await findSuperAdminByEmail(email);
+    const user = await EmailToManagePassword(req, res);
     if (user.length > 0) {
         const ticket = generateSuperAdminToken(user[0]._id);
         // Update user ticket in database
         await updateSuperUserTicket(user[0]._id, ticket);
         // Attach user ticket to link in message transporter
-        const resetLink = `localhost:${process.env.PORT}/superadmin/reset/password/${user[0]._id}/${ticket}`;
+        const resetLink = `localhost:${process.env.EXTERNAL_PORT}/reset-password/${user[0]._id}/${ticket}`;
         await passwordLinkTransporter(email, resetLink);
         res
             .status(200)
@@ -155,7 +162,7 @@ const resetSuperAdminPass = asyncHandler(async (req, res) => {
     const ticket = req.params.ticket;
     const id = req.params.id;
     // Validate ticket from user account
-    const user = await validateSuperUserTicketLink(id, ticket);
+    const user = await validateSuperUserTicketLink(req, res);
     if (user.length === 0) {
         res.status(403);
         throw new Error("Invalid link");
@@ -192,4 +199,5 @@ module.exports = {
     forgotSuperAdminPassword,
     resetSuperAdminPassGetPage,
     resetSuperAdminPass,
+    viewAdmins
 };

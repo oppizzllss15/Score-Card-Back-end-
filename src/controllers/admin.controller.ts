@@ -33,7 +33,7 @@ const {
   validateAdminTicketLink,
   updateAdminPassword,
   resetAdminSecureTicket,
-  isPropertyInDatabase,
+  isPropertyInDatabase
 } = require("../services/admin.service");
 const jwt = require("jsonwebtoken");
 
@@ -276,8 +276,7 @@ const changeAdminPhoneNumber = asyncHandler(
     } else {
       res.status(404).json({ message: "Admin account not found" });
     }
-  }
-);
+})
 
 const forgotAdminPassword = asyncHandler(
   async (req: Request, res: Response) => {
@@ -290,9 +289,8 @@ const forgotAdminPassword = asyncHandler(
     const admin = await findAdminByEmail(email);
 
     if (admin.length > 0) {
-      if (admin[0].activationStatus !== "true") {
+      if (!admin[0].activationStatus) {
         res.status(404).json({ message: "Account deactivated" });
-        return;
       }
       const ticket = generateAdminToken(admin[0]._id);
 
@@ -300,7 +298,7 @@ const forgotAdminPassword = asyncHandler(
       await updateAdminTicket(admin[0]._id, ticket);
 
       // Attach admin ticket to link in message transporter
-      const resetLink = `localhost:${process.env.PORT}/admin/reset/password/${admin[0]._id}/${ticket}`;
+      const resetLink = `localhost:${process.env.EXTERNAL_PORT}/reset-password/${admin[0]._id}/${ticket}`;
       await passwordLinkTransporter(email, resetLink);
       res
         .status(200)
@@ -370,4 +368,4 @@ module.exports = {
   forgotAdminPassword,
   resetAdminPassGetPage,
   resetAdminPass,
-};
+}

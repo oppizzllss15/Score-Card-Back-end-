@@ -29,41 +29,43 @@ const {
 
 const {
   createSuperUser,
-  superUserLogin,
   changePassword,
   superUserProfileImage,
   getSuperAdminProfile,
   viewAllAdmins,
   logoutSuperAdmin,
-  forgotSuperAdminPassword,
   resetSuperAdminPassGetPage,
   resetSuperAdminPass,
+  viewAdmins
 } = require("../controllers/superadmin.controller");
 const {
+  loginUser,
   registerUser,
   updateUser,
   deactivateUser,
   deleteUser,
   calScore,
   getScores,
+  forgotUserPassword
 } = require("../controllers/users.controller");
 
 // Super Admin
 router.post("/create", createSuperUser);
-router.post("/login", superUserLogin);
+router.post("/login", loginUser);
 router.get("/logout", logoutSuperAdmin);
 router.post("/change/password", superAdminProtect, changePassword);
 router.get("/profile", superAdminProtect, getSuperAdminProfile);
 router.get("/all/admin", superAdminProtect, viewAllAdmins);
 router.get("/reset/password/:id/:ticket", resetSuperAdminPassGetPage);
 router.post("/reset/password/:id/:ticket", resetSuperAdminPass);
-router.post("/forgot/password", forgotSuperAdminPassword);
+router.post("/forgot/password", forgotUserPassword);
 router.post(
   "/upload",
   superAdminProtect,
   uploads.single("file"),
   superUserProfileImage
 );
+router.get("/superuser/viewAdmins",viewAdmins);
 
 // Users
 router.post("/user/create", superAdminProtect, registerUser);
@@ -81,6 +83,7 @@ router.post("/editstack/:id", superAdminProtect, editStack);
 router.post("/deletestack/:id", superAdminProtect, deleteStack);
 router.put("/addStack/:id", superAdminProtect, addStackToAdmin);
 
+// Admins
 router.get("/admin/:adminId", superAdminProtect, getAdmin);
 router.post("/admin/create", superAdminProtect, createAdmin);
 router.put("/admin/update/:adminId", superAdminProtect, updateAdmin);

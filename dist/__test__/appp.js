@@ -8,6 +8,7 @@ const path = require('path');
 const express = require('express');
 const SuperAdminRouter = require('../routes/superAdmin.route');
 const AdminRouter = require('../routes/admin.route');
+const UserRouter = require('../routes/users.route');
 const app = express();
 // view engine setup
 app.set('views', path.join(__dirname, '../src/views'));
@@ -24,7 +25,7 @@ app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 app.use('/superadmin', SuperAdminRouter);
 app.use('/admin', AdminRouter);
-;
+app.use('/users', UserRouter);
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
     next(createError(404));
@@ -38,5 +39,5 @@ app.use(function (err, req, res, next) {
     res.status(err.status || 500);
     res.render('error');
 });
-const apper = app.listen(7111, () => { console.log("listening"); });
+const apper = app.listen(3001, () => { console.log("listening"); });
 module.exports = apper;

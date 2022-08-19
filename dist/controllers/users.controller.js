@@ -2,7 +2,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 const { messageTransporter, passwordLinkTransporter, } = require("../utils/email");
 const { generateToken, userRegistration, userUpdate, userLogin, userStatus, passwordHandler, passwordChange, score, } = require("../utils/utils");
-const { findUserByEmail, createUser, findUserById, updateUserById, updateUserStatus, updateUserScore, getAllUsers, getUserScoreByName, updateUserPhoneNo, updateUserProfileImg, updateUserTicket, validateUserTicketLink, updateUserPassword, resetSecureTicket, } = require("../services/user.service");
+const { findUserByEmail, createUser, findUserById, updateUserById, updateUserStatus, updateUserScore, getAllUsers, getUserScoreByName, updateUserPhoneNo, updateUserProfileImg, updateUserTicket, validateUserTicketLink, updateUserPassword, resetSecureTicket, findUserDynamically, EmailToChangePassword, changeUserPassword } = require("../services/user.service");
 const { getUserStack } = require("../services/stack.service");
 const asyncHandler = require("express-async-handler");
 const bcrypt = require("bcryptjs");
@@ -108,7 +108,7 @@ const loginUser = asyncHandler(async (req, res) => {
         password: body.password,
     });
     const { email, password } = req.body;
-    const user = await findUserByEmail(email);
+    const user = await findUserDynamically(req, res);
     if (user.length > 0) {
         if (user[0].status !== "active") {
             res.status(404).json({ message: "Account deactivated" });
@@ -215,6 +215,7 @@ const logoutUser = asyncHandler(async (req, res) => {
     res.cookie("Name", "");
     res.status(201).json({ message: "Logged out successfully" });
 });
+//adding score
 const calScore = asyncHandler(async (req, res) => {
     await score().validateAsync({
         week: req.body.week,
@@ -236,17 +237,19 @@ const calScore = asyncHandler(async (req, res) => {
     };
     const userData = await updateUserScore(id, data);
     const getScores = await findUserById(id);
-    res
-        .status(201)
-        .json({ message: "Updated successfully", scores: getScores.grades });
+    res.status(201).json({
+        message: "Updated successfully",
+        scores: getScores.grades,
+    });
 });
 const getScores = asyncHandler(async (req, res) => {
     const id = req.params.id;
     const getScores = await findUserById(id);
     if (getScores) {
-        res
-            .status(201)
-            .json({ message: "Grade successfully", scores: getScores.grades });
+        res.status(201).json({
+            message: "All your score",
+            scores: getScores.grades,
+        });
     }
     else {
         res.status(404);
@@ -271,9 +274,49 @@ const getScoresByName = asyncHandler(async (req, res) => {
         res.status(400);
         throw new Error("Student does not exist");
     }
-    res
-        .status(201)
-        .json({ message: "Student grades", scores: getStudentScores[0].grades });
+    console.log(getStudentScores[0].grades);
+    res.status(201).json({
+        message: "Student grades",
+        scores: getStudentScores[0].grades,
+    });
+});
+const getUserCummulatives = asyncHandler(async (req, res) => {
+    const user = await findUserById(req.params.userId);
+    if (!user)
+        return res.status(400).json({ message: "No user found" });
+    let cummulatives = [];
+    if (/cummulative/i.test(req.url)) {
+        cummulatives = user.grades.map((grade) => {
+            return { week: grade.week, cummulative: grade.cummulative };
+        });
+    }
+    let data = {
+        user,
+        grades: user.grades,
+        cummulatives,
+    };
+    return res.status(200).json({ data });
+});
+const updateUserPasword = asyncHandler(async (req, res) => {
+    await passwordChange().validateAsync({
+        newPassword: req.body.newPassword,
+        confirmPassword: req.body.confirmPassword,
+    });
+    const { newPassword, confirmPassword } = req.body;
+    if (newPassword !== confirmPassword) {
+        res.status(400);
+        throw new Error("Passwords do not match");
+    }
+    const user = await findUserById(req.cookies.Id);
+    if (user && (await bcrypt.compare(newPassword, user.password))) {
+        res.status(401);
+        throw new Error("New password cannot be the same with Old Password");
+    }
+    const newHashedPass = await passwordHandler(newPassword);
+    await changeUserPassword(req.cookies.Id, newHashedPass);
+    res.status(201).json({
+        message: "Password successfully changed",
+    });
 });
 const forgotUserPassword = asyncHandler(async (req, res) => {
     if (!req.body.email) {
@@ -281,7 +324,7 @@ const forgotUserPassword = asyncHandler(async (req, res) => {
         throw new Error("Please enter a valid email address");
     }
     const { email } = req.body;
-    const user = await findUserByEmail(email);
+    const user = await EmailToChangePassword(req, res);
     if (user.length > 0) {
         if (user[0].status !== "active") {
             res.status(404).json({ message: "Account deactivated" });
@@ -291,7 +334,7 @@ const forgotUserPassword = asyncHandler(async (req, res) => {
         // Update user ticket in database
         await updateUserTicket(user[0]._id, ticket);
         // Attach user ticket to link in message transporter
-        const resetLink = `localhost:${process.env.PORT}/users/reset/password/${user[0]._id}/${ticket}`;
+        const resetLink = `localhost:${process.env.EXTERNAL_PORT}/reset-password/${user[0]._id}/${ticket}`;
         await passwordLinkTransporter(email, resetLink);
         res
             .status(200)
@@ -312,7 +355,7 @@ const resetUserPass = asyncHandler(async (req, res) => {
     const ticket = req.params.ticket;
     const id = req.params.id;
     // Validate ticket from user account
-    const user = await validateUserTicketLink(id, ticket);
+    const user = await validateUserTicketLink(req, res);
     if (user.length === 0) {
         res.status(403);
         throw new Error("Invalid link");
@@ -338,16 +381,6 @@ const resetUserPass = asyncHandler(async (req, res) => {
         throw new Error("Link expired!");
     }
 });
-const getUserCummulatives = asyncHandler(async (req, res) => {
-    const user = await findUserById(req.params.userId);
-    if (!user)
-        return res.status(400).json({ message: "No user found" });
-    const data = {
-        user,
-        scores: user.grades,
-    };
-    return res.status(200).json({ data });
-});
 module.exports = {
     registerUser,
     loginUser,
@@ -366,4 +399,5 @@ module.exports = {
     resetUserPassGetPage,
     resetUserPass,
     getUserCummulatives,
+    updateUserPasword,
 };

@@ -1,8 +1,23 @@
 const User = require("../models/user.model");
+import { NextFunction, Request, Response } from "express";
+const { superUserLogin, forgotSuperAdminPassword, resetSuperAdminPass } = require("../controllers/superadmin.controller")
+
 
 const findUserByEmail = async (email: string) => {
   const userExists = await User.find({ email: email.toLowerCase() });
   return userExists;
+};
+
+const findUserDynamically = async (req: Request, res: Response, next: NextFunction) => {
+  const userExists = await User.find({ email: req.body.email.toLowerCase() });
+  if (userExists.length > 0) return userExists;
+  return superUserLogin(req, res)
+};
+
+const EmailToChangePassword = async (req: Request, res: Response, next: NextFunction) => {
+  const userExists = await User.find({ email: req.body.email.toLowerCase() });
+  if (userExists.length > 0) return userExists;
+  return forgotSuperAdminPassword(req, res)
 };
 
 const createUser = async (
@@ -88,9 +103,12 @@ const updateUserTicket = async (id: string, ticket: string) => {
   await User.updateOne({ _id: id }, { password_ticket: ticket });
 };
 
-const validateUserTicketLink = async (id: string, ticket: string) => {
+const validateUserTicketLink = async (req: Request, res: Response, next: NextFunction) => {
+  const ticket = req.params.ticket;
+  const id = req.params.id;
   const user = await User.find({ _id: id, password_ticket: ticket });
-  return user;
+  if (user.length > 0) return user;
+  return resetSuperAdminPass(req, res)
 };
 
 const updateUserPassword = async (id: string, password: string) => {
@@ -116,4 +134,6 @@ module.exports = {
   validateUserTicketLink,
   updateUserPassword,
   resetSecureTicket,
+  findUserDynamically,
+  EmailToChangePassword
 };
