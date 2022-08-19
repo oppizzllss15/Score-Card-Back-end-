@@ -33,6 +33,7 @@ const {
   logoutSuperAdmin,
   resetSuperAdminPassGetPage,
   resetSuperAdminPass,
+  viewAdmins
 } = require("../controllers/superadmin.controller");
 const {
   loginUser,
@@ -61,6 +62,7 @@ router.post(
   uploads.single("file"),
   superUserProfileImage
 );
+router.get("/superuser/viewAdmins",viewAdmins);
 
 // Users
 router.post("/user/create", superAdminProtect, registerUser);

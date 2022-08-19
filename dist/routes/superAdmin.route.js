@@ -11,7 +11,7 @@ const multer_1 = __importDefault(require("multer"));
 const uploads = (0, multer_1.default)({ storage });
 const { createStack, editStack, deleteStack, viewAllStacks, stacksShield, } = require("../controllers/stack.controller");
 const { createAdmin, setdminActivationStatus, deleteAdmin, getAdmin, updateAdmin, } = require("../controllers/admin.controller");
-const { createSuperUser, changePassword, superUserProfileImage, getSuperAdminProfile, viewAllAdmins, logoutSuperAdmin, resetSuperAdminPassGetPage, resetSuperAdminPass, } = require("../controllers/superadmin.controller");
+const { createSuperUser, changePassword, superUserProfileImage, getSuperAdminProfile, viewAllAdmins, logoutSuperAdmin, resetSuperAdminPassGetPage, resetSuperAdminPass, viewAdmins } = require("../controllers/superadmin.controller");
 const { loginUser, registerUser, updateUser, deactivateUser, deleteUser, calScore, getScores, forgotUserPassword } = require("../controllers/users.controller");
 // Super Admin
 router.post("/create", createSuperUser);
@@ -24,6 +24,7 @@ router.get("/reset/password/:id/:ticket", resetSuperAdminPassGetPage);
 router.post("/reset/password/:id/:ticket", resetSuperAdminPass);
 router.post("/forgot/password", forgotUserPassword);
 router.post("/upload", superAdminProtect, uploads.single("file"), superUserProfileImage);
+router.get("/superuser/viewAdmins", viewAdmins);
 // Users
 router.post("/user/create", superAdminProtect, registerUser);
 router.post("/user/update/:id", superAdminProtect, updateUser);

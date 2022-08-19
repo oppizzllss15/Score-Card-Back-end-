@@ -70,6 +70,11 @@ const updateAdminPassword = async (id, password) => {
 const resetAdminSecureTicket = async (id) => {
     await Admin.updateOne({ _id: id }, { password_ticket: null });
 };
+//view admins
+async function getAdmins() {
+    const Admins = await Admin.find();
+    return Admins;
+}
 module.exports = {
     addAdmin,
     editAdmin,
@@ -85,4 +90,5 @@ module.exports = {
     validateAdminTicketLink,
     updateAdminPassword,
     resetAdminSecureTicket,
+    getAdmins
 };
