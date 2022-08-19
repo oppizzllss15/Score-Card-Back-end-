@@ -5,6 +5,6 @@ module.exports = {
   testEnvironment: "node",
   coverageProvider: "v8",
   moduleFileExtensions: ["js", "jsx", "ts", "tsx", "json", "node"],
-  roots: ["<rootDir>/dist"],
-  testMatch: ["<rootDir>/dist/__test__/*.test.js"],
+  roots: ["<rootDir>/dist", "<rootDir>/src"],
+  testMatch: ["<rootDir>/dist/__test__/*.test.js","<rootDir>/src/__test__/*.test.js"],
 };

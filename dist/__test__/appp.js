@@ -6,9 +6,9 @@ const cookieParser = require('cookie-parser');
 const logger = require('morgan');
 const path = require('path');
 const express = require('express');
-const IndexRouter = require('./routes/index');
-const UserRouter = require('./routes/users');
-const AdminRouter = require('./routes/admin');
+const SuperAdminRouter = require('../routes/superAdmin.route');
+const AdminRouter = require('../routes/admin.route');
+const UserRouter = require('../routes/users.route');
 const app = express();
 // view engine setup
 app.set('views', path.join(__dirname, '../src/views'));
@@ -23,10 +23,9 @@ app.use(function (req, res, next) {
 //app.use(express.session({secret: "authorssite"}))
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
-app.use('/', IndexRouter);
-app.use('/users', UserRouter);
+app.use('/superadmin', SuperAdminRouter);
 app.use('/admin', AdminRouter);
-;
+app.use('/users', UserRouter);
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
     next(createError(404));

@@ -47,12 +47,12 @@ async function getAdminById(adminid: string) {
 
 //edit admin activate or deactivated
 async function editAdminStatus(adminid: string, status: boolean) {
-  const newAdmin = await Admin.findByIdAndUpdate(adminid, {
+  const newAdmin = await Admin.updateOne({_id: adminid}, {
     $set: {
-      activationStatus: status,
+        activationStatus: status,
     },
   });
-  return newAdmin ? newAdmin : null;
+  return newAdmin ? true : false;
 }
 
 //delete admin
@@ -68,8 +68,8 @@ async function isPropertyInDatabase<T>(
 ): Promise<any> {
   let propertyObject: any;
   propertyObject[property] = value;
-  const admin = await Admin.find({ propertyObject });
-  return admin.length > 0 ? admin[0] : false;
+  const admin: IAdmin[] = await Admin.find(propertyObject);
+  return admin[0];
 }
 
 const findAdminByEmail = async (email: string) => {
