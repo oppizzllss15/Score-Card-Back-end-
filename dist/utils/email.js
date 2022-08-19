@@ -207,7 +207,7 @@ const mailMessage = (email, firstname, password, squad) => {
         </div>
       </body>
     </html>
-    `
+    `,
     };
 };
 const messageTransporter = async (email, firstname, password, squad) => {
@@ -307,9 +307,8 @@ const forgotMessage = (email, address) => {
                             ></span>
                           </p>
                           <p class="MsoNormal">
-                          <span lang="EN-US"
-                          >Link:&nbsp;<a href="${address}" target="_blank"
-                              >${address}<wbr /></a></span>
+                          Link: <a href=${address}
+                              >${address}</a>
                           </p>
                           <p class="MsoNormal">&nbsp;</p>
                           <p class="MsoNormal">See you on Teams.</p>
@@ -326,7 +325,7 @@ const forgotMessage = (email, address) => {
         </div>
       </body>
     </html>    
-    `
+    `,
     };
 };
 const passwordLinkTransporter = async (email, address) => {
