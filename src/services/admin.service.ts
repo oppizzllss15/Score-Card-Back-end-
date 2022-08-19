@@ -36,6 +36,7 @@ async function editAdmin(adminid: string, admin: IAdmin) {
       ...admin,
     },
   });
+  console.log(newAdmin);
   return newAdmin ? newAdmin : null;
 }
 
@@ -47,11 +48,14 @@ async function getAdminById(adminid: string) {
 
 //edit admin activate or deactivated
 async function editAdminStatus(adminid: string, status: boolean) {
-  const newAdmin = await Admin.updateOne({_id: adminid}, {
-    $set: {
+  const newAdmin = await Admin.updateOne(
+    { _id: adminid },
+    {
+      $set: {
         activationStatus: status,
-    },
-  });
+      },
+    }
+  );
   return newAdmin ? true : false;
 }
 
@@ -61,12 +65,12 @@ async function removeAdmin(adminid: string) {
   return deletedAdmin ? deletedAdmin : false;
 }
 
-//delete admin
+//check data is in database
 async function isPropertyInDatabase<T>(
   property: string,
   value: T
-): Promise<any> {
-  let propertyObject: any;
+): Promise<IAdmin> {
+  let propertyObject: { [key: string]: T } = {};
   propertyObject[property] = value;
   const admin: IAdmin[] = await Admin.find(propertyObject);
   return admin[0];

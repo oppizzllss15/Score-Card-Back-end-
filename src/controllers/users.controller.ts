@@ -316,7 +316,7 @@ const calScore = asyncHandler(async (req: Request, res: Response) => {
 const getScores = asyncHandler(async (req: Request, res: Response) => {
    const id = req.params.id;
    const getScores = await findUserById(id);
-   console.log(id);
+
    if (getScores) {
       res.status(201).json({
          message: "All your score",

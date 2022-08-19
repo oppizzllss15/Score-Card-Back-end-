@@ -12,6 +12,7 @@ const {
   createStack,
   editStack,
   deleteStack,
+  addStackToAdmin,
   viewAllStacks,
   stacksShield,
 } = require("../controllers/stack.controller");
@@ -77,14 +78,15 @@ router.get("/stacks", stacksShield, viewAllStacks);
 router.post("/createstack", superAdminProtect, createStack);
 router.post("/editstack/:id", superAdminProtect, editStack);
 router.post("/deletestack/:id", superAdminProtect, deleteStack);
+router.put("/addStack/:id", superAdminProtect, addStackToAdmin);
 
 // Admins
 router.get("/admin/:adminId", superAdminProtect, getAdmin);
 router.post("/admin/create", superAdminProtect, createAdmin);
-router.put("/admin/update/:adminId", adminProtect, updateAdmin);
+router.put("/admin/update/:adminId", superAdminProtect, updateAdmin);
 router.delete("/admin/delete/:adminId", superAdminProtect, deleteAdmin);
 router.put(
-  "/admin/deactivate/:adminId/:action",
+  "/admin/status/:action/:adminId",
   superAdminProtect,
   setdminActivationStatus
 );
