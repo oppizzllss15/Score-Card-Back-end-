@@ -24,7 +24,7 @@ interface IUser {
   phone: string;
   profile_img?: string;
   cloudinary_id?: string;
-  squad: number;
+  squad: number | string;
   grades: Grades[];
   status: string;
 }
