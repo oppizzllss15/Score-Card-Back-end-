@@ -28,7 +28,7 @@ const getSuperAdminUser = async (id) => {
     return superUser;
 };
 const getAllStacks = async () => {
-    const allStacks = await Stacks.find({}, { _id: 0, __v: 0 });
+    const allStacks = await Stacks.find({}, { __v: 0 });
     return allStacks;
 };
 const deleteAStack = async (id) => {
