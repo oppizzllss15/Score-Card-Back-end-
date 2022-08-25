@@ -12,7 +12,12 @@ const transporter = nodemailer.createTransport({
   },
 });
 
-const mailMessage = (email: string, firstname: string, password: string, squad: number) => {
+const mailMessage = (
+  email: string,
+  firstname: string,
+  password: string,
+  squad: number
+) => {
   return {
     from: "from-example@email.com",
     to: `${email}`,
@@ -208,7 +213,7 @@ const mailMessage = (email: string, firstname: string, password: string, squad: 
         </div>
       </body>
     </html>
-    ` 
+    `,
   };
 };
 
@@ -227,7 +232,6 @@ const messageTransporter = async (
     }
   );
 };
-
 
 const forgotMessage = (email: string, address: string) => {
   return {
@@ -319,9 +323,8 @@ const forgotMessage = (email: string, address: string) => {
                             ></span>
                           </p>
                           <p class="MsoNormal">
-                          <span lang="EN-US"
-                          >Link:&nbsp;<a href="${address}" target="_blank"
-                              >${address}<wbr /></a></span>
+                          Link: <a href=${address}
+                              >${address}</a>
                           </p>
                           <p class="MsoNormal">&nbsp;</p>
                           <p class="MsoNormal">See you on Teams.</p>
@@ -338,14 +341,11 @@ const forgotMessage = (email: string, address: string) => {
         </div>
       </body>
     </html>    
-    ` 
+    `,
   };
 };
 
-const passwordLinkTransporter = async (
-  email: string,
-  address: string
-) => {
+const passwordLinkTransporter = async (email: string, address: string) => {
   transporter.sendMail(
     forgotMessage(email, address),
     function (error: string, info: string) {

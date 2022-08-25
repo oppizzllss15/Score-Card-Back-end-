@@ -8,6 +8,11 @@ const findUserByEmail = async (email: string) => {
   return userExists;
 };
 
+const findAllUsers = async () => {
+  const users = await User.find();
+  return users;
+};
+
 const findUserDynamically = async (req: Request, res: Response, next: NextFunction) => {
   const userExists = await User.find({ email: req.body.email.toLowerCase() });
   if (userExists.length > 0) return userExists;
@@ -55,17 +60,14 @@ const updateUserById = async (id: string, data: IAdmin) => {
   return updatedUser;
 };
 
-const updateUserStatus = async (email: string, status: string) => {
-  const deactivateUserAccount = await User.updateOne(
-    { email: email.toLowerCase() },
+const updateUserStatus = async (id: string, status: string) => {
+  const userStatus = await User.updateOne(
+    { _id: id },
     {
-      status:
-        status.toLowerCase() === "active"
-          ? status.toLowerCase()
-          : "deactivated",
+      status: status
     }
   );
-  return deactivateUserAccount;
+  return await findUserById(id);
 };
 
 const updateUserScore = async (id: string, data: object) => {
@@ -120,6 +122,7 @@ const resetSecureTicket = async (id: string) => {
 };
 
 module.exports = {
+  findAllUsers,
   findUserByEmail,
   createUser,
   findUserById,

@@ -41,7 +41,9 @@ const {
 const {
   loginUser,
   registerUser,
+  getAllDevs,
   updateUser,
+  activateUser,
   deactivateUser,
   deleteUser,
   calScore,
@@ -68,10 +70,12 @@ router.post(
 router.get("/superuser/viewAdmins",viewAdmins);
 
 // Users
+router.get("/all/devs", superAdminProtect, getAllDevs);
 router.post("/user/create", superAdminProtect, registerUser);
-router.post("/user/update/:id", superAdminProtect, updateUser);
-router.get("/user/delete/:id", superAdminProtect, deleteUser);
-router.post("/user/deactivate", superAdminProtect, deactivateUser);
+router.put("/user/update/:id", superAdminProtect, updateUser);
+router.delete("/user/delete/:id", superAdminProtect, deleteUser);
+router.get("/user/deactivate/:id", superAdminProtect, deactivateUser);
+router.get("/user/activate/:id", superAdminProtect, activateUser);
 router.post("/user/calculate/score/:id", superAdminProtect, calScore);
 router.get("/user/getscores/:id", superAdminProtect, getScores);
 
