@@ -9,6 +9,7 @@ async function addAdmin(admin: IAdmin) {
 //view all admin
 async function viewAdminDetails() {
   const allAdmins = await Admin.find();
+  console.log(allAdmins);
   return allAdmins;
 }
 

@@ -55,7 +55,6 @@ router.post("/login", loginUser);
 router.get("/logout", logoutSuperAdmin);
 router.post("/change/password", superAdminProtect, changePassword);
 router.get("/profile", superAdminProtect, getSuperAdminProfile);
-router.get("/all/admin", superAdminProtect, viewAllAdmins);
 router.get("/reset/password/:id/:ticket", resetSuperAdminPassGetPage);
 router.post("/reset/password/:id/:ticket", resetSuperAdminPass);
 router.post("/forgot/password", forgotUserPassword);
@@ -68,7 +67,8 @@ router.post(
 router.get("/superuser/viewAdmins",viewAdmins);
 
 // Users
-router.get("/all/devs", superAdminProtect, getAllDevs);
+router.get("/all/admin", viewAllAdmins);
+router.get("/all/devs", getAllDevs);
 router.post("/user/create", superAdminProtect, registerUser);
 router.put("/user/update/:id", superAdminProtect, updateUser);
 router.delete("/user/delete/:id", superAdminProtect, deleteUser);
