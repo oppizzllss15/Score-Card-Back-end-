@@ -143,7 +143,10 @@ const changePassword = asyncHandler(async (req: Request, res: Response) => {
 
 const superUserProfileImage = asyncHandler(
   async (req: Request, res: Response, next: NextFunction) => {
-    if (req.file === undefined) return res.send("you must select a file.");
+    if (req.file === undefined) {
+      res.status(401)
+      throw new Error("You must select a file.")
+    }
     const id = req.cookies.Id;
     await updateSuperUserProfileImg(id, req.file?.path, req.file?.filename);
     const findSuper = await findSuperUser();
