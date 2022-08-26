@@ -79,7 +79,7 @@ router.get("/user/getscores/:id", superAdminProtect, getScores);
 
 // Stacks
 router.get("/stacks", superAdminProtect, viewAllStacks);
-router.post("/createstack", superAdminProtect, uploads.single("file"), createStack);
+router.post("/createstack", superAdminProtect, createStack);
 router.post("/editstack/:id", superAdminProtect, uploads.single("file"), editStack);
 router.post("/deletestack/:id", superAdminProtect, deleteStack);
 router.put("/addStack/:id", superAdminProtect, addStackToAdmin);

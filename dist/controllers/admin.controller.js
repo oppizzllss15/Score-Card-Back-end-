@@ -13,7 +13,7 @@ require("dotenv").config();
 const uuidv1 = require("uuid");
 const { addAdmin, editAdmin, editAdminStatus, removeAdmin, updateAdminProfileImg, getAdminById, updateAdminPhoneNo, findAdminByEmail, updateAdminTicket, validateAdminTicketLink, updateAdminPassword, resetAdminSecureTicket, isPropertyInDatabase } = require("../services/admin.service");
 const jwt = require("jsonwebtoken");
-const ADMIN_EMAIL_DOMAIN = "decagonhq.com";
+const ADMIN_EMAIL_DOMAIN = "gmail.com";
 const getAdmin = asyncHandler(async (req, res) => {
     const admim = await getAdminById(req.params.adminId);
     if (admim)

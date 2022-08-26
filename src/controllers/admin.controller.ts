@@ -37,7 +37,7 @@ const {
 } = require("../services/admin.service");
 const jwt = require("jsonwebtoken");
 
-const ADMIN_EMAIL_DOMAIN = "decagonhq.com";
+const ADMIN_EMAIL_DOMAIN = "gmail.com";
 
 const getAdmin = asyncHandler(async (req: Request, res: Response) => {
   const admim: IAdmin = await getAdminById(req.params.adminId);

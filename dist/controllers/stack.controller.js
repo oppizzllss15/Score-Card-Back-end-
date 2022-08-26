@@ -63,9 +63,7 @@ const viewStack = asyncHandler(async (req, res) => {
     return;
 });
 const createStack = asyncHandler(async (req, res) => {
-    var _a;
-    const { name } = req.body;
-    const image = ((_a = req.file) === null || _a === void 0 ? void 0 : _a.path) || name;
+    const { name, image } = req.body;
     const newStack = await createAStack({ name, image });
     res.status(201).json({
         status: "Success",
