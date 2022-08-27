@@ -4,7 +4,7 @@ const { superAdminValidator, generateSuperAdminToken, passwordHandler, userLogin
 const { messageTransporter, passwordLinkTransporter, } = require("../utils/email");
 const asyncHandler = require("express-async-handler");
 const { findSuperAdminByEmail, findSuperUser, createSuperHandler, updateSuperUserPassword, updateSuperUserProfileImg, updateSuperUserTicket, validateSuperUserTicketLink, resetSuperUserSecureTicket, findSuperUserDynamically, EmailToManagePassword } = require("../services/superadmin.service");
-const { viewAdminDetails, getAdmins } = require("../services/admin.service");
+const { viewAdminDetails } = require("../services/admin.service");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const createSuperUser = asyncHandler(async (req, res) => {
@@ -88,8 +88,10 @@ const changePassword = asyncHandler(async (req, res) => {
 });
 const superUserProfileImage = asyncHandler(async (req, res, next) => {
     var _a, _b;
-    if (req.file === undefined)
-        return res.send("you must select a file.");
+    if (req.file === undefined) {
+        res.status(401);
+        throw new Error("You must select a file.");
+    }
     const id = req.cookies.Id;
     await updateSuperUserProfileImg(id, (_a = req.file) === null || _a === void 0 ? void 0 : _a.path, (_b = req.file) === null || _b === void 0 ? void 0 : _b.filename);
     const findSuper = await findSuperUser();
@@ -122,13 +124,6 @@ const logoutSuperAdmin = asyncHandler(async (req, res) => {
     res.cookie("Id", "");
     res.cookie("Name", "");
     res.status(201).json({ message: "Logged out successfully" });
-});
-// logic that enable superAdmin view all registered admins
-const viewAdmins = asyncHandler(async (req, res) => {
-    const admins = await getAdmins();
-    if (admins.length == 0)
-        res.status(404).send('No admins');
-    res.status(200).json(admins);
 });
 const forgotSuperAdminPassword = asyncHandler(async (req, res) => {
     if (!req.body.email) {
@@ -200,5 +195,4 @@ module.exports = {
     forgotSuperAdminPassword,
     resetSuperAdminPassGetPage,
     resetSuperAdminPass,
-    viewAdmins
 };

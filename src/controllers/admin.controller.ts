@@ -21,6 +21,7 @@ require("dotenv").config();
 const uuidv1 = require("uuid");
 
 const {
+  getAdmins,
   addAdmin,
   editAdmin,
   editAdminStatus,
@@ -37,7 +38,19 @@ const {
 } = require("../services/admin.service");
 const jwt = require("jsonwebtoken");
 
-const ADMIN_EMAIL_DOMAIN = "decagonhq.com";
+const ADMIN_EMAIL_DOMAIN = "gmail.com";
+
+
+const viewAdmins = asyncHandler(async( req: Request, res: Response ) => {
+  const admins = await getAdmins()
+
+ if ( admins.length === 0 ) {
+  res.status( 404 )
+  throw new Error( 'No admins')
+}
+
+ res.status(200).json({data: admins })
+})
 
 const getAdmin = asyncHandler(async (req: Request, res: Response) => {
   const admim: IAdmin = await getAdminById(req.params.adminId);
@@ -210,7 +223,10 @@ const logoutAdmin = asyncHandler(async (req: Request, res: Response) => {
 });
 
 const adminProfileImage = asyncHandler(async (req: Request, res: Response) => {
-  if (req.file === undefined) return res.send("You must select a file.");
+  if (req.file === undefined) {
+    res.status(401)
+    throw new Error("You must select a file.");
+  }
 
   const id = req.cookies.Id;
 
@@ -360,4 +376,5 @@ module.exports = {
   forgotAdminPassword,
   resetAdminPassGetPage,
   resetAdminPass,
+  viewAdmins
 }

@@ -31,7 +31,8 @@ const createUser = async (
   email: string,
   hashedPass: string,
   squad: number,
-  stack: string
+  stack: string,
+  grades: Grades[]
 ) => {
   const user = await User.create({
     firstname,
@@ -40,6 +41,7 @@ const createUser = async (
     password: hashedPass,
     squad,
     stack,
+    grades
   });
   return user;
 };
