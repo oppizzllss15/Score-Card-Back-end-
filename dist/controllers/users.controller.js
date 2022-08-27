@@ -83,9 +83,19 @@ const registerUser = asyncHandler(async (req, res) => {
         res.status(400);
         throw new Error("User already exists");
     }
+    const grades = [
+        {
+            week: 0,
+            agile: 0,
+            weekly_task: 0,
+            assessment: 0,
+            algorithm: 0,
+            cummulative: 0,
+        },
+    ];
     const userStack = await getUserStack(stack);
     const hashedPass = await passwordHandler(password);
-    const user = await createUser(firstname, lastname, email, hashedPass, squad, stack);
+    const user = await createUser(firstname, lastname, email, hashedPass, squad, stack, grades);
     if (user) {
         await messageTransporter(email, firstname, password, squad);
         res.status(201).json({
@@ -269,9 +279,11 @@ const getScores = asyncHandler(async (req, res) => {
 });
 const filterScores = asyncHandler(async (req, res) => {
     const week = Number(req.params.weekId);
+    console.log(req.params.weekId, week);
     const getAllScores = await getAllUsers();
     const buffer = [];
     getAllScores.forEach((doc) => buffer.push({
+        id: doc._id,
         firstname: doc.firstname,
         lastname: doc.lastname,
         week: doc.grades.filter((grd) => grd["week"] === week),

@@ -22,7 +22,7 @@ const EmailToChangePassword = async (req, res, next) => {
         return userExists;
     return forgotSuperAdminPassword(req, res);
 };
-const createUser = async (firstname, lastname, email, hashedPass, squad, stack) => {
+const createUser = async (firstname, lastname, email, hashedPass, squad, stack, grades) => {
     const user = await User.create({
         firstname,
         lastname,
@@ -30,6 +30,7 @@ const createUser = async (firstname, lastname, email, hashedPass, squad, stack) 
         password: hashedPass,
         squad,
         stack,
+        grades
     });
     return user;
 };
