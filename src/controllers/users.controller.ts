@@ -347,8 +347,9 @@ const filterScores = asyncHandler(async (req: Request, res: Response) => {
   const buffer: object[] = [];
 
   getAllScores.forEach(
-    (doc: { lastname: string; firstname: string; grades: any }) =>
+    (doc: { lastname: string; firstname: string; grades: any; _id: string }) =>
       buffer.push({
+        id: doc._id,
         firstname: doc.firstname,
         lastname: doc.lastname,
         week: doc.grades.filter(

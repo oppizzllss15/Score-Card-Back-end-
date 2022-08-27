@@ -23,7 +23,7 @@ const {
   findSuperUserDynamically,
   EmailToManagePassword
 } = require("../services/superadmin.service");
-const { viewAdminDetails, getAdmins } = require("../services/admin.service");
+const { viewAdminDetails } = require("../services/admin.service");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 
@@ -188,12 +188,7 @@ const logoutSuperAdmin = asyncHandler(async (req: Request, res: Response) => {
 
   res.status(201).json({ message: "Logged out successfully" });
 });
-// logic that enable superAdmin view all registered admins
-const viewAdmins = asyncHandler(async( req: Request, res: Response ) => {
-   const admins = await getAdmins()
-  if( admins.length == 0 ) res.status( 404 ).send( 'No admins')
-  res.status( 200 ).json( admins )
-})
+
 
 const forgotSuperAdminPassword = asyncHandler(
   async (req: Request, res: Response) => {
@@ -281,5 +276,4 @@ module.exports = {
   forgotSuperAdminPassword,
   resetSuperAdminPassGetPage,
   resetSuperAdminPass,
-  viewAdmins
 };

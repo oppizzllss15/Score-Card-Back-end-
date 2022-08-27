@@ -11,9 +11,17 @@ const bcrypt_1 = __importDefault(require("bcrypt"));
 const { messageTransporter, passwordLinkTransporter, } = require("../utils/email");
 require("dotenv").config();
 const uuidv1 = require("uuid");
-const { addAdmin, editAdmin, editAdminStatus, removeAdmin, updateAdminProfileImg, getAdminById, updateAdminPhoneNo, findAdminByEmail, updateAdminTicket, validateAdminTicketLink, updateAdminPassword, resetAdminSecureTicket, isPropertyInDatabase } = require("../services/admin.service");
+const { getAdmins, addAdmin, editAdmin, editAdminStatus, removeAdmin, updateAdminProfileImg, getAdminById, updateAdminPhoneNo, findAdminByEmail, updateAdminTicket, validateAdminTicketLink, updateAdminPassword, resetAdminSecureTicket, isPropertyInDatabase } = require("../services/admin.service");
 const jwt = require("jsonwebtoken");
 const ADMIN_EMAIL_DOMAIN = "gmail.com";
+const viewAdmins = asyncHandler(async (req, res) => {
+    const admins = await getAdmins();
+    if (admins.length === 0) {
+        res.status(404);
+        throw new Error('No admins');
+    }
+    res.status(200).json({ data: admins });
+});
 const getAdmin = asyncHandler(async (req, res) => {
     const admim = await getAdminById(req.params.adminId);
     if (admim)
@@ -130,8 +138,10 @@ const logoutAdmin = asyncHandler(async (req, res) => {
 });
 const adminProfileImage = asyncHandler(async (req, res) => {
     var _a, _b;
-    if (req.file === undefined)
-        return res.send("You must select a file.");
+    if (req.file === undefined) {
+        res.status(401);
+        throw new Error("You must select a file.");
+    }
     const id = req.cookies.Id;
     await updateAdminProfileImg(id, (_a = req.file) === null || _a === void 0 ? void 0 : _a.path, (_b = req.file) === null || _b === void 0 ? void 0 : _b.filename);
     const findAdmin = await Admin.findById(id);
@@ -254,4 +264,5 @@ module.exports = {
     forgotAdminPassword,
     resetAdminPassGetPage,
     resetAdminPass,
+    viewAdmins
 };

@@ -272,6 +272,7 @@ const filterScores = asyncHandler(async (req, res) => {
     const getAllScores = await getAllUsers();
     const buffer = [];
     getAllScores.forEach((doc) => buffer.push({
+        id: doc._id,
         firstname: doc.firstname,
         lastname: doc.lastname,
         week: doc.grades.filter((grd) => grd["week"] === week),
