@@ -66,11 +66,11 @@ router.post(
 router.get("/superuser/viewAdmins",viewAdmins);
 
 // Users
-router.post("/user/create", superAdminProtect, registerUser);
+router.post("/user/create",  registerUser);
 router.post("/user/update/:id", superAdminProtect, updateUser);
 router.get("/user/delete/:id", superAdminProtect, deleteUser);
 router.post("/user/deactivate", superAdminProtect, deactivateUser);
-router.post("/user/calculate/score/:id", superAdminProtect, calScore);
+router.post("/user/calculate/score/:id",  calScore);
 router.get("/user/getscores/:id", superAdminProtect, getScores);
 
 // Stacks
@@ -92,3 +92,6 @@ router.put(
 );
 
 module.exports = router;
+
+//superAdminProtect,
+//superAdminProtect,

@@ -26,11 +26,11 @@ router.post("/forgot/password", forgotUserPassword);
 router.post("/upload", superAdminProtect, uploads.single("file"), superUserProfileImage);
 router.get("/superuser/viewAdmins", viewAdmins);
 // Users
-router.post("/user/create", superAdminProtect, registerUser);
+router.post("/user/create", registerUser);
 router.post("/user/update/:id", superAdminProtect, updateUser);
 router.get("/user/delete/:id", superAdminProtect, deleteUser);
 router.post("/user/deactivate", superAdminProtect, deactivateUser);
-router.post("/user/calculate/score/:id", superAdminProtect, calScore);
+router.post("/user/calculate/score/:id", calScore);
 router.get("/user/getscores/:id", superAdminProtect, getScores);
 // Stacks
 router.get("/stacks", stacksShield, viewAllStacks);
@@ -45,3 +45,5 @@ router.put("/admin/update/:adminId", superAdminProtect, updateAdmin);
 router.delete("/admin/delete/:adminId", superAdminProtect, deleteAdmin);
 router.put("/admin/status/:action/:adminId", superAdminProtect, setdminActivationStatus);
 module.exports = router;
+//superAdminProtect,
+//superAdminProtect,
