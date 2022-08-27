@@ -33,7 +33,7 @@ router.delete("/user/delete/:id", superAdminProtect, deleteUser);
 router.get("/user/deactivate/:id", superAdminProtect, deactivateUser);
 router.get("/user/activate/:id", superAdminProtect, activateUser);
 router.post("/user/calculate/score/:id", superAdminProtect, calScore);
-router.get("/user/getscores/:id", superAdminProtect, filterScores);
+router.get("/user/getscores/:weekId", superAdminProtect, filterScores);
 // Stacks
 router.get("/stacks", superAdminProtect, viewAllStacks);
 router.post("/createstack", superAdminProtect, createStack);

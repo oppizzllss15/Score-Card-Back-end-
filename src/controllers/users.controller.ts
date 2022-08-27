@@ -126,16 +126,27 @@ const registerUser = asyncHandler(async (req: Request, res: Response) => {
     res.status(400);
     throw new Error("User already exists");
   }
+  const grades = [
+    {
+      week: 0,
+      agile: 0,
+      weekly_task: 0,
+      assessment: 0,
+      algorithm: 0,
+      cummulative: 0,
+    },
+  ];
 
   const userStack = await getUserStack(stack);
   const hashedPass = await passwordHandler(password);
-  const user = await createUser(
+  const user: IUser = await createUser(
     firstname,
     lastname,
     email,
     hashedPass,
     squad,
-    stack
+    stack,
+    grades
   );
 
   if (user) {
@@ -343,6 +354,7 @@ const getScores = asyncHandler(async (req: Request, res: Response) => {
 
 const filterScores = asyncHandler(async (req: Request, res: Response) => {
   const week = Number(req.params.weekId);
+  console.log(req.params.weekId, week)
   const getAllScores = await getAllUsers();
   const buffer: object[] = [];
 
