@@ -18,12 +18,14 @@ const {
 const { storage } = require("../utils/upload");
 import multer from "multer";
 const uploads = multer({ storage });
+import {Request, Response} from 'express';
+const Admin = require('../models/admin.model');
 
-router.get("/profile", adminProtect, adminProfile);
+router.get("/profile/:adminId", adminProfile);
 router.post("/login", loginUser);
 router.get("/logout", logoutAdmin);
 router.get("/stack", stacksShield2, viewStack);
-router.post("/upload", adminProtect, uploads.single("file"), adminProfileImage);
+router.post("/upload", uploads.single("file"), adminProfileImage);
 router.get("/stack", adminProtect, viewStack);
 router.get("/reset/password/:id/:ticket", resetAdminPassGetPage);
 router.post("/reset/password/:id/:ticket", resetAdminPass);
@@ -32,5 +34,6 @@ router.post("/forgot/password", forgotUserPassword);
 // User routes
 router.get("/user/filterscores/:weekId", filterScores);
 router.post("/user/score/name", getScoresByName);
+
 
 module.exports = router;

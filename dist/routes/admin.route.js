@@ -12,11 +12,12 @@ const { loginUser, filterScores, getScoresByName, forgotUserPassword } = require
 const { storage } = require("../utils/upload");
 const multer_1 = __importDefault(require("multer"));
 const uploads = (0, multer_1.default)({ storage });
-router.get("/profile", adminProtect, adminProfile);
+const Admin = require('../models/admin.model');
+router.get("/profile/:adminId", adminProfile);
 router.post("/login", loginUser);
 router.get("/logout", logoutAdmin);
 router.get("/stack", stacksShield2, viewStack);
-router.post("/upload", adminProtect, uploads.single("file"), adminProfileImage);
+router.post("/upload", uploads.single("file"), adminProfileImage);
 router.get("/stack", adminProtect, viewStack);
 router.get("/reset/password/:id/:ticket", resetAdminPassGetPage);
 router.post("/reset/password/:id/:ticket", resetAdminPass);

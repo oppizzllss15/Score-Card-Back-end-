@@ -78,7 +78,7 @@ router.post("/user/calculate/score/:id", superAdminProtect, calScore);
 router.get("/user/getscores/:id", superAdminProtect, getScores);
 
 // Stacks
-router.get("/stacks", stacksShield, viewAllStacks);
+router.get("/stacks",  viewAllStacks);
 router.post("/createstack", superAdminProtect, createStack);
 router.post("/editstack/:id", superAdminProtect, editStack);
 router.post("/deletestack/:id", superAdminProtect, deleteStack);
@@ -87,7 +87,7 @@ router.put("/addStack/:id", superAdminProtect, addStackToAdmin);
 // Admins
 router.get("/admin/:adminId", superAdminProtect, getAdmin);
 router.post("/admin/create", superAdminProtect, createAdmin);
-router.put("/admin/update/:adminId", superAdminProtect, updateAdmin);
+router.put("/admin/update/:adminId",  updateAdmin);
 router.delete("/admin/delete/:adminId", superAdminProtect, deleteAdmin);
 router.put(
   "/admin/status/:action/:adminId",

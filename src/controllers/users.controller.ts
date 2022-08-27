@@ -390,6 +390,7 @@ const getUserCummulatives = asyncHandler(
       grades: user.grades,
       cummulatives,
     };
+    console.log(data)
     return res.status(200).json({ data });
   }
 );
