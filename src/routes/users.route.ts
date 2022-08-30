@@ -11,6 +11,7 @@ const {
   forgotUserPassword,
   resetUserPassGetPage,
   resetUserPass,
+  getUserPerformance,
   getUserCummulatives,
 } = require("../controllers/users.controller");
 const { storage } = require("../utils/upload");
@@ -22,8 +23,8 @@ router.post("/login", loginUser);
 router.get("/logout", logoutUser);
 router.post("/upload", protect, uploads.single("file"), userProfileImage);
 router.post("/change/phone", protect, changeUserPhoneNumber);
-router.get("/getscores/:id", protect, getScores);
 router.get("/reset/password/:id/:ticket", resetUserPassGetPage);
+router.get("/score/tracker/:userId", protect, getUserPerformance);
 router.post("/reset/password/:id/:ticket", resetUserPass);
 router.post("/forgot/password", forgotUserPassword);
 router.get("/getscores/:id", protect, getScores);
