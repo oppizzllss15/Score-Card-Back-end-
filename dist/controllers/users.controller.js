@@ -334,6 +334,7 @@ const getUserCummulatives = asyncHandler(async (req, res) => {
         grades: user.grades,
         cummulatives,
     };
+    console.log(data);
     return res.status(200).json({ data });
 });
 const updateUserPasword = asyncHandler(async (req, res) => {
@@ -436,6 +437,40 @@ const getAllDevs = asyncHandler(async (req, res) => {
     }
     res.status(201).json({ users });
 });
+const getUserPerformance = asyncHandler(async (req, res) => {
+    const userId = req.params.userId;
+    const user = await findUserById(userId);
+    const userGrades = user.grades;
+    const initialPercent = {
+        agile: "0.00",
+        weekly_task: "0.00",
+        assessment: "0.00",
+        algorithm: "0.00",
+    };
+    if (userGrades.length <= 1)
+        return res.status(200).json({ data: userGrades, change: initialPercent });
+    const currWeekGrade = userGrades[userGrades.length - 1];
+    const prevWeekGrade = userGrades[userGrades.length - 2];
+    let data = {
+        algorithm: `${(((currWeekGrade.algorithm - prevWeekGrade.algorithm) /
+            prevWeekGrade.algorithm) *
+            100).toFixed(1)}`,
+        weekly_task: `${(((currWeekGrade.weekly_task - prevWeekGrade.weekly_task) /
+            prevWeekGrade.weekly_task) *
+            100).toFixed(1)}`,
+        assessment: `${(((currWeekGrade.assessment - prevWeekGrade.assessment) /
+            prevWeekGrade.assessment) *
+            100).toFixed(1)}`,
+        agile: `${(((currWeekGrade.agile - prevWeekGrade.agile) / prevWeekGrade.agile) *
+            100).toFixed(1)}`,
+    };
+    return res
+        .status(200)
+        .json({
+        change: data,
+        data: currWeekGrade,
+    });
+});
 module.exports = {
     getAllDevs,
     registerUser,
@@ -455,6 +490,7 @@ module.exports = {
     forgotUserPassword,
     resetUserPassGetPage,
     resetUserPass,
+    getUserPerformance,
     getUserCummulatives,
     updateUserPasword,
 };

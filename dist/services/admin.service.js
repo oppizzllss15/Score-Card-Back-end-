@@ -8,6 +8,7 @@ async function addAdmin(admin) {
 //view all admin
 async function viewAdminDetails() {
     const allAdmins = await Admin.find();
+    console.log(allAdmins);
     return allAdmins;
 }
 // update admin profile_img
@@ -21,11 +22,9 @@ const updateAdminPhoneNo = async (id, data) => {
 //edit admin
 async function editAdmin(adminid, admin) {
     const newAdmin = await Admin.findByIdAndUpdate(adminid, {
-        $set: {
-            ...admin,
-        },
+        $set: admin
     });
-    console.log(newAdmin);
+    console.log(newAdmin + JSON.stringify(admin) + "good");
     return newAdmin ? newAdmin : null;
 }
 //get admin

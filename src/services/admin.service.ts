@@ -9,6 +9,7 @@ async function addAdmin(admin: IAdmin) {
 //view all admin
 async function viewAdminDetails() {
   const allAdmins = await Admin.find();
+  console.log(allAdmins);
   return allAdmins;
 }
 
@@ -32,11 +33,9 @@ const updateAdminPhoneNo = async (id: string, data: string) => {
 //edit admin
 async function editAdmin(adminid: string, admin: IAdmin) {
   const newAdmin = await Admin.findByIdAndUpdate(adminid, {
-    $set: {
-      ...admin,
-    },
+    $set: admin
   });
-  console.log(newAdmin);
+  console.log(newAdmin + JSON.stringify(admin) + "good");
   return newAdmin ? newAdmin : null;
 }
 

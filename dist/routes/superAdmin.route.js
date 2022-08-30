@@ -19,14 +19,14 @@ router.post("/login", loginUser);
 router.get("/logout", logoutSuperAdmin);
 router.post("/change/password", superAdminProtect, changePassword);
 router.get("/profile", superAdminProtect, getSuperAdminProfile);
-router.get("/all/admin", superAdminProtect, viewAllAdmins);
 router.get("/reset/password/:id/:ticket", resetSuperAdminPassGetPage);
 router.post("/reset/password/:id/:ticket", resetSuperAdminPass);
 router.post("/forgot/password", forgotUserPassword);
 router.post("/upload", superAdminProtect, uploads.single("file"), superUserProfileImage);
 router.get("/superuser/viewAdmins", viewAdmins);
 // Users
-router.get("/all/devs", superAdminProtect, getAllDevs);
+router.get("/all/admin", viewAllAdmins);
+router.get("/all/devs", getAllDevs);
 router.post("/user/create", superAdminProtect, registerUser);
 router.put("/user/update/:id", superAdminProtect, updateUser);
 router.delete("/user/delete/:id", superAdminProtect, deleteUser);
@@ -35,7 +35,11 @@ router.get("/user/activate/:id", superAdminProtect, activateUser);
 router.post("/user/calculate/score/:id", superAdminProtect, calScore);
 router.get("/user/getscores/:weekId", superAdminProtect, filterScores);
 // Stacks
+<<<<<<< HEAD
+router.get("/stacks", viewAllStacks);
+=======
 router.get("/stacks", superAdminProtect, viewAllStacks);
+>>>>>>> 292f54d3a3e96b325b9859f914c7679f47e636e8
 router.post("/createstack", superAdminProtect, createStack);
 router.post("/editstack/:id", superAdminProtect, uploads.single("file"), editStack);
 router.post("/deletestack/:id", superAdminProtect, deleteStack);
@@ -44,7 +48,7 @@ router.put("/addStack/:id", superAdminProtect, addStackToAdmin);
 router.get("/admin/:adminId", superAdminProtect, getAdmin);
 router.get("/all/admin", superAdminProtect, viewAdmins);
 router.post("/admin/create", superAdminProtect, createAdmin);
-router.put("/admin/update/:adminId", superAdminProtect, updateAdmin);
+router.put("/admin/update/:adminId", updateAdmin);
 router.delete("/admin/delete/:adminId", superAdminProtect, deleteAdmin);
 router.put("/admin/status/:action/:adminId", superAdminProtect, setdminActivationStatus);
 module.exports = router;
