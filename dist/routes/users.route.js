@@ -20,6 +20,6 @@ router.get("/score/tracker/:userId", protect, getUserPerformance);
 router.post("/reset/password/:id/:ticket", resetUserPass);
 router.post("/forgot/password", forgotUserPassword);
 router.get("/getscores/:id", protect, getScores);
-router.get("/cummulatives/:userId", protect, getUserCummulatives);
-router.get("/performance/:userId", protect, getUserCummulatives);
+router.get("/cummulatives/:userId", getUserCummulatives);
+router.get("/performance/:userId", getUserCummulatives);
 module.exports = router;

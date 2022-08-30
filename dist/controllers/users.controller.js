@@ -318,6 +318,7 @@ const getUserCummulatives = asyncHandler(async (req, res) => {
         grades: user.grades,
         cummulatives,
     };
+    console.log(data);
     return res.status(200).json({ data });
 });
 const updateUserPasword = asyncHandler(async (req, res) => {

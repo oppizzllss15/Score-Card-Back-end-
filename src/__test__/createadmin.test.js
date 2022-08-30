@@ -1,6 +1,9 @@
 let app;
+const { json } = require('stream/consumers');
 const request = require('supertest');
-const { connectDB, disconnectDB} = require('../../app/dbsetup')
+const { connectDB, disconnectDB} = require('../../app/dbsetup');
+const { createAdmin } = require('../../dist/controllers/admin.controller');
+const { userStatus } = require('../../dist/utils/utils');
 
 let token = "";
 

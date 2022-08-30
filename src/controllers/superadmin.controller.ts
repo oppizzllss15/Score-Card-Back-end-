@@ -177,8 +177,10 @@ const getSuperAdminProfile = asyncHandler(
 );
 
 const viewAllAdmins = asyncHandler(async (req: Request, res: Response) => {
+  console.log('got here already')
   const allAdmin = await viewAdminDetails();
-  res.status(200).json({ message: "All admin in database", Admins: allAdmin });
+  console.log(allAdmin);
+  return res.status(200).json({ message: "All admin in database", data: allAdmin });
 });
 
 const logoutSuperAdmin = asyncHandler(async (req: Request, res: Response) => {

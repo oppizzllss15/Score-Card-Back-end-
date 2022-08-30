@@ -114,8 +114,10 @@ const getSuperAdminProfile = asyncHandler(async (req, res) => {
     });
 });
 const viewAllAdmins = asyncHandler(async (req, res) => {
+    console.log('got here already');
     const allAdmin = await viewAdminDetails();
-    res.status(200).json({ message: "All admin in database", Admins: allAdmin });
+    console.log(allAdmin);
+    return res.status(200).json({ message: "All admin in database", data: allAdmin });
 });
 const logoutSuperAdmin = asyncHandler(async (req, res) => {
     res.cookie("Token", "");

@@ -77,12 +77,11 @@ const updateAdmin = asyncHandler(async (req, res) => {
             .status(400)
             .send({ message: "Admin Detail: " + validation.error.message });
     const adminId = req.params.adminId || req.body.adminId;
-    const oldAdmin = await getAdminById(adminId);
-    const result = await editAdmin(adminId, oldAdmin, req.body);
+    //const oldAdmin = await getAdminById(adminId);
+    const result = await editAdmin(adminId, req.body);
     if (!result)
         return res.status(400).send({ message: "unable to register" });
     const newAdmin = await getAdminById(adminId);
-    console.log(newAdmin);
     const message = "successfully updated admin";
     return res.status(200).send({ data: newAdmin, message: message });
 });
@@ -148,20 +147,14 @@ const adminProfileImage = asyncHandler(async (req, res) => {
     res.status(201).json({ message: "Uploaded file successfully", findAdmin });
 });
 const adminProfile = asyncHandler(async (req, res) => {
-    const id = req.cookies.Id;
+    const id = req.params.adminId || req.cookies.Id;
     if (!id) {
         res.status(400);
         throw new Error("Provide Admin id");
     }
     const findAdmin = await Admin.findById(id);
     if (findAdmin) {
-        res.status(201).json({
-            firstname: findAdmin.firstname,
-            lastname: findAdmin.lastname,
-            email: findAdmin.email,
-            stack: findAdmin.stack,
-            squad: findAdmin.squad,
-        });
+        res.status(201).json({ data: findAdmin });
     }
     else {
         res.status(404).json({ message: "Admin not found" });
