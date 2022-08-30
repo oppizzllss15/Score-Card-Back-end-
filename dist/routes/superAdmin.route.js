@@ -10,9 +10,9 @@ const { storage } = require("../utils/upload");
 const multer_1 = __importDefault(require("multer"));
 const uploads = (0, multer_1.default)({ storage });
 const { createStack, editStack, deleteStack, addStackToAdmin, viewAllStacks, stacksShield, } = require("../controllers/stack.controller");
-const { createAdmin, setdminActivationStatus, deleteAdmin, getAdmin, updateAdmin, } = require("../controllers/admin.controller");
-const { createSuperUser, changePassword, superUserProfileImage, getSuperAdminProfile, viewAllAdmins, logoutSuperAdmin, resetSuperAdminPassGetPage, resetSuperAdminPass, viewAdmins } = require("../controllers/superadmin.controller");
-const { loginUser, registerUser, updateUser, deactivateUser, deleteUser, calScore, getScores, forgotUserPassword } = require("../controllers/users.controller");
+const { createAdmin, setdminActivationStatus, deleteAdmin, getAdmin, updateAdmin, viewAdmins } = require("../controllers/admin.controller");
+const { createSuperUser, changePassword, superUserProfileImage, getSuperAdminProfile, viewAllAdmins, logoutSuperAdmin, resetSuperAdminPassGetPage, resetSuperAdminPass } = require("../controllers/superadmin.controller");
+const { loginUser, registerUser, getAllDevs, updateUser, activateUser, deactivateUser, deleteUser, calScore, getScores, filterScores, forgotUserPassword } = require("../controllers/users.controller");
 // Super Admin
 router.post("/create", createSuperUser);
 router.post("/login", loginUser);
@@ -26,20 +26,23 @@ router.post("/forgot/password", forgotUserPassword);
 router.post("/upload", superAdminProtect, uploads.single("file"), superUserProfileImage);
 router.get("/superuser/viewAdmins", viewAdmins);
 // Users
-router.post("/user/create", registerUser);
-router.post("/user/update/:id", superAdminProtect, updateUser);
-router.get("/user/delete/:id", superAdminProtect, deleteUser);
-router.post("/user/deactivate", superAdminProtect, deactivateUser);
-router.post("/user/calculate/score/:id", calScore);
-router.get("/user/getscores/:id", superAdminProtect, getScores);
+router.get("/all/devs", superAdminProtect, getAllDevs);
+router.post("/user/create", superAdminProtect, registerUser);
+router.put("/user/update/:id", superAdminProtect, updateUser);
+router.delete("/user/delete/:id", superAdminProtect, deleteUser);
+router.get("/user/deactivate/:id", superAdminProtect, deactivateUser);
+router.get("/user/activate/:id", superAdminProtect, activateUser);
+router.post("/user/calculate/score/:id", superAdminProtect, calScore);
+router.get("/user/getscores/:weekId", superAdminProtect, filterScores);
 // Stacks
-router.get("/stacks", stacksShield, viewAllStacks);
+router.get("/stacks", superAdminProtect, viewAllStacks);
 router.post("/createstack", superAdminProtect, createStack);
-router.post("/editstack/:id", superAdminProtect, editStack);
+router.post("/editstack/:id", superAdminProtect, uploads.single("file"), editStack);
 router.post("/deletestack/:id", superAdminProtect, deleteStack);
 router.put("/addStack/:id", superAdminProtect, addStackToAdmin);
 // Admins
 router.get("/admin/:adminId", superAdminProtect, getAdmin);
+router.get("/all/admin", superAdminProtect, viewAdmins);
 router.post("/admin/create", superAdminProtect, createAdmin);
 router.put("/admin/update/:adminId", superAdminProtect, updateAdmin);
 router.delete("/admin/delete/:adminId", superAdminProtect, deleteAdmin);

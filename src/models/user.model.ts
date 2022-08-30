@@ -26,8 +26,8 @@ const userData = UserDb.Schema({
   ],
   status: {
     type: String,
-    enum: ["deactivated", "active"],
-    default: "active",
+    enum: ["inactive", "active"],
+    default: "inactive",
   },
 });
 

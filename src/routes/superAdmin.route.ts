@@ -23,6 +23,7 @@ const {
   deleteAdmin,
   getAdmin,
   updateAdmin,
+  viewAdmins
 } = require("../controllers/admin.controller");
 
 const {
@@ -33,17 +34,19 @@ const {
   viewAllAdmins,
   logoutSuperAdmin,
   resetSuperAdminPassGetPage,
-  resetSuperAdminPass,
-  viewAdmins
+  resetSuperAdminPass
 } = require("../controllers/superadmin.controller");
 const {
   loginUser,
   registerUser,
+  getAllDevs,
   updateUser,
+  activateUser,
   deactivateUser,
   deleteUser,
   calScore,
   getScores,
+  filterScores,
   forgotUserPassword
 } = require("../controllers/users.controller");
 
@@ -66,22 +69,25 @@ router.post(
 router.get("/superuser/viewAdmins",viewAdmins);
 
 // Users
-router.post("/user/create",  registerUser);
-router.post("/user/update/:id", superAdminProtect, updateUser);
-router.get("/user/delete/:id", superAdminProtect, deleteUser);
-router.post("/user/deactivate", superAdminProtect, deactivateUser);
-router.post("/user/calculate/score/:id",  calScore);
-router.get("/user/getscores/:id", superAdminProtect, getScores);
+router.get("/all/devs", superAdminProtect, getAllDevs);
+router.post("/user/create", superAdminProtect, registerUser);
+router.put("/user/update/:id", superAdminProtect, updateUser);
+router.delete("/user/delete/:id", superAdminProtect, deleteUser);
+router.get("/user/deactivate/:id", superAdminProtect, deactivateUser);
+router.get("/user/activate/:id", superAdminProtect, activateUser);
+router.post("/user/calculate/score/:id", superAdminProtect, calScore);
+router.get("/user/getscores/:weekId", superAdminProtect, filterScores);
 
 // Stacks
-router.get("/stacks", stacksShield, viewAllStacks);
+router.get("/stacks", superAdminProtect, viewAllStacks);
 router.post("/createstack", superAdminProtect, createStack);
-router.post("/editstack/:id", superAdminProtect, editStack);
+router.post("/editstack/:id", superAdminProtect, uploads.single("file"), editStack);
 router.post("/deletestack/:id", superAdminProtect, deleteStack);
 router.put("/addStack/:id", superAdminProtect, addStackToAdmin);
 
 // Admins
 router.get("/admin/:adminId", superAdminProtect, getAdmin);
+router.get("/all/admin", superAdminProtect, viewAdmins);
 router.post("/admin/create", superAdminProtect, createAdmin);
 router.put("/admin/update/:adminId", superAdminProtect, updateAdmin);
 router.delete("/admin/delete/:adminId", superAdminProtect, deleteAdmin);

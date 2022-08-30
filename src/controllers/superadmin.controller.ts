@@ -23,7 +23,7 @@ const {
   findSuperUserDynamically,
   EmailToManagePassword
 } = require("../services/superadmin.service");
-const { viewAdminDetails, getAdmins } = require("../services/admin.service");
+const { viewAdminDetails } = require("../services/admin.service");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 
@@ -143,7 +143,10 @@ const changePassword = asyncHandler(async (req: Request, res: Response) => {
 
 const superUserProfileImage = asyncHandler(
   async (req: Request, res: Response, next: NextFunction) => {
-    if (req.file === undefined) return res.send("you must select a file.");
+    if (req.file === undefined) {
+      res.status(401)
+      throw new Error("You must select a file.")
+    }
     const id = req.cookies.Id;
     await updateSuperUserProfileImg(id, req.file?.path, req.file?.filename);
     const findSuper = await findSuperUser();
@@ -185,12 +188,7 @@ const logoutSuperAdmin = asyncHandler(async (req: Request, res: Response) => {
 
   res.status(201).json({ message: "Logged out successfully" });
 });
-// logic that enable superAdmin view all registered admins
-const viewAdmins = asyncHandler(async( req: Request, res: Response ) => {
-   const admins = await getAdmins()
-  if( admins.length == 0 ) res.status( 404 ).send( 'No admins')
-  res.status( 200 ).json( admins )
-})
+
 
 const forgotSuperAdminPassword = asyncHandler(
   async (req: Request, res: Response) => {
@@ -278,5 +276,4 @@ module.exports = {
   forgotSuperAdminPassword,
   resetSuperAdminPassGetPage,
   resetSuperAdminPass,
-  viewAdmins
 };

@@ -99,11 +99,10 @@ const resetAdminSecureTicket = async (id: string) => {
 };
 
 //view admins
-async function getAdmins() {
+const getAdmins = async () => {
   const Admins = await Admin.find();
-  return Admins
-
-}
+  return Admins;
+};
 
 module.exports = {
   addAdmin,
@@ -120,5 +119,5 @@ module.exports = {
   validateAdminTicketLink,
   updateAdminPassword,
   resetAdminSecureTicket,
-  getAdmins
+  getAdmins,
 };

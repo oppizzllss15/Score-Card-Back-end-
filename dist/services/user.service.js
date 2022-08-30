@@ -6,6 +6,10 @@ const findUserByEmail = async (email) => {
     const userExists = await User.find({ email: email.toLowerCase() });
     return userExists;
 };
+const findAllUsers = async () => {
+    const users = await User.find();
+    return users;
+};
 const findUserDynamically = async (req, res, next) => {
     const userExists = await User.find({ email: req.body.email.toLowerCase() });
     if (userExists.length > 0)
@@ -18,7 +22,7 @@ const EmailToChangePassword = async (req, res, next) => {
         return userExists;
     return forgotSuperAdminPassword(req, res);
 };
-const createUser = async (firstname, lastname, email, hashedPass, squad, stack) => {
+const createUser = async (firstname, lastname, email, hashedPass, squad, stack, grades) => {
     const user = await User.create({
         firstname,
         lastname,
@@ -26,6 +30,7 @@ const createUser = async (firstname, lastname, email, hashedPass, squad, stack) 
         password: hashedPass,
         squad,
         stack,
+        grades
     });
     return user;
 };
@@ -44,13 +49,11 @@ const updateUserById = async (id, data) => {
     });
     return updatedUser;
 };
-const updateUserStatus = async (email, status) => {
-    const deactivateUserAccount = await User.updateOne({ email: email.toLowerCase() }, {
-        status: status.toLowerCase() === "active"
-            ? status.toLowerCase()
-            : "deactivated",
+const updateUserStatus = async (id, status) => {
+    const userStatus = await User.updateOne({ _id: id }, {
+        status: status
     });
-    return deactivateUserAccount;
+    return await findUserById(id);
 };
 const updateUserScore = async (id, data) => {
     const userData = await User.updateOne({ _id: id }, { $push: { grades: data } });
@@ -86,6 +89,7 @@ const resetSecureTicket = async (id) => {
     await User.updateOne({ _id: id }, { password_ticket: null });
 };
 module.exports = {
+    findAllUsers,
     findUserByEmail,
     createUser,
     findUserById,

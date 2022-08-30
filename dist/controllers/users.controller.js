@@ -2,7 +2,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 const { messageTransporter, passwordLinkTransporter, } = require("../utils/email");
 const { generateToken, userRegistration, userUpdate, userLogin, userStatus, passwordHandler, passwordChange, score, } = require("../utils/utils");
-const { findUserByEmail, createUser, findUserById, updateUserById, updateUserStatus, updateUserScore, getAllUsers, getUserScoreByName, updateUserPhoneNo, updateUserProfileImg, updateUserTicket, validateUserTicketLink, updateUserPassword, resetSecureTicket, findUserDynamically, EmailToChangePassword, changeUserPassword } = require("../services/user.service");
+const { findAllUsers, findUserByEmail, createUser, findUserById, updateUserById, updateUserStatus, updateUserScore, getAllUsers, getUserScoreByName, updateUserPhoneNo, updateUserProfileImg, updateUserTicket, validateUserTicketLink, updateUserPassword, resetSecureTicket, findUserDynamically, EmailToChangePassword, changeUserPassword, } = require("../services/user.service");
 const { getUserStack } = require("../services/stack.service");
 const asyncHandler = require("express-async-handler");
 const bcrypt = require("bcryptjs");
@@ -83,9 +83,19 @@ const registerUser = asyncHandler(async (req, res) => {
         res.status(400);
         throw new Error("User already exists");
     }
+    const grades = [
+        {
+            week: 0,
+            agile: 0,
+            weekly_task: 0,
+            assessment: 0,
+            algorithm: 0,
+            cummulative: 0,
+        },
+    ];
     const userStack = await getUserStack(stack);
     const hashedPass = await passwordHandler(password);
-    const user = await createUser(firstname, lastname, email, hashedPass, squad, stack);
+    const user = await createUser(firstname, lastname, email, hashedPass, squad, stack, grades);
     if (user) {
         await messageTransporter(email, firstname, password, squad);
         res.status(201).json({
@@ -153,6 +163,7 @@ const updateUser = asyncHandler(async (req, res) => {
             squad: squad || user.squad,
             stack: stack || user.stack,
             grades: user.grades,
+            status: user.status,
             profile_img: user.profile_img,
             cloudinary_id: user.cloudinary_id,
         };
@@ -174,18 +185,28 @@ const updateUser = asyncHandler(async (req, res) => {
         res.status(404).json({ message: "User not Found" });
     }
 });
-const deactivateUser = asyncHandler(async (req, res) => {
-    await userStatus().validateAsync({
-        email: req.body.email,
-        status: req.body.status,
-    });
-    const { email, status } = req.body;
-    const findUser = await findUserByEmail(email);
-    if (findUser.length > 0) {
-        const deactivateUserAccount = await updateUserStatus(email, status);
+const activateUser = asyncHandler(async (req, res) => {
+    const id = req.params.id;
+    const findUser = await findUserById(id);
+    const status = "active";
+    if (findUser) {
+        const activatedUserAccount = await updateUserStatus(id, status);
         res.status(201).json({
-            message: "Updated successfully",
-            deactivateUserAccount,
+            message: `${activatedUserAccount.firstname} with ${activatedUserAccount.email} account activated successfully`,
+        });
+    }
+    else {
+        res.status(404).json({ message: "User not found" });
+    }
+});
+const deactivateUser = asyncHandler(async (req, res) => {
+    const id = req.params.id;
+    const findUser = await findUserById(id);
+    const status = "inactive";
+    if (findUser) {
+        const deactivateUserAccount = await updateUserStatus(id, status);
+        res.status(201).json({
+            message: `${deactivateUserAccount.firstname} with ${deactivateUserAccount.email} successfully deactivated`,
         });
     }
     else {
@@ -206,7 +227,7 @@ const deleteUser = asyncHandler(async (req, res) => {
         });
     }
     else {
-        res.status(404).json({ message: "User not found" });
+        res.status(404).json({ error: "User not found" });
     }
 });
 const logoutUser = asyncHandler(async (req, res) => {
@@ -274,9 +295,11 @@ const getScores = asyncHandler(async (req, res) => {
 //  });
 const filterScores = asyncHandler(async (req, res) => {
     const week = Number(req.params.weekId);
+    console.log(req.params.weekId, week);
     const getAllScores = await getAllUsers();
     const buffer = [];
     getAllScores.forEach((doc) => buffer.push({
+        id: doc._id,
         firstname: doc.firstname,
         lastname: doc.lastname,
         week: doc.grades.filter((grd) => grd["week"] === week),
@@ -397,11 +420,29 @@ const resetUserPass = asyncHandler(async (req, res) => {
         throw new Error("Link expired!");
     }
 });
+const getAllDevs = asyncHandler(async (req, res) => {
+    const users = [];
+    const userData = await findAllUsers();
+    for (const usr of userData) {
+        const data = {
+            id: usr._id,
+            firstname: usr.firstname,
+            lastname: usr.lastname,
+            email: usr.email,
+            squad: `SQ0${usr.squad}`,
+            stack: await getUserStack(usr.stack),
+        };
+        users.push(data);
+    }
+    res.status(201).json({ users });
+});
 module.exports = {
+    getAllDevs,
     registerUser,
     loginUser,
     logoutUser,
     updateUser,
+    activateUser,
     deactivateUser,
     deleteUser,
     userProfile,
