@@ -79,6 +79,16 @@ const updateUserScore = async (id: string, data: object) => {
   );
 };
 
+const updategrade = async (id: string, data: Grades[]) => {
+   const userData = await User.updateOne(
+     { _id: id },
+     { $set: { grades: data } }
+   );
+  return true
+};
+
+
+
 const updateUserPhoneNo = async (id: string, data: string) => {
   await User.updateOne({ _id: id }, { phone: data });
 };
@@ -124,21 +134,22 @@ const resetSecureTicket = async (id: string) => {
 };
 
 module.exports = {
-  findAllUsers,
-  findUserByEmail,
-  createUser,
-  findUserById,
-  updateUserById,
-  updateUserStatus,
-  updateUserScore,
-  getAllUsers,
-  getUserScoreByName,
-  updateUserPhoneNo,
-  updateUserProfileImg,
-  updateUserTicket,
-  validateUserTicketLink,
-  updateUserPassword,
-  resetSecureTicket,
-  findUserDynamically,
-  EmailToChangePassword
+   findAllUsers,
+   findUserByEmail,
+   createUser,
+   findUserById,
+   updateUserById,
+   updateUserStatus,
+   updateUserScore,
+   getAllUsers,
+   getUserScoreByName,
+   updateUserPhoneNo,
+   updateUserProfileImg,
+   updateUserTicket,
+   validateUserTicketLink,
+   updateUserPassword,
+   resetSecureTicket,
+   findUserDynamically,
+   EmailToChangePassword,
+   updategrade,
 };

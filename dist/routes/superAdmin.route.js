@@ -12,7 +12,7 @@ const uploads = (0, multer_1.default)({ storage });
 const { createStack, editStack, deleteStack, addStackToAdmin, viewAllStacks, stacksShield, } = require("../controllers/stack.controller");
 const { createAdmin, setdminActivationStatus, deleteAdmin, getAdmin, updateAdmin, viewAdmins } = require("../controllers/admin.controller");
 const { createSuperUser, changePassword, superUserProfileImage, getSuperAdminProfile, viewAllAdmins, logoutSuperAdmin, resetSuperAdminPassGetPage, resetSuperAdminPass } = require("../controllers/superadmin.controller");
-const { loginUser, registerUser, getAllDevs, updateUser, activateUser, deactivateUser, deleteUser, calScore, getScores, filterScores, forgotUserPassword } = require("../controllers/users.controller");
+const { loginUser, registerUser, getAllDevs, updateUser, activateUser, deactivateUser, deleteUser, calScore, getScores, filterScores, forgotUserPassword, editScores } = require("../controllers/users.controller");
 // Super Admin
 router.post("/create", createSuperUser);
 router.post("/login", loginUser);
@@ -34,12 +34,9 @@ router.get("/user/deactivate/:id", superAdminProtect, deactivateUser);
 router.get("/user/activate/:id", superAdminProtect, activateUser);
 router.post("/user/calculate/score/:id", superAdminProtect, calScore);
 router.get("/user/getscores/:weekId", superAdminProtect, filterScores);
+router.put("/user/editscoreweek/:id", editScores);
 // Stacks
-<<<<<<< HEAD
-router.get("/stacks", viewAllStacks);
-=======
 router.get("/stacks", superAdminProtect, viewAllStacks);
->>>>>>> 292f54d3a3e96b325b9859f914c7679f47e636e8
 router.post("/createstack", superAdminProtect, createStack);
 router.post("/editstack/:id", superAdminProtect, uploads.single("file"), editStack);
 router.post("/deletestack/:id", superAdminProtect, deleteStack);

@@ -47,7 +47,8 @@ const {
   calScore,
   getScores,
   filterScores,
-  forgotUserPassword
+  forgotUserPassword,
+  editScores
 } = require("../controllers/users.controller");
 
 // Super Admin
@@ -77,6 +78,7 @@ router.get("/user/deactivate/:id", superAdminProtect, deactivateUser);
 router.get("/user/activate/:id", superAdminProtect, activateUser);
 router.post("/user/calculate/score/:id", superAdminProtect, calScore);
 router.get("/user/getscores/:weekId", superAdminProtect, filterScores);
+router.put("/user/editscoreweek/:id", editScores);
 
 // Stacks
 router.get("/stacks", superAdminProtect, viewAllStacks);

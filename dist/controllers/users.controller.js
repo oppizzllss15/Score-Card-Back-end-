@@ -2,7 +2,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 const { messageTransporter, passwordLinkTransporter, } = require("../utils/email");
 const { generateToken, userRegistration, userUpdate, userLogin, userStatus, passwordHandler, passwordChange, score, } = require("../utils/utils");
-const { findAllUsers, findUserByEmail, createUser, findUserById, updateUserById, updateUserStatus, updateUserScore, getAllUsers, getUserScoreByName, updateUserPhoneNo, updateUserProfileImg, updateUserTicket, validateUserTicketLink, updateUserPassword, resetSecureTicket, findUserDynamically, EmailToChangePassword, changeUserPassword, } = require("../services/user.service");
+const { findAllUsers, findUserByEmail, createUser, findUserById, updateUserById, updateUserStatus, updateUserScore, getAllUsers, getUserScoreByName, updateUserPhoneNo, updateUserProfileImg, updateUserTicket, validateUserTicketLink, updateUserPassword, resetSecureTicket, findUserDynamically, EmailToChangePassword, changeUserPassword, updategrade } = require("../services/user.service");
 const { getUserStack } = require("../services/stack.service");
 const asyncHandler = require("express-async-handler");
 const bcrypt = require("bcryptjs");
@@ -277,22 +277,36 @@ const getScores = asyncHandler(async (req, res) => {
         throw new Error("User not found");
     }
 });
-// const deletescores = asyncHandler(async (req: Request, res: Response) => {
-//     const id = req.params.id;
-//     const getScores = await findUserById(id);
-//     console.log(id);
-//     if (getScores) {
-//         const deleteScores = await deleteUserScores(id);
-//         res.status(201).json({
-//           message: "All your score",
-//           scores: deleteScores.grades,
-//         });
-//     } else {
-//         res.status(404);
-//         throw new Error("User not found");
-//     }
-//   }
-//  });
+const editScores = asyncHandler(async (req, res) => {
+    await score().validateAsync({
+        week: req.body.week,
+        agile: req.body.agile,
+        weekly_task: req.body.weekly_task,
+        assessment: req.body.assessment,
+        algorithm: req.body.algorithm,
+    });
+    const id = req.params.id;
+    const { week, agile, weekly_task, assessment, algorithm } = req.body;
+    const calCum = weekly_task * 0.4 + agile * 0.2 + assessment * 0.2 + algorithm * 0.2;
+    const user = await findUserById(id);
+    const task = user.grades.map((grade) => {
+        if ((grade === null || grade === void 0 ? void 0 : grade.week) == week) {
+            return { week, agile, weekly_task, assessment, algorithm, cummulative: calCum.toFixed(2) };
+        }
+        else {
+            return grade;
+        }
+    });
+    const updateUserScor = await updategrade(id, task);
+    if (updateUserScor) {
+        return res.status(201).json({
+            message: "score updated successfully"
+        });
+    }
+    else {
+        res.status(400).json({ message: "Something went wrong" });
+    }
+});
 const filterScores = asyncHandler(async (req, res) => {
     const week = Number(req.params.weekId);
     console.log(req.params.weekId, week);
@@ -493,4 +507,5 @@ module.exports = {
     getUserPerformance,
     getUserCummulatives,
     updateUserPasword,
+    editScores,
 };
