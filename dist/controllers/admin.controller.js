@@ -137,11 +137,14 @@ const logoutAdmin = asyncHandler(async (req, res) => {
 });
 const adminProfileImage = asyncHandler(async (req, res) => {
     var _a, _b;
+    console.log("got to route");
     if (req.file === undefined) {
+        console.log("got undefined file");
         res.status(401);
         throw new Error("You must select a file.");
     }
-    const id = req.cookies.Id;
+    const id = req.body.id || req.cookies.Id;
+    console.log("passed the test");
     await updateAdminProfileImg(id, (_a = req.file) === null || _a === void 0 ? void 0 : _a.path, (_b = req.file) === null || _b === void 0 ? void 0 : _b.filename);
     const findAdmin = await Admin.findById(id);
     res.status(201).json({ message: "Uploaded file successfully", findAdmin });

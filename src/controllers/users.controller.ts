@@ -31,6 +31,7 @@ const {
   findUserDynamically,
   EmailToChangePassword,
   changeUserPassword,
+  findAllUsersByStack,
   updategrade,
 } = require("../services/user.service");
 
@@ -605,6 +606,27 @@ const getAllDevs = asyncHandler(async (req: Request, res: Response) => {
   res.status(201).json({ users });
 });
 
+
+const getAllDevsByStackId = asyncHandler(async (req: Request, res: Response) => {
+  const users: any = [];
+  const stackId = req.params.stackId;
+  let userData = await findAllUsersByStack(stackId);
+  
+  for (const usr of userData) {
+    const data = {
+      id: usr._id,
+      firstname: usr.firstname,
+      lastname: usr.lastname,
+      email: usr.email,
+      squad: `SQ0${usr.squad}`,
+      stack: usr.stack.name,
+    };
+    users.push(data);
+  }
+  
+  res.status(201).json({ users });
+});
+
 const getUserPerformance = asyncHandler(async (req: Request, res: Response) => {
   const userId: string = req.params.userId;
   const user: IUser = await findUserById(userId);
@@ -669,5 +691,6 @@ module.exports = {
   getUserPerformance,
   getUserCummulatives,
   updateUserPasword,
+  getAllDevsByStackId,
   editScores,
 };

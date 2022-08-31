@@ -11,7 +11,7 @@ const userData = UserDb.Schema({
     cloudinary_id: String,
     stack: {
         type: UserDb.Schema.Types.ObjectId,
-        ref: "stack",
+        ref: "Stacks",
     },
     squad: Number,
     grades: [

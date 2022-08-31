@@ -223,13 +223,17 @@ const logoutAdmin = asyncHandler(async (req: Request, res: Response) => {
 });
 
 const adminProfileImage = asyncHandler(async (req: Request, res: Response) => {
+  
+  console.log("got to route");
   if (req.file === undefined) {
+    console.log("got undefined file");
     res.status(401)
     throw new Error("You must select a file.");
   }
 
-  const id = req.cookies.Id;
+  const id = req.body.id || req.cookies.Id;
 
+  console.log("passed the test");
   await updateAdminProfileImg(id, req.file?.path, req.file?.filename);
 
   const findAdmin = await Admin.findById(id);
