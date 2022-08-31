@@ -20,6 +20,7 @@ const adminSchema = adminDB.Schema({
     ],
     squad: Number,
     role: String,
+    position: { type: String, default: "admin" },
     activationStatus: { type: Boolean, default: true },
 }, { timestamps: true });
 module.exports = adminDB.model("Admin", adminSchema);

@@ -62,6 +62,10 @@ const updateUserStatus = async (id, status) => {
 const updateUserScore = async (id, data) => {
     const userData = await User.updateOne({ _id: id }, { $push: { grades: data } });
 };
+const updategrade = async (id, data) => {
+    const userData = await User.updateOne({ _id: id }, { $set: { grades: data } });
+    return true;
+};
 const updateUserPhoneNo = async (id, data) => {
     await User.updateOne({ _id: id }, { phone: data });
 };
@@ -110,5 +114,6 @@ module.exports = {
     updateUserPassword,
     resetSecureTicket,
     findUserDynamically,
-    EmailToChangePassword
+    EmailToChangePassword,
+    updategrade,
 };

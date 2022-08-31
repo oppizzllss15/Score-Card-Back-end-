@@ -31,7 +31,8 @@ const {
   findUserDynamically,
   EmailToChangePassword,
   changeUserPassword,
-  findAllUsersByStack
+  findAllUsersByStack,
+  updategrade,
 } = require("../services/user.service");
 
 const { getUserStack } = require("../services/stack.service");
@@ -39,6 +40,7 @@ const asyncHandler = require("express-async-handler");
 const bcrypt = require("bcryptjs");
 const randomPass = require("pino-password");
 const jwt = require("jsonwebtoken");
+import { log } from "console";
 import { Request, Response, NextFunction } from "express";
 
 const userProfileImage = asyncHandler(
@@ -353,9 +355,52 @@ const getScores = asyncHandler(async (req: Request, res: Response) => {
   }
 });
 
+const editScores = asyncHandler(async (req: Request, res: Response) => {
+  await score().validateAsync({
+    week: req.body.week,
+    agile: req.body.agile,
+    weekly_task: req.body.weekly_task,
+    assessment: req.body.assessment,
+    algorithm: req.body.algorithm,
+  });
+
+  const id = req.params.id;
+  const { week, agile, weekly_task, assessment, algorithm } = req.body;
+
+  const calCum =
+    weekly_task * 0.4 + agile * 0.2 + assessment * 0.2 + algorithm * 0.2;
+
+  const user = await findUserById(id);
+
+  const task = user.grades.map((grade: Grades) => {
+    if (grade?.week == week) {
+      return {
+        week,
+        agile,
+        weekly_task,
+        assessment,
+        algorithm,
+        cummulative: calCum.toFixed(2),
+      };
+    } else {
+      return grade;
+    }
+  });
+
+  const updateUserScor: any = await updategrade(id, task);
+
+  if (updateUserScor) {
+    return res.status(201).json({
+      message: "score updated successfully",
+    });
+  } else {
+    res.status(400).json({ message: "Something went wrong" });
+  }
+});
+
 const filterScores = asyncHandler(async (req: Request, res: Response) => {
   const week = Number(req.params.weekId);
-  console.log(req.params.weekId, week)
+
   const getAllScores = await getAllUsers();
   const buffer: object[] = [];
 
@@ -371,7 +416,11 @@ const filterScores = asyncHandler(async (req: Request, res: Response) => {
       })
   );
 
-  res.status(201).json({ message: "Grade by week", week: buffer });
+  if (buffer.length > 0) {
+    res.status(201).json({ message: "Grade by week", week: buffer });
+  } else {
+    res.status(400).json({ message: "Something went wrong", week: [] });
+  }
 });
 
 const getScoresByName = asyncHandler(async (req: Request, res: Response) => {
@@ -404,7 +453,7 @@ const getUserCummulatives = asyncHandler(
       grades: user.grades,
       cummulatives,
     };
-    console.log(data)
+    console.log(data);
     return res.status(200).json({ data });
   }
 );
@@ -546,7 +595,48 @@ const getAllDevsByStackId = asyncHandler(async (req: Request, res: Response) => 
   }
   
   res.status(201).json({ users });
+});
 
+const getUserPerformance = asyncHandler(async (req: Request, res: Response) => {
+  const userId: string = req.params.userId;
+  const user: IUser = await findUserById(userId);
+  const userGrades: Grades[] = user.grades;
+  const initialPercent = {
+    agile: "0.00",
+    weekly_task: "0.00",
+    assessment: "0.00",
+    algorithm: "0.00",
+  };
+  if (userGrades.length <= 1)
+    return res.status(200).json({ data: userGrades, change: initialPercent });
+
+  const currWeekGrade = userGrades[userGrades.length - 1];
+  const prevWeekGrade = userGrades[userGrades.length - 2];
+  let data = {
+    algorithm: `${(
+      ((currWeekGrade.algorithm - prevWeekGrade.algorithm) /
+        prevWeekGrade.algorithm) *
+      100
+    ).toFixed(1)}`,
+    weekly_task: `${(
+      ((currWeekGrade.weekly_task - prevWeekGrade.weekly_task) /
+        prevWeekGrade.weekly_task) *
+      100
+    ).toFixed(1)}`,
+    assessment: `${(
+      ((currWeekGrade.assessment - prevWeekGrade.assessment) /
+        prevWeekGrade.assessment) *
+      100
+    ).toFixed(1)}`,
+    agile: `${(
+      ((currWeekGrade.agile - prevWeekGrade.agile) / prevWeekGrade.agile) *
+      100
+    ).toFixed(1)}`,
+  };
+  return res.status(200).json({
+    change: data,
+    data: currWeekGrade,
+  });
 });
 
 module.exports = {
@@ -568,7 +658,9 @@ module.exports = {
   forgotUserPassword,
   resetUserPassGetPage,
   resetUserPass,
+  getUserPerformance,
   getUserCummulatives,
   updateUserPasword,
-  getAllDevsByStackId
+  getAllDevsByStackId,
+  editScores,
 };
