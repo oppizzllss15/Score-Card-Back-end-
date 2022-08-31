@@ -13,6 +13,11 @@ const findAllUsers = async () => {
   return users;
 };
 
+const findAllUsersByStack = async (stackId: string) => {
+  const users = await User.find({stack: stackId}).populate("stack", "name");
+  return users;
+};
+
 const findUserDynamically = async (req: Request, res: Response, next: NextFunction) => {
   const userExists = await User.find({ email: req.body.email.toLowerCase() });
   if (userExists.length > 0) return userExists;
@@ -126,6 +131,7 @@ const resetSecureTicket = async (id: string) => {
 module.exports = {
   findAllUsers,
   findUserByEmail,
+  findAllUsersByStack,
   createUser,
   findUserById,
   updateUserById,

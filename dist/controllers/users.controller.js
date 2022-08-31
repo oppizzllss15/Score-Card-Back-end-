@@ -2,7 +2,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 const { messageTransporter, passwordLinkTransporter, } = require("../utils/email");
 const { generateToken, userRegistration, userUpdate, userLogin, userStatus, passwordHandler, passwordChange, score, } = require("../utils/utils");
-const { findAllUsers, findUserByEmail, createUser, findUserById, updateUserById, updateUserStatus, updateUserScore, getAllUsers, getUserScoreByName, updateUserPhoneNo, updateUserProfileImg, updateUserTicket, validateUserTicketLink, updateUserPassword, resetSecureTicket, findUserDynamically, EmailToChangePassword, changeUserPassword, } = require("../services/user.service");
+const { findAllUsers, findUserByEmail, createUser, findUserById, updateUserById, updateUserStatus, updateUserScore, getAllUsers, getUserScoreByName, updateUserPhoneNo, updateUserProfileImg, updateUserTicket, validateUserTicketLink, updateUserPassword, resetSecureTicket, findUserDynamically, EmailToChangePassword, changeUserPassword, findAllUsersByStack } = require("../services/user.service");
 const { getUserStack } = require("../services/stack.service");
 const asyncHandler = require("express-async-handler");
 const bcrypt = require("bcryptjs");
@@ -421,6 +421,23 @@ const getAllDevs = asyncHandler(async (req, res) => {
     }
     res.status(201).json({ users });
 });
+const getAllDevsByStackId = asyncHandler(async (req, res) => {
+    const users = [];
+    const stackId = req.params.stackId;
+    let userData = await findAllUsersByStack(stackId);
+    for (const usr of userData) {
+        const data = {
+            id: usr._id,
+            firstname: usr.firstname,
+            lastname: usr.lastname,
+            email: usr.email,
+            squad: `SQ0${usr.squad}`,
+            stack: usr.stack.name,
+        };
+        users.push(data);
+    }
+    res.status(201).json({ users });
+});
 module.exports = {
     getAllDevs,
     registerUser,
@@ -442,4 +459,5 @@ module.exports = {
     resetUserPass,
     getUserCummulatives,
     updateUserPasword,
+    getAllDevsByStackId
 };

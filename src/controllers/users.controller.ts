@@ -31,6 +31,7 @@ const {
   findUserDynamically,
   EmailToChangePassword,
   changeUserPassword,
+  findAllUsersByStack
 } = require("../services/user.service");
 
 const { getUserStack } = require("../services/stack.service");
@@ -526,6 +527,28 @@ const getAllDevs = asyncHandler(async (req: Request, res: Response) => {
   res.status(201).json({ users });
 });
 
+
+const getAllDevsByStackId = asyncHandler(async (req: Request, res: Response) => {
+  const users: any = [];
+  const stackId = req.params.stackId;
+  let userData = await findAllUsersByStack(stackId);
+  
+  for (const usr of userData) {
+    const data = {
+      id: usr._id,
+      firstname: usr.firstname,
+      lastname: usr.lastname,
+      email: usr.email,
+      squad: `SQ0${usr.squad}`,
+      stack: usr.stack.name,
+    };
+    users.push(data);
+  }
+  
+  res.status(201).json({ users });
+
+});
+
 module.exports = {
   getAllDevs,
   registerUser,
@@ -547,4 +570,5 @@ module.exports = {
   resetUserPass,
   getUserCummulatives,
   updateUserPasword,
+  getAllDevsByStackId
 };

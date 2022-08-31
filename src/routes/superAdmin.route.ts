@@ -47,7 +47,8 @@ const {
   calScore,
   getScores,
   filterScores,
-  forgotUserPassword
+  forgotUserPassword,
+  getAllDevsByStackId
 } = require("../controllers/users.controller");
 
 // Super Admin
@@ -70,6 +71,7 @@ router.get("/superuser/viewAdmins",viewAdmins);
 // Users
 router.get("/all/admin", viewAllAdmins);
 router.get("/all/devs", getAllDevs);
+router.get("/all/devs/:stackId", getAllDevsByStackId);
 router.post("/user/create", superAdminProtect, registerUser);
 router.put("/user/update/:id", superAdminProtect, updateUser);
 router.delete("/user/delete/:id", superAdminProtect, deleteUser);
