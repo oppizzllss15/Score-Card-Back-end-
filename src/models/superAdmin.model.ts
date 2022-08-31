@@ -1,52 +1,54 @@
 const superAdmin = require("mongoose");
 
-const superAdminData = superAdmin.Schema({
+const superAdminData = superAdmin.Schema(
+  {
     firstname: {
-        type: String,
-        required: [true, "Please add a firstname"],
+      type: String,
+      required: [true, "Please add a firstname"],
     },
     lastname: {
-        type: String,
-        required: [true, "Please add a lastname"],
+      type: String,
+      required: [true, "Please add a lastname"],
     },
     email: {
-        type: String,
-        required: [true, "Please add an email"],
-        unique: true,
+      type: String,
+      required: [true, "Please add an email"],
+      unique: true,
     },
     secret: {
-        type: String,
-        required: [true, "Please add secret password"],
-        default: process.env.SECRET_PASS,
+      type: String,
+      required: [true, "Please add secret password"],
+      default: process.env.SECRET_PASS,
     },
     stack: {
-        type: String,
-        required: [true, "Please add a stack"],
+      type: String,
+      required: [true, "Please add a stack"],
     },
     squad: {
-        type: String,
-        required: [true, "Please add a squad"],
+      type: String,
+      required: [true, "Please add a squad"],
     },
     password: {
-        type: String,
-        required: [true, "Please add a password"],
+      type: String,
+      required: [true, "Please add a password"],
     },
     phone: {
-        type: String,
-        required: [true, "Please add your phone number"],
+      type: String,
+      required: [true, "Please add your phone number"],
     },
     profile_img: {
-        type: String,
+      type: String,
     },
     cloudinary_id: {
-        type: String,
+      type: String,
     },
     password_ticket: {
-        type: String,
+      type: String,
     },
-},
-{
+    position: { type: String, default: "superadmin" },
+  },
+  {
     timestamps: true,
-}
+  }
 );
-module.exports = superAdmin.model("SuperUser", superAdminData)
+module.exports = superAdmin.model("SuperUser", superAdminData);

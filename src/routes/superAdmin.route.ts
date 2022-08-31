@@ -68,8 +68,8 @@ router.post(
 router.get("/superuser/viewAdmins",viewAdmins);
 
 // Users
-router.get("/all/admin", viewAllAdmins);
-router.get("/all/devs", getAllDevs);
+router.get("/all/admin", superAdminProtect, viewAllAdmins);
+router.get("/all/devs", superAdminProtect, getAllDevs);
 router.post("/user/create", superAdminProtect, registerUser);
 router.put("/user/update/:id", superAdminProtect, updateUser);
 router.delete("/user/delete/:id", superAdminProtect, deleteUser);

@@ -279,7 +279,6 @@ const getScores = asyncHandler(async (req, res) => {
 });
 const filterScores = asyncHandler(async (req, res) => {
     const week = Number(req.params.weekId);
-    console.log(req.params.weekId, week);
     const getAllScores = await getAllUsers();
     const buffer = [];
     getAllScores.forEach((doc) => buffer.push({
@@ -288,7 +287,12 @@ const filterScores = asyncHandler(async (req, res) => {
         lastname: doc.lastname,
         week: doc.grades.filter((grd) => grd["week"] === week),
     }));
-    res.status(201).json({ message: "Grade by week", week: buffer });
+    if (buffer.length > 0) {
+        res.status(201).json({ message: "Grade by week", week: buffer });
+    }
+    else {
+        res.status(400).json({ message: "Something went wrong", week: [] });
+    }
 });
 const getScoresByName = asyncHandler(async (req, res) => {
     const { firstname, lastname } = req.body;

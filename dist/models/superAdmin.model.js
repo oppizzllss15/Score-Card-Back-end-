@@ -44,6 +44,7 @@ const superAdminData = superAdmin.Schema({
     password_ticket: {
         type: String,
     },
+    position: { type: String, default: "superadmin" },
 }, {
     timestamps: true,
 });

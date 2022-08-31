@@ -29,5 +29,6 @@ const userData = UserDb.Schema({
         enum: ["inactive", "active"],
         default: "inactive",
     },
+    position: { type: String, default: "user" },
 });
 module.exports = UserDb.model("Users", userData);
