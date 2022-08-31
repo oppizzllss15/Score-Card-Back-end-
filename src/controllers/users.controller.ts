@@ -31,6 +31,8 @@ const {
   findUserDynamically,
   EmailToChangePassword,
   changeUserPassword,
+  findAllUsersByStack,
+  updategrade,
 } = require("../services/user.service");
 
 const { getUserStack } = require("../services/stack.service");
@@ -38,6 +40,7 @@ const asyncHandler = require("express-async-handler");
 const bcrypt = require("bcryptjs");
 const randomPass = require("pino-password");
 const jwt = require("jsonwebtoken");
+import { log } from "console";
 import { Request, Response, NextFunction } from "express";
 
 const userProfileImage = asyncHandler(
@@ -304,7 +307,6 @@ const logoutUser = asyncHandler(async (req: Request, res: Response) => {
   res.status(201).json({ message: "Logged out successfully" });
 });
 
-//adding score
 const calScore = asyncHandler(async (req: Request, res: Response) => {
   await score().validateAsync({
     week: req.body.week,
@@ -314,27 +316,45 @@ const calScore = asyncHandler(async (req: Request, res: Response) => {
     algorithm: req.body.algorithm,
   });
   const id = req.params.id;
+  const user = await findUserById(id);
+
   const { week, agile, weekly_task, assessment, algorithm } = req.body;
+  const noOfWeeks = user.grades.length;
+  const findWeek = user.grades.filter(
+    (grd: { week: any }) => grd.week == week
+  );
 
-  const calCum =
-    weekly_task * 0.4 + agile * 0.2 + assessment * 0.2 + algorithm * 0.2;
-  const data = {
-    week: week,
-    agile: agile,
-    weekly_task: weekly_task,
-    assessment: assessment,
-    algorithm: algorithm,
-    cummulative: calCum.toFixed(2),
-  };
+  if (findWeek.length > 0) {
+    res.status(400);
+    throw new Error(
+      `Week already updated. ${user.firstname} has ${noOfWeeks} weeks updated`
+    );
+  }
 
-  const userData = await updateUserScore(id, data);
+  if (week != noOfWeeks) {
+    res.status(400);
+    throw new Error(`Add week ${noOfWeeks} performance for ${user.firstname}`);
+  } else {
+    const calCum =
+      weekly_task * 0.4 + agile * 0.2 + assessment * 0.2 + algorithm * 0.2;
+    const data = {
+      week: week,
+      agile: agile,
+      weekly_task: weekly_task,
+      assessment: assessment,
+      algorithm: algorithm,
+      cummulative: calCum.toFixed(2),
+    };
 
-  const getScores = await findUserById(id);
+    const userData = await updateUserScore(id, data);
 
-  res.status(201).json({
-    message: "Updated successfully",
-    scores: getScores.grades,
-  });
+    const getScores = await findUserById(id);
+
+    res.status(201).json({
+      message: "Updated successfully",
+      scores: getScores.grades,
+    });
+  }
 });
 
 const getScores = asyncHandler(async (req: Request, res: Response) => {
@@ -352,9 +372,65 @@ const getScores = asyncHandler(async (req: Request, res: Response) => {
   }
 });
 
+const editScores = asyncHandler(async (req: Request, res: Response) => {
+  await score().validateAsync({
+    week: req.body.week,
+    agile: req.body.agile,
+    weekly_task: req.body.weekly_task,
+    assessment: req.body.assessment,
+    algorithm: req.body.algorithm,
+  });
+
+  const id = req.params.id;
+  const { week, agile, weekly_task, assessment, algorithm } = req.body;
+
+  const calCum =
+    weekly_task * 0.4 + agile * 0.2 + assessment * 0.2 + algorithm * 0.2;
+
+  const user = await findUserById(id);
+
+  const noOfWeeks = user.grades.length;
+  const findWeek = user.grades.filter(
+    (grd: { week: any }) => grd.week == week
+  );
+
+  if (findWeek.length === 0) {
+    res.status(404);
+    throw new Error(
+      `User performance for week ${week} does not exist. ${user.firstname} has ${noOfWeeks} weeks updated`
+    );
+  }
+
+  const task = user.grades.map((grade: Grades) => {
+    if (grade?.week == week) {
+      return {
+        week,
+        agile,
+        weekly_task,
+        assessment,
+        algorithm,
+        cummulative: calCum.toFixed(2),
+      };
+    } else {
+      return grade;
+    }
+  });
+
+  const updateUserScor: any = await updategrade(id, task);
+
+  if (updateUserScor) {
+    return res.status(201).json({
+      message: "score updated successfully",
+    });
+  } else {
+    res.status(400);
+    throw new Error("Something went wrong. Cannot update score.");
+  }
+});
+
 const filterScores = asyncHandler(async (req: Request, res: Response) => {
   const week = Number(req.params.weekId);
-  console.log(req.params.weekId, week)
+
   const getAllScores = await getAllUsers();
   const buffer: object[] = [];
 
@@ -370,7 +446,11 @@ const filterScores = asyncHandler(async (req: Request, res: Response) => {
       })
   );
 
-  res.status(201).json({ message: "Grade by week", week: buffer });
+  if (buffer.length > 0) {
+    res.status(201).json({ message: "Grade by week", week: buffer });
+  } else {
+    res.status(400).json({ message: "Something went wrong", week: [] });
+  }
 });
 
 const getScoresByName = asyncHandler(async (req: Request, res: Response) => {
@@ -403,6 +483,7 @@ const getUserCummulatives = asyncHandler(
       grades: user.grades,
       cummulatives,
     };
+    console.log(data);
     return res.status(200).json({ data });
   }
 );
@@ -525,6 +606,69 @@ const getAllDevs = asyncHandler(async (req: Request, res: Response) => {
   res.status(201).json({ users });
 });
 
+
+const getAllDevsByStackId = asyncHandler(async (req: Request, res: Response) => {
+  const users: any = [];
+  const stackId = req.params.stackId;
+  let userData = await findAllUsersByStack(stackId);
+  
+  for (const usr of userData) {
+    const data = {
+      id: usr._id,
+      firstname: usr.firstname,
+      lastname: usr.lastname,
+      email: usr.email,
+      squad: `SQ0${usr.squad}`,
+      stack: usr.stack.name,
+    };
+    users.push(data);
+  }
+  
+  res.status(201).json({ users });
+});
+
+const getUserPerformance = asyncHandler(async (req: Request, res: Response) => {
+  const userId: string = req.params.userId;
+  const user: IUser = await findUserById(userId);
+  const userGrades: Grades[] = user.grades;
+  const initialPercent = {
+    agile: "0.00",
+    weekly_task: "0.00",
+    assessment: "0.00",
+    algorithm: "0.00",
+  };
+  if (userGrades.length <= 1)
+    return res.status(200).json({ data: userGrades, change: initialPercent });
+
+  const currWeekGrade = userGrades[userGrades.length - 1];
+  const prevWeekGrade = userGrades[userGrades.length - 2];
+  let data = {
+    algorithm: `${(
+      ((currWeekGrade.algorithm - prevWeekGrade.algorithm) /
+        prevWeekGrade.algorithm) *
+      100
+    ).toFixed(1)}`,
+    weekly_task: `${(
+      ((currWeekGrade.weekly_task - prevWeekGrade.weekly_task) /
+        prevWeekGrade.weekly_task) *
+      100
+    ).toFixed(1)}`,
+    assessment: `${(
+      ((currWeekGrade.assessment - prevWeekGrade.assessment) /
+        prevWeekGrade.assessment) *
+      100
+    ).toFixed(1)}`,
+    agile: `${(
+      ((currWeekGrade.agile - prevWeekGrade.agile) / prevWeekGrade.agile) *
+      100
+    ).toFixed(1)}`,
+  };
+  return res.status(200).json({
+    change: data,
+    data: currWeekGrade,
+  });
+});
+
 module.exports = {
   getAllDevs,
   registerUser,
@@ -544,6 +688,9 @@ module.exports = {
   forgotUserPassword,
   resetUserPassGetPage,
   resetUserPass,
+  getUserPerformance,
   getUserCummulatives,
   updateUserPasword,
+  getAllDevsByStackId,
+  editScores,
 };

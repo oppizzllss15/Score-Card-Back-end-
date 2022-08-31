@@ -11,7 +11,7 @@ const userData = UserDb.Schema({
     cloudinary_id: String,
     stack: {
         type: UserDb.Schema.Types.ObjectId,
-        ref: "stack",
+        ref: "Stacks",
     },
     squad: Number,
     grades: [
@@ -29,5 +29,6 @@ const userData = UserDb.Schema({
         enum: ["inactive", "active"],
         default: "inactive",
     },
+    position: { type: String, default: "user" },
 });
 module.exports = UserDb.model("Users", userData);

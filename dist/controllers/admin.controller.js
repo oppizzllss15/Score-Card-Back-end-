@@ -77,12 +77,11 @@ const updateAdmin = asyncHandler(async (req, res) => {
             .status(400)
             .send({ message: "Admin Detail: " + validation.error.message });
     const adminId = req.params.adminId || req.body.adminId;
-    const oldAdmin = await getAdminById(adminId);
-    const result = await editAdmin(adminId, oldAdmin, req.body);
+    //const oldAdmin = await getAdminById(adminId);
+    const result = await editAdmin(adminId, req.body);
     if (!result)
         return res.status(400).send({ message: "unable to register" });
     const newAdmin = await getAdminById(adminId);
-    console.log(newAdmin);
     const message = "successfully updated admin";
     return res.status(200).send({ data: newAdmin, message: message });
 });
@@ -138,30 +137,27 @@ const logoutAdmin = asyncHandler(async (req, res) => {
 });
 const adminProfileImage = asyncHandler(async (req, res) => {
     var _a, _b;
+    console.log("got to route");
     if (req.file === undefined) {
+        console.log("got undefined file");
         res.status(401);
         throw new Error("You must select a file.");
     }
-    const id = req.cookies.Id;
+    const id = req.body.id || req.cookies.Id;
+    console.log("passed the test");
     await updateAdminProfileImg(id, (_a = req.file) === null || _a === void 0 ? void 0 : _a.path, (_b = req.file) === null || _b === void 0 ? void 0 : _b.filename);
     const findAdmin = await Admin.findById(id);
     res.status(201).json({ message: "Uploaded file successfully", findAdmin });
 });
 const adminProfile = asyncHandler(async (req, res) => {
-    const id = req.cookies.Id;
+    const id = req.params.adminId || req.cookies.Id;
     if (!id) {
         res.status(400);
         throw new Error("Provide Admin id");
     }
     const findAdmin = await Admin.findById(id);
     if (findAdmin) {
-        res.status(201).json({
-            firstname: findAdmin.firstname,
-            lastname: findAdmin.lastname,
-            email: findAdmin.email,
-            stack: findAdmin.stack,
-            squad: findAdmin.squad,
-        });
+        res.status(201).json({ data: findAdmin });
     }
     else {
         res.status(404).json({ message: "Admin not found" });

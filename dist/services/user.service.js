@@ -10,6 +10,10 @@ const findAllUsers = async () => {
     const users = await User.find();
     return users;
 };
+const findAllUsersByStack = async (stackId) => {
+    const users = await User.find({ stack: stackId }).populate("stack", "name");
+    return users;
+};
 const findUserDynamically = async (req, res, next) => {
     const userExists = await User.find({ email: req.body.email.toLowerCase() });
     if (userExists.length > 0)
@@ -58,6 +62,10 @@ const updateUserStatus = async (id, status) => {
 const updateUserScore = async (id, data) => {
     const userData = await User.updateOne({ _id: id }, { $push: { grades: data } });
 };
+const updategrade = async (id, data) => {
+    const userData = await User.updateOne({ _id: id }, { $set: { grades: data } });
+    return true;
+};
 const updateUserPhoneNo = async (id, data) => {
     await User.updateOne({ _id: id }, { phone: data });
 };
@@ -105,5 +113,7 @@ module.exports = {
     updateUserPassword,
     resetSecureTicket,
     findUserDynamically,
-    EmailToChangePassword
+    EmailToChangePassword,
+    updategrade,
+    findAllUsersByStack
 };
