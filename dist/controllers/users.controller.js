@@ -2,7 +2,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 const { messageTransporter, passwordLinkTransporter, } = require("../utils/email");
 const { generateToken, userRegistration, userUpdate, userLogin, userStatus, passwordHandler, passwordChange, score, } = require("../utils/utils");
-const { findAllUsers, findUserByEmail, createUser, findUserById, updateUserById, updateUserStatus, updateUserScore, getAllUsers, getUserScoreByName, updateUserPhoneNo, updateUserProfileImg, updateUserTicket, validateUserTicketLink, updateUserPassword, resetSecureTicket, findUserDynamically, EmailToChangePassword, changeUserPassword, updategrade } = require("../services/user.service");
+const { findAllUsers, findUserByEmail, createUser, findUserById, updateUserById, updateUserStatus, updateUserScore, getAllUsers, getUserScoreByName, updateUserPhoneNo, updateUserProfileImg, updateUserTicket, validateUserTicketLink, updateUserPassword, resetSecureTicket, findUserDynamically, EmailToChangePassword, changeUserPassword, updategrade, } = require("../services/user.service");
 const { getUserStack } = require("../services/stack.service");
 const asyncHandler = require("express-async-handler");
 const bcrypt = require("bcryptjs");
@@ -291,7 +291,14 @@ const editScores = asyncHandler(async (req, res) => {
     const user = await findUserById(id);
     const task = user.grades.map((grade) => {
         if ((grade === null || grade === void 0 ? void 0 : grade.week) == week) {
-            return { week, agile, weekly_task, assessment, algorithm, cummulative: calCum.toFixed(2) };
+            return {
+                week,
+                agile,
+                weekly_task,
+                assessment,
+                algorithm,
+                cummulative: calCum.toFixed(2),
+            };
         }
         else {
             return grade;
@@ -300,7 +307,7 @@ const editScores = asyncHandler(async (req, res) => {
     const updateUserScor = await updategrade(id, task);
     if (updateUserScor) {
         return res.status(201).json({
-            message: "score updated successfully"
+            message: "score updated successfully",
         });
     }
     else {
@@ -482,9 +489,7 @@ const getUserPerformance = asyncHandler(async (req, res) => {
         agile: `${(((currWeekGrade.agile - prevWeekGrade.agile) / prevWeekGrade.agile) *
             100).toFixed(1)}`,
     };
-    return res
-        .status(200)
-        .json({
+    return res.status(200).json({
         change: data,
         data: currWeekGrade,
     });

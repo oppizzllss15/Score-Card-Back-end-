@@ -76,9 +76,9 @@ router.put("/user/update/:id", superAdminProtect, updateUser);
 router.delete("/user/delete/:id", superAdminProtect, deleteUser);
 router.get("/user/deactivate/:id", superAdminProtect, deactivateUser);
 router.get("/user/activate/:id", superAdminProtect, activateUser);
-router.post("/user/calculate/score/:id", superAdminProtect, calScore);
+router.put("/user/calculate/score/:id", superAdminProtect, calScore);
 router.get("/user/getscores/:weekId", superAdminProtect, filterScores);
-router.put("/user/editscoreweek/:id", editScores);
+router.put("/user/editscoreweek/:id", superAdminProtect, editScores);
 
 // Stacks
 router.get("/stacks", superAdminProtect, viewAllStacks);
@@ -100,6 +100,3 @@ router.put(
 );
 
 module.exports = router;
-
-//superAdminProtect,
-//superAdminProtect,
