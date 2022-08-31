@@ -12,7 +12,7 @@ const uploads = (0, multer_1.default)({ storage });
 const { createStack, editStack, deleteStack, addStackToAdmin, viewAllStacks, stacksShield, } = require("../controllers/stack.controller");
 const { createAdmin, setdminActivationStatus, deleteAdmin, getAdmin, updateAdmin, viewAdmins } = require("../controllers/admin.controller");
 const { createSuperUser, changePassword, superUserProfileImage, getSuperAdminProfile, viewAllAdmins, logoutSuperAdmin, resetSuperAdminPassGetPage, resetSuperAdminPass } = require("../controllers/superadmin.controller");
-const { loginUser, registerUser, getAllDevs, updateUser, activateUser, deactivateUser, deleteUser, calScore, getScores, filterScores, forgotUserPassword } = require("../controllers/users.controller");
+const { loginUser, registerUser, getAllDevs, updateUser, activateUser, deactivateUser, deleteUser, calScore, getScores, filterScores, forgotUserPassword, editScores } = require("../controllers/users.controller");
 // Super Admin
 router.post("/create", createSuperUser);
 router.post("/login", loginUser);
@@ -34,6 +34,7 @@ router.get("/user/deactivate/:id", superAdminProtect, deactivateUser);
 router.get("/user/activate/:id", superAdminProtect, activateUser);
 router.post("/user/calculate/score/:id", superAdminProtect, calScore);
 router.get("/user/getscores/:weekId", superAdminProtect, filterScores);
+router.put("/user/editscoreweek/:id", editScores);
 // Stacks
 router.get("/stacks", superAdminProtect, viewAllStacks);
 router.post("/createstack", superAdminProtect, createStack);
@@ -48,3 +49,5 @@ router.put("/admin/update/:adminId", updateAdmin);
 router.delete("/admin/delete/:adminId", superAdminProtect, deleteAdmin);
 router.put("/admin/status/:action/:adminId", superAdminProtect, setdminActivationStatus);
 module.exports = router;
+//superAdminProtect,
+//superAdminProtect,

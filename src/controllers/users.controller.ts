@@ -31,6 +31,7 @@ const {
   findUserDynamically,
   EmailToChangePassword,
   changeUserPassword,
+  updategrade
 } = require("../services/user.service");
 
 const { getUserStack } = require("../services/stack.service");
@@ -38,6 +39,7 @@ const asyncHandler = require("express-async-handler");
 const bcrypt = require("bcryptjs");
 const randomPass = require("pino-password");
 const jwt = require("jsonwebtoken");
+import { log } from "console";
 import { Request, Response, NextFunction } from "express";
 
 const userProfileImage = asyncHandler(
@@ -352,6 +354,55 @@ const getScores = asyncHandler(async (req: Request, res: Response) => {
   }
 });
 
+
+
+
+
+const editScores = asyncHandler(async (req: Request, res: Response) => {
+
+ await score().validateAsync({
+    week: req.body.week,
+    agile: req.body.agile,
+    weekly_task: req.body.weekly_task,
+    assessment: req.body.assessment,
+    algorithm: req.body.algorithm,
+ });
+
+  const id = req.params.id;
+  const { week, agile, weekly_task, assessment, algorithm } = req.body;
+
+  const calCum =
+  weekly_task * 0.4 + agile * 0.2 + assessment * 0.2 + algorithm * 0.2;
+  
+  const user = await findUserById(id);
+  
+  const task = user.grades.map((grade:Grades) => {
+    if (grade?.week == week) {
+      return { week, agile, weekly_task, assessment, algorithm, cummulative: calCum.toFixed(2)};
+    } else {
+      return grade;
+    }
+    
+  });
+  
+ const updateUserScor: any = await updategrade(id, task);
+
+  if (updateUserScor) {
+    return res.status(201).json({
+       message: "score updated successfully"    
+    });
+  } else {
+    res.status(400).json({ message: "Something went wrong"})
+  }
+});
+
+
+
+
+
+
+
+
 const filterScores = asyncHandler(async (req: Request, res: Response) => {
   const week = Number(req.params.weekId);
 
@@ -576,26 +627,35 @@ const getUserPerformance = asyncHandler(async (req: Request, res: Response) => {
     });
 });
 
+
+
+
+
+
+
+
+
 module.exports = {
-  getAllDevs,
-  registerUser,
-  loginUser,
-  logoutUser,
-  updateUser,
-  activateUser,
-  deactivateUser,
-  deleteUser,
-  userProfile,
-  changeUserPhoneNumber,
-  userProfileImage,
-  calScore,
-  getScores,
-  filterScores,
-  getScoresByName,
-  forgotUserPassword,
-  resetUserPassGetPage,
-  resetUserPass,
-  getUserPerformance,
-  getUserCummulatives,
-  updateUserPasword,
+   getAllDevs,
+   registerUser,
+   loginUser,
+   logoutUser,
+   updateUser,
+   activateUser,
+   deactivateUser,
+   deleteUser,
+   userProfile,
+   changeUserPhoneNumber,
+   userProfileImage,
+   calScore,
+   getScores,
+   filterScores,
+   getScoresByName,
+   forgotUserPassword,
+   resetUserPassGetPage,
+   resetUserPass,
+   getUserPerformance,
+   getUserCummulatives,
+   updateUserPasword,
+   editScores,
 };
