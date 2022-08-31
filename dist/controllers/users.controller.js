@@ -2,11 +2,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 const { messageTransporter, passwordLinkTransporter, } = require("../utils/email");
 const { generateToken, userRegistration, userUpdate, userLogin, userStatus, passwordHandler, passwordChange, score, } = require("../utils/utils");
-<<<<<<< HEAD
-const { findAllUsers, findUserByEmail, createUser, findUserById, updateUserById, updateUserStatus, updateUserScore, getAllUsers, getUserScoreByName, updateUserPhoneNo, updateUserProfileImg, updateUserTicket, validateUserTicketLink, updateUserPassword, resetSecureTicket, findUserDynamically, EmailToChangePassword, changeUserPassword, findAllUsersByStack } = require("../services/user.service");
-=======
-const { findAllUsers, findUserByEmail, createUser, findUserById, updateUserById, updateUserStatus, updateUserScore, getAllUsers, getUserScoreByName, updateUserPhoneNo, updateUserProfileImg, updateUserTicket, validateUserTicketLink, updateUserPassword, resetSecureTicket, findUserDynamically, EmailToChangePassword, changeUserPassword, updategrade, } = require("../services/user.service");
->>>>>>> ebe40b0419188bb6b2744814e784093c5ed438ab
+const { findAllUsers, findUserByEmail, createUser, findUserById, updateUserById, updateUserStatus, updateUserScore, getAllUsers, getUserScoreByName, updateUserPhoneNo, updateUserProfileImg, updateUserTicket, validateUserTicketLink, updateUserPassword, resetSecureTicket, findUserDynamically, EmailToChangePassword, changeUserPassword, findAllUsersByStack, updategrade, } = require("../services/user.service");
 const { getUserStack } = require("../services/stack.service");
 const asyncHandler = require("express-async-handler");
 const bcrypt = require("bcryptjs");
@@ -485,7 +481,6 @@ const getAllDevs = asyncHandler(async (req, res) => {
     }
     res.status(201).json({ users });
 });
-<<<<<<< HEAD
 const getAllDevsByStackId = asyncHandler(async (req, res) => {
     const users = [];
     const stackId = req.params.stackId;
@@ -502,7 +497,7 @@ const getAllDevsByStackId = asyncHandler(async (req, res) => {
         users.push(data);
     }
     res.status(201).json({ users });
-=======
+});
 const getUserPerformance = asyncHandler(async (req, res) => {
     const userId = req.params.userId;
     const user = await findUserById(userId);
@@ -534,7 +529,6 @@ const getUserPerformance = asyncHandler(async (req, res) => {
         change: data,
         data: currWeekGrade,
     });
->>>>>>> ebe40b0419188bb6b2744814e784093c5ed438ab
 });
 module.exports = {
     getAllDevs,
@@ -558,9 +552,6 @@ module.exports = {
     getUserPerformance,
     getUserCummulatives,
     updateUserPasword,
-<<<<<<< HEAD
-    getAllDevsByStackId
-=======
+    getAllDevsByStackId,
     editScores,
->>>>>>> ebe40b0419188bb6b2744814e784093c5ed438ab
 };

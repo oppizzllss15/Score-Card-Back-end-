@@ -99,7 +99,6 @@ const resetSecureTicket = async (id) => {
 module.exports = {
     findAllUsers,
     findUserByEmail,
-    findAllUsersByStack,
     createUser,
     findUserById,
     updateUserById,
@@ -116,4 +115,5 @@ module.exports = {
     findUserDynamically,
     EmailToChangePassword,
     updategrade,
+    findAllUsersByStack
 };
