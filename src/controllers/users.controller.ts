@@ -306,7 +306,6 @@ const logoutUser = asyncHandler(async (req: Request, res: Response) => {
   res.status(201).json({ message: "Logged out successfully" });
 });
 
-//adding score
 const calScore = asyncHandler(async (req: Request, res: Response) => {
   await score().validateAsync({
     week: req.body.week,
@@ -316,27 +315,45 @@ const calScore = asyncHandler(async (req: Request, res: Response) => {
     algorithm: req.body.algorithm,
   });
   const id = req.params.id;
+  const user = await findUserById(id);
+
   const { week, agile, weekly_task, assessment, algorithm } = req.body;
+  const noOfWeeks = user.grades.length;
+  const findWeek = user.grades.filter(
+    (grd: { week: any }) => grd.week == week
+  );
 
-  const calCum =
-    weekly_task * 0.4 + agile * 0.2 + assessment * 0.2 + algorithm * 0.2;
-  const data = {
-    week: week,
-    agile: agile,
-    weekly_task: weekly_task,
-    assessment: assessment,
-    algorithm: algorithm,
-    cummulative: calCum.toFixed(2),
-  };
+  if (findWeek.length > 0) {
+    res.status(400);
+    throw new Error(
+      `Week already updated. ${user.firstname} has ${noOfWeeks} weeks updated`
+    );
+  }
 
-  const userData = await updateUserScore(id, data);
+  if (week != noOfWeeks) {
+    res.status(400);
+    throw new Error(`Add week ${noOfWeeks} performance for ${user.firstname}`);
+  } else {
+    const calCum =
+      weekly_task * 0.4 + agile * 0.2 + assessment * 0.2 + algorithm * 0.2;
+    const data = {
+      week: week,
+      agile: agile,
+      weekly_task: weekly_task,
+      assessment: assessment,
+      algorithm: algorithm,
+      cummulative: calCum.toFixed(2),
+    };
 
-  const getScores = await findUserById(id);
+    const userData = await updateUserScore(id, data);
 
-  res.status(201).json({
-    message: "Updated successfully",
-    scores: getScores.grades,
-  });
+    const getScores = await findUserById(id);
+
+    res.status(201).json({
+      message: "Updated successfully",
+      scores: getScores.grades,
+    });
+  }
 });
 
 const getScores = asyncHandler(async (req: Request, res: Response) => {
@@ -371,6 +388,18 @@ const editScores = asyncHandler(async (req: Request, res: Response) => {
 
   const user = await findUserById(id);
 
+  const noOfWeeks = user.grades.length;
+  const findWeek = user.grades.filter(
+    (grd: { week: any }) => grd.week == week
+  );
+
+  if (findWeek.length === 0) {
+    res.status(404);
+    throw new Error(
+      `User performance for week ${week} does not exist. ${user.firstname} has ${noOfWeeks} weeks updated`
+    );
+  }
+
   const task = user.grades.map((grade: Grades) => {
     if (grade?.week == week) {
       return {
@@ -393,7 +422,8 @@ const editScores = asyncHandler(async (req: Request, res: Response) => {
       message: "score updated successfully",
     });
   } else {
-    res.status(400).json({ message: "Something went wrong" });
+    res.status(400);
+    throw new Error("Something went wrong. Cannot update score.");
   }
 });
 
