@@ -101,8 +101,7 @@ const adminProtect = asyncHandler( async (req: Request, res: Response, next: Nex
           next();
         }
       } catch (error) {
-        res.status(401);
-        throw new Error("Not authorized as Super User");
+        superAdminProtect(req, res, next);
       }
     }
 

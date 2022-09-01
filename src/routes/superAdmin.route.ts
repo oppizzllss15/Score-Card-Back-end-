@@ -70,20 +70,20 @@ router.post(
 router.get("/superuser/viewAdmins",viewAdmins);
 
 // Users
-router.get("/all/admin", viewAllAdmins);
-router.get("/all/devs", getAllDevs);
+router.get("/all/admin", superAdminProtect, viewAllAdmins);
+router.get("/all/devs", adminProtect, getAllDevs);
 router.get("/all/devs/:stackId", getAllDevsByStackId);
-router.post("/user/create", superAdminProtect, registerUser);
-router.put("/user/update/:id", superAdminProtect, updateUser);
-router.delete("/user/delete/:id", superAdminProtect, deleteUser);
-router.get("/user/deactivate/:id", superAdminProtect, deactivateUser);
-router.get("/user/activate/:id", superAdminProtect, activateUser);
-router.put("/user/calculate/score/:id", superAdminProtect, calScore);
-router.get("/user/getscores/:weekId", superAdminProtect, filterScores);
-router.put("/user/editscoreweek/:id", superAdminProtect, editScores);
+router.post("/user/create", adminProtect, registerUser);
+router.put("/user/update/:id", adminProtect, updateUser);
+router.delete("/user/delete/:id", adminProtect, deleteUser);
+router.get("/user/deactivate/:id", adminProtect, deactivateUser);
+router.get("/user/activate/:id", adminProtect, activateUser);
+router.put("/user/calculate/score/:id", adminProtect, calScore);
+router.get("/user/getscores/:weekId", adminProtect, filterScores);
+router.put("/user/editscoreweek/:id", adminProtect, editScores);
 
 // Stacks
-router.get("/stacks", superAdminProtect, viewAllStacks);
+router.get("/stacks", adminProtect, viewAllStacks);
 router.post("/createstack", superAdminProtect, createStack);
 router.post("/editstack/:id", superAdminProtect, uploads.single("file"), editStack);
 router.post("/deletestack/:id", superAdminProtect, deleteStack);

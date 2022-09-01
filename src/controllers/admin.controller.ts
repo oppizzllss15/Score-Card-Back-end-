@@ -208,7 +208,7 @@ const loginAdmin = asyncHandler(async (req: Request, res: Response) => {
 
     res.cookie("Id", admin._id);
 
-    return res.status(200).json({ token, data: admin });
+    return res.status(200).json({ token, user: admin });
   }
 
   return res.status(400).json({ error: true, message: "Invalid login detail" });

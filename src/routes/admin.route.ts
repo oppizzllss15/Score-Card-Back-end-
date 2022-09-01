@@ -18,8 +18,7 @@ const {
 const { storage } = require("../utils/upload");
 import multer from "multer";
 const uploads = multer({ storage });
-import {Request, Response} from 'express';
-const Admin = require('../models/admin.model');
+
 
 router.get("/profile/:adminId", adminProfile);
 router.post("/login", loginUser);
