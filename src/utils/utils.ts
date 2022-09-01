@@ -14,8 +14,8 @@ const generateAdminToken = (id: string) => {
   });
 };
 
-const generateSuperAdminToken = (id: string) => {
-  return jwt.sign({ id }, process.env.SECRET_PASS, {
+const generateSuperAdminToken = (user: any) => {
+  return jwt.sign({ user }, process.env.SECRET_PASS, {
     expiresIn: "3d",
   });
 };

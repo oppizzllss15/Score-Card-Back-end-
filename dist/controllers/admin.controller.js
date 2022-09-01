@@ -121,7 +121,7 @@ const loginAdmin = asyncHandler(async (req, res) => {
         return res.status(400).send({ message: "Incorrect login details" });
     const passwordMatch = await bcrypt_1.default.compare(password, admin.password);
     if (passwordMatch) {
-        const token = generateAdminToken(admin._id);
+        const token = generateAdminToken(admin);
         res.cookie("Token", token);
         res.cookie("Name", admin.firstname);
         res.cookie("Id", admin._id);

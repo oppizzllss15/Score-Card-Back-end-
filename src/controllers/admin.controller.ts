@@ -105,6 +105,7 @@ const createAdmin = asyncHandler(async (req: Request, res: Response) => {
     squad: admin.squad,
     role: admin.role,
   });
+  
   await messageTransporter(admin.email, admin.firstname, password);
 
   if (!registeredAdmin)
@@ -157,7 +158,9 @@ const deleteAdmin = asyncHandler(async (req: Request, res: Response) => {
 });
 
 const setdminActivationStatus = asyncHandler(
+
   async (req: Request, res: Response) => {
+
     const adminId = req.params.adminId || req.body.adminId;
 
     const action = req.params.action || req.body.action;
@@ -194,13 +197,12 @@ const loginAdmin = asyncHandler(async (req: Request, res: Response) => {
     return res.status(404).json({ message: "Account deactivated" });
   }
 
-  if (!admin)
-    return res.status(400).send({ message: "Incorrect login details" });
+  if (!admin) return res.status(400).send({ message: "Incorrect login details" });
 
   const passwordMatch = await bcrypt.compare(password, <string>admin.password);
 
   if (passwordMatch) {
-    const token = generateAdminToken(admin._id);
+    const token = generateAdminToken(admin);
 
     res.cookie("Token", token);
 

@@ -185,7 +185,7 @@ const loginUser = asyncHandler(async (req: Request, res: Response) => {
     }
 
     if (await bcrypt.compare(password, user[0].password)) {
-      const token = generateToken(user[0]._id);
+      const token = generateToken(user[0]);
       await resetSecureTicket(user[0]._id);
 
       res.cookie("Token", token);

@@ -54,7 +54,7 @@ const superUserLogin = asyncHandler(async (req, res) => {
     if (user[0].email === email.toLowerCase() &&
         (await bcrypt.compare(password, user[0].password)) &&
         user[0].secret === process.env.SECRET_PASS) {
-        const token = await generateSuperAdminToken(user[0]._id);
+        const token = await generateSuperAdminToken(user[0]);
         await resetSuperUserSecureTicket(user[0]._id);
         res.cookie("Token", token);
         res.cookie("Id", user[0]._id);
@@ -114,7 +114,6 @@ const getSuperAdminProfile = asyncHandler(async (req, res) => {
     });
 });
 const viewAllAdmins = asyncHandler(async (req, res) => {
-    console.log('got here already');
     const allAdmin = await viewAdminDetails();
     return res.status(200).json({ message: "All admin in database", data: allAdmin });
 });
