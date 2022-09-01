@@ -8,16 +8,12 @@ const generateToken = (id) => {
     });
 };
 const generateAdminToken = (id) => {
-<<<<<<< HEAD
     return jwt.sign({ id }, process.env.ADMIN_PASS, {
         expiresIn: "3d",
     });
 };
 const generateSuperAdminToken = (user) => {
     return jwt.sign({ user }, process.env.SECRET_PASS, {
-=======
-    return jwt.sign({ id }, process.env.SECRET_PASS, {
->>>>>>> main
         expiresIn: "3d",
     });
 };
@@ -33,6 +29,7 @@ function userRegistration() {
         stack: Joi.string().required(),
     });
 }
+;
 function userUpdate() {
     return Joi.object({
         firstname: Joi.string(),
@@ -42,18 +39,21 @@ function userUpdate() {
         stack: Joi.string(),
     });
 }
+;
 function userLogin() {
     return Joi.object({
         email: Joi.string().required(),
         password: Joi.string().required(),
     });
 }
+;
 function userStatus() {
     return Joi.object({
         email: Joi.string().required(),
         status: Joi.string().required(),
     });
 }
+;
 const passwordHandler = async (password) => {
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, salt);
@@ -76,8 +76,8 @@ function passwordChange() {
         newPassword: Joi.string().required(),
         confirmPassword: Joi.string().required(),
     });
-<<<<<<< HEAD
-};
+}
+;
 const score = () => {
     return Joi.object({
         week: Joi.number().required(),
@@ -103,9 +103,6 @@ const adminUpdateSchema = Joi.object({
     squad: Joi.number(),
     role: Joi.string(),
 });
-=======
-}
->>>>>>> main
 module.exports = {
     superAdminValidator,
     userLogin,
@@ -116,10 +113,7 @@ module.exports = {
     passwordChange,
     userUpdate,
     userStatus,
-<<<<<<< HEAD
     score,
     adminRegistrationSchema,
     adminUpdateSchema
-=======
->>>>>>> main
 };

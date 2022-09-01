@@ -1,6 +1,5 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-<<<<<<< HEAD
 const { messageTransporter, passwordLinkTransporter, } = require("../utils/email");
 const { generateToken, userRegistration, userUpdate, userLogin, userStatus, passwordHandler, passwordChange, score, } = require("../utils/utils");
 const { findAllUsers, findUserByEmail, createUser, findUserById, updateUserById, updateUserStatus, updateUserScore, getAllUsers, getUserScoreByName, updateUserPhoneNo, updateUserProfileImg, updateUserTicket, validateUserTicketLink, updateUserPassword, resetSecureTicket, findUserDynamically, EmailToChangePassword, changeUserPassword, findAllUsersByStack, updategrade, } = require("../services/user.service");
@@ -9,13 +8,6 @@ const asyncHandler = require("express-async-handler");
 const bcrypt = require("bcryptjs");
 const randomPass = require("pino-password");
 const jwt = require("jsonwebtoken");
-=======
-const { messageTransporter } = require("../services/usersService");
-const { generateToken, userRegistration, userUpdate, userLogin, userStatus, passwordHandler, } = require("../utils/utils");
-const asyncHandler = require("express-async-handler");
-const bcrypt = require("bcryptjs");
-const User = require("../models/user.model");
->>>>>>> main
 const userProfileImage = asyncHandler(async (req, res, next) => {
     var _a, _b;
     if (req.file === undefined)
@@ -76,37 +68,21 @@ const changeUserPhoneNumber = asyncHandler(async (req, res) => {
     }
 });
 const registerUser = asyncHandler(async (req, res) => {
-<<<<<<< HEAD
     const { firstname, lastname, email, squad, stack } = req.body;
-=======
-    const { firstname, lastname, email, password, confirmPassword, phone, squad, stack, } = req.body;
->>>>>>> main
     await userRegistration().validateAsync({
         firstname: firstname,
         lastname: lastname,
         email: email,
-        password: password,
-        confirmPassword: confirmPassword,
-        phone: phone,
         squad: squad,
         stack: stack,
     });
-<<<<<<< HEAD
     const pass = new randomPass();
     const password = pass.generatePassword(firstname);
     const userExists = await findUserByEmail(email);
-=======
-    if (password !== confirmPassword) {
-        res.status(400);
-        throw new Error("Passwords do not match");
-    }
-    const userExists = await User.find({ email: email.toLowerCase() });
->>>>>>> main
     if (userExists.length > 0) {
         res.status(400);
         throw new Error("User already exists");
     }
-<<<<<<< HEAD
     const grades = [
         {
             week: 0,
@@ -120,17 +96,6 @@ const registerUser = asyncHandler(async (req, res) => {
     const userStack = await getUserStack(stack);
     const hashedPass = await passwordHandler(password);
     const user = await createUser(firstname, lastname, email, hashedPass, squad, stack, grades);
-=======
-    const user = await User.create({
-        firstname,
-        lastname,
-        email: email.toLowerCase(),
-        password: await passwordHandler(password),
-        phone,
-        squad,
-        stack,
-    });
->>>>>>> main
     if (user) {
         await messageTransporter(email, firstname, password, squad);
         res.status(201).json({
@@ -229,7 +194,6 @@ const activateUser = asyncHandler(async (req, res) => {
         res.status(201).json({
             message: `${activatedUserAccount.firstname} with ${activatedUserAccount.email} account activated successfully`,
         });
-<<<<<<< HEAD
     }
     else {
         res.status(404).json({ message: "User not found" });
@@ -244,11 +208,6 @@ const deactivateUser = asyncHandler(async (req, res) => {
         res.status(201).json({
             message: `${deactivateUserAccount.firstname} with ${deactivateUserAccount.email} successfully deactivated`,
         });
-=======
-        res
-            .status(201)
-            .json({ message: "Updated successfully", deactivateUserAccount });
->>>>>>> main
     }
     else {
         res.status(404).json({ message: "User not found" });
@@ -277,7 +236,6 @@ const logoutUser = asyncHandler(async (req, res) => {
     res.cookie("Name", "");
     res.status(201).json({ message: "Logged out successfully" });
 });
-<<<<<<< HEAD
 //adding score
 const calScore = asyncHandler(async (req, res) => {
     await score().validateAsync({
@@ -553,8 +511,6 @@ const getUserPerformance = asyncHandler(async (req, res) => {
         data: currWeekGrade,
     });
 });
-=======
->>>>>>> main
 module.exports = {
     getAllDevs,
     registerUser,
@@ -567,7 +523,6 @@ module.exports = {
     userProfile,
     changeUserPhoneNumber,
     userProfileImage,
-<<<<<<< HEAD
     calScore,
     getScores,
     filterScores,
@@ -580,6 +535,4 @@ module.exports = {
     updateUserPasword,
     getAllDevsByStackId,
     editScores,
-=======
->>>>>>> main
 };
