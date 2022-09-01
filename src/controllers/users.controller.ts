@@ -116,6 +116,9 @@ const registerUser = asyncHandler(async (req: Request, res: Response) => {
     firstname: firstname,
     lastname: lastname,
     email: email,
+    password: password,
+    confirmPassword: confirmPassword,
+    phone: phone,
     squad: squad,
     stack: stack,
   });
@@ -291,9 +294,9 @@ const deleteUser = asyncHandler(async (req: Request, res: Response) => {
   if (findUser) {
     await findUser.remove();
 
-    res.status(201).json({
-      message: `${findUser.email} with id ${id} has been removed`,
-    });
+    res
+      .status(201)
+      .json({ message: `${findUser.email} with id ${id} has been removed` });
   } else {
     res.status(404).json({ error: "User not found" });
   }

@@ -101,11 +101,11 @@ const adminProtect = asyncHandler( async (req: Request, res: Response, next: Nex
         throw new Error("Not authorized as Admin");
       }
     } else if (
-      req.headers.authorization &&
-      req.headers.authorization.startsWith("Bearer")
+        req.headers.authorization &&
+        req.headers.authorization.startsWith('Bearer')
     ) {
-      try {
-        token = req.headers.authorization.split(" ")[1];
+        try {
+            token = req.headers.authorization.split(' ')[1]
 
         const superAdminPayload = await jwt.verify(token, process.env.SECRET_PASS);
         const adminPayload = await jwt.verify(token, process.env.ADMIN_PASS);
@@ -113,17 +113,12 @@ const adminProtect = asyncHandler( async (req: Request, res: Response, next: Nex
         if((superAdminPayload  && (superAdminPayload.user.position != "user")) || (adminPayload  && (adminPayload.user.position != "user"))){
           next();
         }
-      } catch (error) {
-        res.status(401);
-        throw new Error("Not authorized as Super User");
-      }
     }
 
     if (!token) {
       res.status(401);
       throw new Error("Provide token for authentication");
     }
-  }
-);
+})
 
 module.exports = { protect, superAdminProtect, adminProtect };

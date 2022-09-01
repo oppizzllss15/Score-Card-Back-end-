@@ -1,6 +1,6 @@
 const {
   superAdminValidator,
-  generateSuperAdminToken,
+  generateAdminToken,
   passwordHandler,
   userLogin,
   passwordChange,

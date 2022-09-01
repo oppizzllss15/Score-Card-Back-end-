@@ -35,6 +35,7 @@ const protect = asyncHandler(async (req, res, next) => {
 });
 const superAdminProtect = asyncHandler(async (req, res, next) => {
     let token = req.cookies.Token;
+    console.log(token);
     if (token) {
         try {
             if (process.env.SECRET_PASS) {
@@ -48,6 +49,7 @@ const superAdminProtect = asyncHandler(async (req, res, next) => {
         }
         catch (error) {
             res.status(401);
+<<<<<<< HEAD
             throw new Error(" Cookie Not authorized as Admin");
         }
     }
@@ -58,11 +60,24 @@ const superAdminProtect = asyncHandler(async (req, res, next) => {
             //const adminPayload = await jwt.verify(token, process.env.ADMIN_PASS);
             console.log(`${superAdminPayload}}`);
             if ((superAdminPayload && (superAdminPayload.user.position != "user"))) {
+=======
+            throw new Error('Not authorized as Admin');
+        }
+    }
+    else if (req.headers.authorization &&
+        req.headers.authorization.startsWith('Bearer')) {
+        try {
+            token = req.headers.authorization.split(' ')[1];
+            await jwt.verify(token, process.env.SECRET_PASS);
+            const user = await AdminModel.find();
+            if (user[0].secret === process.env.SECRET_PASS) {
+>>>>>>> main
                 next();
             }
         }
         catch (error) {
             res.status(401);
+<<<<<<< HEAD
             throw new Error("Header Not authorized as Super User");
         }
     }
@@ -101,6 +116,9 @@ const adminProtect = asyncHandler(async (req, res, next) => {
         catch (error) {
             res.status(401);
             throw new Error("Not authorized as Super User");
+=======
+            throw new Error('Not authorized as Super User');
+>>>>>>> main
         }
     }
     if (!token) {
@@ -108,4 +126,4 @@ const adminProtect = asyncHandler(async (req, res, next) => {
         throw new Error("Provide token for authentication");
     }
 });
-module.exports = { protect, superAdminProtect, adminProtect };
+module.exports = { protect, superAdminProtect };

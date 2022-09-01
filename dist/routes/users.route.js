@@ -1,4 +1,5 @@
 "use strict";
+<<<<<<< HEAD
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
@@ -22,4 +23,10 @@ router.post("/forgot/password", forgotUserPassword);
 router.get("/getscores/:id", protect, getScores);
 router.get("/cummulatives/:userId", getUserCummulatives);
 router.get("/performance/:userId", getUserCummulatives);
+=======
+const express = require('express');
+const router = express.Router();
+const { registerUser } = require("../controllers/users.controller");
+router.post('/create', registerUser);
+>>>>>>> main
 module.exports = router;

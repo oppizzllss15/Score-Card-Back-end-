@@ -8,25 +8,32 @@ const generateToken = (id) => {
     });
 };
 const generateAdminToken = (id) => {
+<<<<<<< HEAD
     return jwt.sign({ id }, process.env.ADMIN_PASS, {
         expiresIn: "3d",
     });
 };
 const generateSuperAdminToken = (user) => {
     return jwt.sign({ user }, process.env.SECRET_PASS, {
+=======
+    return jwt.sign({ id }, process.env.SECRET_PASS, {
+>>>>>>> main
         expiresIn: "3d",
     });
 };
-const userRegistration = () => {
+function userRegistration() {
     return Joi.object({
         firstname: Joi.string().required(),
         lastname: Joi.string().required(),
         email: Joi.string().email().required(),
+        password: Joi.string().min(8).required(),
+        confirmPassword: Joi.string().min(8).required(),
+        phone: Joi.string().required(),
         squad: Joi.number().required(),
         stack: Joi.string().required(),
     });
-};
-const userUpdate = () => {
+}
+function userUpdate() {
     return Joi.object({
         firstname: Joi.string(),
         lastname: Joi.string(),
@@ -34,19 +41,19 @@ const userUpdate = () => {
         squad: Joi.number(),
         stack: Joi.string(),
     });
-};
-const userLogin = () => {
+}
+function userLogin() {
     return Joi.object({
         email: Joi.string().required(),
         password: Joi.string().required(),
     });
-};
-const userStatus = () => {
+}
+function userStatus() {
     return Joi.object({
         email: Joi.string().required(),
         status: Joi.string().required(),
     });
-};
+}
 const passwordHandler = async (password) => {
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, salt);
@@ -64,11 +71,12 @@ const superAdminValidator = () => {
         confirmPassword: Joi.string().required(),
     });
 };
-const passwordChange = () => {
+function passwordChange() {
     return Joi.object({
         newPassword: Joi.string().required(),
         confirmPassword: Joi.string().required(),
     });
+<<<<<<< HEAD
 };
 const score = () => {
     return Joi.object({
@@ -95,6 +103,9 @@ const adminUpdateSchema = Joi.object({
     squad: Joi.number(),
     role: Joi.string(),
 });
+=======
+}
+>>>>>>> main
 module.exports = {
     superAdminValidator,
     userLogin,
@@ -102,11 +113,13 @@ module.exports = {
     passwordHandler,
     generateToken,
     generateAdminToken,
-    generateSuperAdminToken,
     passwordChange,
     userUpdate,
     userStatus,
+<<<<<<< HEAD
     score,
     adminRegistrationSchema,
     adminUpdateSchema
+=======
+>>>>>>> main
 };
