@@ -8,7 +8,7 @@ async function addAdmin(admin) {
 //view all admin
 async function viewAdminDetails() {
     const allAdmins = await Admin.find();
-    console.log(allAdmins);
+    //console.log(allAdmins);
     return allAdmins;
 }
 // update admin profile_img

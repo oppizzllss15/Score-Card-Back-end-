@@ -145,6 +145,7 @@ const forgotSuperAdminPassword = asyncHandler(async (req, res) => {
         res.status(404).json({ message: "User not found" });
     }
 });
+
 const resetSuperAdminPassGetPage = asyncHandler(async (req, res) => {
     res.status(201).json({ message: "Use post method to reset password" });
 });
@@ -182,6 +183,7 @@ const resetSuperAdminPass = asyncHandler(async (req, res) => {
         throw new Error("Link expired!");
     }
 });
+
 module.exports = {
     createSuperUser,
     superUserLogin,

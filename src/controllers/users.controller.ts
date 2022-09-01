@@ -185,7 +185,7 @@ const loginUser = asyncHandler(async (req: Request, res: Response) => {
     }
 
     if (await bcrypt.compare(password, user[0].password)) {
-      const token = generateToken(user[0]._id);
+      const token = generateToken(user[0]);
       await resetSecureTicket(user[0]._id);
 
       res.cookie("Token", token);
@@ -291,9 +291,9 @@ const deleteUser = asyncHandler(async (req: Request, res: Response) => {
   if (findUser) {
     await findUser.remove();
 
-    res.status(201).json({
-      message: `${findUser.email} with id ${id} has been removed`,
-    });
+    res
+      .status(201)
+      .json({ message: `${findUser.email} with id ${id} has been removed` });
   } else {
     res.status(404).json({ error: "User not found" });
   }
