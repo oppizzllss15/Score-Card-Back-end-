@@ -116,9 +116,6 @@ const registerUser = asyncHandler(async (req: Request, res: Response) => {
     firstname: firstname,
     lastname: lastname,
     email: email,
-    password: password,
-    confirmPassword: confirmPassword,
-    phone: phone,
     squad: squad,
     stack: stack,
   });

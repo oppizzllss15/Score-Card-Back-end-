@@ -113,6 +113,10 @@ const adminProtect = asyncHandler( async (req: Request, res: Response, next: Nex
         if((superAdminPayload  && (superAdminPayload.user.position != "user")) || (adminPayload  && (adminPayload.user.position != "user"))){
           next();
         }
+    } catch (error) {
+        res.status(401);
+        throw new Error("Header Not authorized as Super User");
+      }
     }
 
     if (!token) {
