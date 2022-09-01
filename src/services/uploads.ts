@@ -1,6 +1,5 @@
 import { v2 as cloudinary } from "cloudinary";
 import { CloudinaryStorage } from "multer-storage-cloudinary";
-import multer from "multer";
 
 cloudinary.config({
   cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
@@ -16,8 +15,6 @@ const storage = new CloudinaryStorage({
     allowedFormats: ["png", "jpeg", "jpg", "pdf"],
   },
 } as any);
-
-const parser = multer({ storage: storage });
 
 module.exports = {
   cloudinary,

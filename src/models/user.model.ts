@@ -6,9 +6,13 @@ const userData = UserDb.Schema({
   email: String,
   password: String,
   phone: String,
+  password_ticket: String,
   profile_img: String,
   cloudinary_id: String,
-  stack: String,
+  stack: {
+    type: UserDb.Schema.Types.ObjectId,
+    ref: "Stacks",
+  },
   squad: Number,
   grades: [
     {
@@ -22,9 +26,10 @@ const userData = UserDb.Schema({
   ],
   status: {
     type: String,
-    enum: ["deactivated", "active"],
-    default: "active",
+    enum: ["inactive", "active"],
+    default: "inactive",
   },
+  position: { type: String, default: "user" },
 });
 
 module.exports = UserDb.model("Users", userData);

@@ -1,28 +1,22 @@
+"use strict";
 const nodemailer = require("nodemailer");
-
 const transporter = nodemailer.createTransport({
-  service: "gmail",
-  auth: {
-    type: "OAuth2",
-    user: process.env.EMAIL_USERNAME,
-    pass: process.env.PASSWORD,
-    clientId: process.env.CLIENT_ID,
-    clientSecret: process.env.CLIENT_SECRET,
-    refreshToken: process.env.REFRESH_TOKEN,
-  },
+    service: "gmail",
+    auth: {
+        type: "OAuth2",
+        user: process.env.EMAIL_USERNAME,
+        pass: process.env.PASSWORD,
+        clientId: process.env.CLIENT_ID,
+        clientSecret: process.env.CLIENT_SECRET,
+        refreshToken: process.env.REFRESH_TOKEN,
+    },
 });
-
-const mailMessage = (
-  email: string,
-  firstname: string,
-  password: string,
-  squad: number
-) => {
-  return {
-    from: "from-example@email.com",
-    to: `${email}`,
-    subject: "Scorecard credentials",
-    html: `<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "https://www.w3.org/TR/html4/strict.dtd">
+const mailMessage = (email, firstname, password, squad) => {
+    return {
+        from: "from-example@email.com",
+        to: `${email}`,
+        subject: "Scorecard credentials",
+        html: `<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "https://www.w3.org/TR/html4/strict.dtd">
     <html lang="en">
       <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
@@ -214,31 +208,21 @@ const mailMessage = (
       </body>
     </html>
     `,
-  };
+    };
 };
-
-const messageTransporter = async (
-  email: string,
-  firstname: string,
-  password: string,
-  squad: number
-) => {
-  transporter.sendMail(
-    mailMessage(email, firstname, password, squad),
-    function (error: string, info: string) {
-      // if (error) throw Error(error);
-      // console.log("Email Sent Successfully");
-      // console.log(info);
-    }
-  );
+const messageTransporter = async (email, firstname, password, squad) => {
+    transporter.sendMail(mailMessage(email, firstname, password, squad), function (error, info) {
+        // if (error) throw Error(error);
+        // console.log("Email Sent Successfully");
+        // console.log(info);
+    });
 };
-
-const forgotMessage = (email: string, address: string) => {
-  return {
-    from: "from-example@email.com",
-    to: `${email}`,
-    subject: "Reset Scorecard Password",
-    html: `<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "https://www.w3.org/TR/html4/strict.dtd">
+const forgotMessage = (email, address) => {
+    return {
+        from: "from-example@email.com",
+        to: `${email}`,
+        subject: "Reset Scorecard Password",
+        html: `<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "https://www.w3.org/TR/html4/strict.dtd">
     <html lang="en">
       <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
@@ -342,16 +326,13 @@ const forgotMessage = (email: string, address: string) => {
       </body>
     </html>    
     `,
-  };
+    };
 };
-
-const passwordLinkTransporter = async (email: string, address: string) => {
-  transporter.sendMail(
-    forgotMessage(email, address),
-    function (error: string, info: string) {
-      if (error) throw Error(error);
-      console.log("Email Sent Successfully");
-    }
-  );
+const passwordLinkTransporter = async (email, address) => {
+    transporter.sendMail(forgotMessage(email, address), function (error, info) {
+        if (error)
+            throw Error(error);
+        console.log("Email Sent Successfully");
+    });
 };
 module.exports = { messageTransporter, passwordLinkTransporter };
