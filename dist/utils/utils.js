@@ -115,5 +115,6 @@ module.exports = {
     userStatus,
     score,
     adminRegistrationSchema,
-    adminUpdateSchema
+    adminUpdateSchema,
+    generateSuperAdminToken
 };
