@@ -20,9 +20,14 @@ app.use(logger('dev'));
 app.use(express.json({ limit: "10mb", extended: true }));
 app.use(express.urlencoded({ limit: "10mb", extended: true, parameterLimit: 50000 }));
 app.use(cookieParser());
+<<<<<<< HEAD
 app.use("/users", usersRouter);
 app.use("/admin", adminRouter);
 app.use("/superadmin", superAdminRouter);
+=======
+app.use('/users', usersRouter);
+app.use('/admin', superAdminRouter);
+>>>>>>> joshua
 app.use(errorHandler);
 app.use((req, res, next) => {
     res.status(404).json({ message: "page not found" });

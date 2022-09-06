@@ -38,25 +38,32 @@ const superAdminProtect = asyncHandler(async (req, res, next) => {
     if (token) {
         try {
             if (process.env.SECRET_PASS) {
-                await jwt.verify(token, process.env.SECRET_PASS);
+                const superAdminPayload = await jwt.verify(token, process.env.SECRET_PASS);
+                //const adminPayload = await jwt.verify(token, process.env.SECRET_PASS);
+                console.log(superAdminPayload);
+                if ((superAdminPayload)) {
+                    next();
+                }
+            }
+        }
+        catch (error) {
+            res.status(401);
+            throw new Error(" Cookie Not authorized as Admin");
+        }
+    }
+    else if (req.headers.authorization && req.headers.authorization.startsWith("Bearer")) {
+        try {
+            token = req.headers.authorization.split(" ")[1];
+            const superAdminPayload = await jwt.verify(token, process.env.SECRET_PASS);
+            const adminPayload = await jwt.verify(token, process.env.ADMIN_PASS);
+            // console.log(`${JSON.stringify(adminP)}}`)
+            if ((superAdminPayload && (superAdminPayload.user.position != "user"))) {
                 next();
             }
         }
         catch (error) {
             res.status(401);
-            throw new Error("Not authorized as Admin");
-        }
-    }
-    else if (req.headers.authorization &&
-        req.headers.authorization.startsWith("Bearer")) {
-        try {
-            token = req.headers.authorization.split(" ")[1];
-            await jwt.verify(token, process.env.SECRET_PASS);
-            next();
-        }
-        catch (error) {
-            res.status(401);
-            throw new Error("Not authorized as Super User");
+            throw new Error("Header Not authorized as Super User");
         }
     }
     if (!token) {
@@ -68,8 +75,10 @@ const adminProtect = asyncHandler(async (req, res, next) => {
     let token = req.cookies.Token;
     if (token) {
         try {
-            const adminToken = await jwt.verify(token, process.env.ADMIN_PASS);
-            if (adminToken) {
+            const superAdminPayload = await jwt.verify(token, process.env.SECRET_PASS);
+            const adminPayload = await jwt.verify(token, process.env.ADMIN_PASS);
+            console.log(`${superAdminPayload}, ${adminPayload}`);
+            if ((superAdminPayload && (superAdminPayload.user.position != "user")) || (adminPayload && (adminPayload.user.position != "user"))) {
                 next();
             }
         }
@@ -79,17 +88,18 @@ const adminProtect = asyncHandler(async (req, res, next) => {
         }
     }
     else if (req.headers.authorization &&
-        req.headers.authorization.startsWith("Bearer")) {
+        req.headers.authorization.startsWith('Bearer')) {
         try {
-            token = req.headers.authorization.split(" ")[1];
-            const adminToken = await jwt.verify(token, process.env.ADMIN_PASS);
-            if (adminToken) {
+            token = req.headers.authorization.split(' ')[1];
+            const superAdminPayload = await jwt.verify(token, process.env.SECRET_PASS);
+            const adminPayload = await jwt.verify(token, process.env.ADMIN_PASS);
+            console.log(`${superAdminPayload}, ${adminPayload}`);
+            if ((superAdminPayload && (superAdminPayload.user.position != "user")) || (adminPayload && (adminPayload.user.position != "user"))) {
                 next();
             }
         }
         catch (error) {
-            res.status(401);
-            throw new Error("Not authorized as Super User");
+            superAdminProtect(req, res, next);
         }
     }
     if (!token) {

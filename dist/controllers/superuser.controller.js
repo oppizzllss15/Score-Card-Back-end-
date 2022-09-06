@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-const { superAdminValidator, generateSuperAdminToken, passwordHandler, userLogin, passwordChange, } = require("../utils/utils");
+const { superAdminValidator, generateAdminToken, generateSuperAdminToken, passwordHandler, userLogin, passwordChange, } = require("../utils/utils");
 const { messageTransporter, passwordLinkTransporter, } = require("../utils/email");
 const asyncHandler = require("express-async-handler");
 const { findSuperAdminByEmail, findSuperUser, createSuperHandler, updateSuperUserPassword, updateSuperUserProfileImg, updateSuperUserTicket, validateSuperUserTicketLink, resetSuperUserSecureTicket, findSuperUserDynamically, EmailToManagePassword } = require("../services/superadmin.service");
@@ -38,7 +38,6 @@ const createSuperUser = asyncHandler(async (req, res) => {
     res.status(201).json({
         user: createData,
         token: token,
-        message: "Sign Up Successful, Please Log in",
     });
 });
 const superUserLogin = asyncHandler(async (req, res) => {
@@ -146,6 +145,7 @@ const forgotSuperAdminPassword = asyncHandler(async (req, res) => {
         res.status(404).json({ message: "User not found" });
     }
 });
+
 const resetSuperAdminPassGetPage = asyncHandler(async (req, res) => {
     res.status(201).json({ message: "Use post method to reset password" });
 });
@@ -183,6 +183,7 @@ const resetSuperAdminPass = asyncHandler(async (req, res) => {
         throw new Error("Link expired!");
     }
 });
+
 module.exports = {
     createSuperUser,
     superUserLogin,

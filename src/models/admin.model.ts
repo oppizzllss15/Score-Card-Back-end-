@@ -23,6 +23,7 @@ const adminSchema = adminDB.Schema(
     role: String,
     position: { type: String, default: "admin" },
     activationStatus: { type: Boolean, default: true },
+    
   },
   { timestamps: true }
 );

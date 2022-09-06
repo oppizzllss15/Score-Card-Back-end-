@@ -22,7 +22,7 @@ const userData = UserDb.Schema({
             assessment: Number,
             algorithm: Number,
             cummulative: Number,
-        },
+        }
     ],
     status: {
         type: String,
