@@ -1,13 +1,27 @@
 "use strict";
-<<<<<<< HEAD
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
+var __importDefault =
+  (this && this.__importDefault) ||
+  function (mod) {
+    return mod && mod.__esModule ? mod : { default: mod };
+  };
 Object.defineProperty(exports, "__esModule", { value: true });
 var express = require("express");
 var router = express.Router();
 const { protect } = require("../middlewares/authenticate");
-const { loginUser, logoutUser, userProfile, changeUserPhoneNumber, userProfileImage, getScores, forgotUserPassword, resetUserPassGetPage, resetUserPass, getUserPerformance, getUserCummulatives, } = require("../controllers/users.controller");
+const {
+  loginUser,
+  logoutUser,
+  userProfile,
+  changeUserPhoneNumber,
+  userProfileImage,
+  getScores,
+  forgotUserPassword,
+  resetUserPassGetPage,
+  resetUserPass,
+  getUserPerformance,
+  getUserCummulatives,
+} = require("../controllers/users.controller");
+const { registerUser } = require("../controllers/users.controller");
 const { storage } = require("../utils/upload");
 const multer_1 = __importDefault(require("multer"));
 const uploads = (0, multer_1.default)({ storage });
@@ -23,10 +37,5 @@ router.post("/forgot/password", forgotUserPassword);
 router.get("/getscores/:id", protect, getScores);
 router.get("/cummulatives/:userId", getUserCummulatives);
 router.get("/performance/:userId", getUserCummulatives);
-=======
-const express = require('express');
-const router = express.Router();
-const { registerUser } = require("../controllers/users.controller");
-router.post('/create', registerUser);
->>>>>>> main
+router.post("/create", registerUser);
 module.exports = router;

@@ -37,12 +37,7 @@ router.put("/user/calculate/score/:id", adminProtect, calScore);
 router.get("/user/getscores/:weekId", adminProtect, filterScores);
 router.put("/user/editscoreweek/:id", adminProtect, editScores);
 // Stacks
-<<<<<<< HEAD
-router.get("/stacks", superAdminProtect, viewAllStacks);
-// router.get("/adminstack", stacksShield2, viewAdminStack);
-=======
 router.get("/stacks", adminProtect, viewAllStacks);
->>>>>>> joshua
 router.post("/createstack", superAdminProtect, createStack);
 router.post("/editstack/:id", superAdminProtect, uploads.single("file"), editStack);
 router.post("/deletestack/:id", superAdminProtect, deleteStack);

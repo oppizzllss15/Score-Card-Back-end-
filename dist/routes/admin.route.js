@@ -15,15 +15,8 @@ const uploads = (0, multer_1.default)({ storage });
 router.get("/profile/:adminId", adminProfile);
 router.post("/login", loginUser);
 router.get("/logout", logoutAdmin);
-<<<<<<< HEAD
 router.get("/stack", stacksShield2, viewAdminStack);
 router.post("/upload", adminProtect, uploads.single("file"), adminProfileImage);
-// router.get("/stack", adminProtect, viewStack);
-=======
-router.get("/stack", stacksShield2, viewStack);
-router.post("/upload", uploads.single("file"), adminProfileImage);
-router.get("/stack", adminProtect, viewStack);
->>>>>>> joshua
 router.get("/reset/password/:id/:ticket", resetAdminPassGetPage);
 router.post("/reset/password/:id/:ticket", resetAdminPass);
 router.post("/forgot/password", forgotUserPassword);
@@ -31,4 +24,3 @@ router.post("/forgot/password", forgotUserPassword);
 router.get("/user/filterscores/:weekId", filterScores);
 router.post("/user/score/name", getScoresByName);
 module.exports = router;
-// , stacksShield2,
